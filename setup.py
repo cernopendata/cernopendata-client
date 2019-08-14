@@ -41,6 +41,7 @@ setup_requires = [
 
 install_requires = [
     'click>=7,<8',
+    'requests==2.22.0'
 ]
 
 # Get the version string. Cannot be done with import!
