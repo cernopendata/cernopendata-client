@@ -1,5 +1,6 @@
 # TODO: add licence
 import json
+import sys
 import urllib.parse
 
 import click
@@ -22,30 +23,17 @@ def cernopendata_client():
 @click.option('--doi',
               help='Digital Object Identifier.')
 @click.option('--title',
-              help='Record Title')
+              help='Record title')
 @click.option('--output-fields', is_flag=False, type=click.STRING,
               help='Comma separated list of fields from the record '
                    'that should be included in the output.')
 def get_record(recid, doi, title, output_fields):
-    """Get records content by its recid, doi or title."""
+    """Get records content by its recid, doi or title filtered."""
+    # TODO: Add decorator to require one of (recid, doi or title)
+    record_json = get_record_as_json(recid, doi, title)
+
     if output_fields is not None:
         output_fields = [f.strip() for f in output_fields.split(',')]
-
-    # TODO: Add decorator to require one of (recid, doi or title)
-    if recid:
-        record_id = recid
-    elif title:
-        record_id = get_recid(title=title)
-    elif doi:
-        record_id = get_recid(doi=doi)
-    else:
-        click.secho("Please provide at least one of following arguments: "
-                    "(recid, doi, title)", fg='red', err=True)
-        return 1
-
-    record_id = verify_recid(record_id)
-    record_api = get_recid_api(record_id)
-    record_json = record_api.json()
     if output_fields and len(output_fields) > 0:
         try:
             output_json = {
@@ -69,21 +57,24 @@ def get_record(recid, doi, title, output_fields):
 @click.option('--recid',
               help='Record ID')
 @click.option('--doi',
-              help='.') #TODO
+              help='Digital Object Identifier.')
 @click.option('--title',
-              help='Record ID')
-@click.option('--protocol',
-              help='Root or default.')
-def get_file_locations(url, wget_options, out_warc_file, directory_prefix):
-    """
-    :param url:
-    :param wget_options:
-    :param out_warc_file:
-    :param directory_prefix:
-    """
-    # TODO: add logic
-    # TODO: Add decorator to require one of (recid, doi or title)
-    raise NotImplementedError()
+              help='Record title')
+@click.option('--protocol', default='root',
+              type=click.Choice(['root', 'http']),
+              help='Protocol to be used in links.')
+def get_file_locations(recid, doi, title, protocol):
+    """Get a list of files belonging to a dataset."""
+    record_json = get_record_as_json(recid, doi, title)
+    file_locations = [
+        file['uri'] for file in record_json['metadata']['files']
+    ]
+    if protocol == 'http':
+        file_locations = [
+            f.replace('root://eospublic.cern.ch/', 'http://opendata.cern.ch')
+            for f in file_locations
+        ]
+    click.echo('\n'.join(file_locations))
 
 
 def get_recid(title=None, doi=None):
@@ -113,3 +104,21 @@ def get_recid(title=None, doi=None):
             return 1
         elif hits_total == 1:
             return response.json()['hits']['hits'][0]['id']
+
+
+def get_record_as_json(recid, doi, title):
+    """Get record content in json by its recid, doi or title."""
+    if recid:
+        record_id = recid
+    elif title:
+        record_id = get_recid(title=title)
+    elif doi:
+        record_id = get_recid(doi=doi)
+    else:
+        click.secho("Please provide at least one of following arguments: "
+                    "(recid, doi, title)", fg='red', err=True)
+        sys.exit()
+
+    record_id = verify_recid(record_id)
+    record_api = get_recid_api(record_id)
+    return record_api.json()

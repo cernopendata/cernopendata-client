@@ -43,6 +43,17 @@ Basic usage
     $ cernopendata-client get-record --recid 43 | jq ".metadata.system_details.global_tag"
 
 
+    $ # To get a list of files belonging to a dataset you can use the get-file-locations
+    $ cernopendata-client get-file-locations --recid 43
+    $ ...
+    $ # Using --title and --doi is also possible here.
+    $
+    $ # By default links are in root protocol, but if you can change it
+    $ # with --protocol option:
+    $ cernopendata-client get-file-locations --recid 43 --protocol http
+    $ ...
+
+
 CLI API
 -------
 

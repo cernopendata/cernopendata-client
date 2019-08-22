@@ -1,3 +1,4 @@
+# TODO: Add license
 """cernopendata-client version test."""
 
 
