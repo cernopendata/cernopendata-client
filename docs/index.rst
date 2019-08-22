@@ -3,7 +3,6 @@
 .. toctree::
    :numbered:
 
-   introduction
    userguide
    contributing
    changes

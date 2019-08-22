@@ -24,8 +24,8 @@ def cernopendata_client():
 @click.option('--title',
               help='Record Title')
 @click.option('--output-fields', is_flag=False, type=click.STRING,
-              help='Fields from the record that should be included '
-                   'in the output. (i.e. id, metadata or links)')
+              help='Comma separated list of fields from the record '
+                   'that should be included in the output.')
 def get_record(recid, doi, title, output_fields):
     """Get records content by its recid, doi or title."""
     if output_fields is not None:
