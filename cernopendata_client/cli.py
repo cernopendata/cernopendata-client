@@ -6,8 +6,8 @@ import click
 import requests
 from requests import HTTPError
 
-from cernopendata_client.opendata_analysis_query import verify_recid, \
-    get_recid_api
+from cernopendata_client.opendata_analysis_query import (get_recid_api,
+                                                         verify_recid)
 
 SEARCH_URL = 'http://opendata.cern.ch/api/records/'
 

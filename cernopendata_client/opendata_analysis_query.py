@@ -1,8 +1,10 @@
 from __future__ import print_function
-import requests
+
 import argparse
 import os
 import sys
+
+import requests
 
 BASE_RECORD_URL = 'http://opendata.cern.ch/record/'
 BASE_API_URL = 'http://opendata.cern.ch/api/records/'
