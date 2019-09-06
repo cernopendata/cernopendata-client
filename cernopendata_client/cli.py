@@ -1,7 +1,12 @@
 # TODO: add licence
 import json
 import sys
-import urllib.parse
+
+try:
+    from urllib.parse import quote
+except ImportError:
+    # fallback for Python 2
+    from urllib import quote
 
 import click
 import requests
@@ -84,7 +89,7 @@ def get_recid(title=None, doi=None):
     elif doi:
         name, value = 'doi', doi
     url = (SEARCH_URL + "?page=1&size=1&q={}:".format(name)
-           + urllib.parse.quote('"{}"'.format(value), safe=''))
+           + quote('"{}"'.format(value), safe=''))
     response = requests.get(url)
     try:
         response.raise_for_status()
