@@ -17,6 +17,15 @@ from cernopendata_client.opendata_analysis_query import (get_recid_api,
 
 SEARCH_URL = 'http://opendata.cern.ch/api/records/'
 
+
+def ensure_positive_int(ctx, param, value):
+    if value < 0:
+        click.secho("Recid should be a positive integer", fg='red', err=True)
+        sys.exit()
+    else:
+        return value
+
+
 @click.group()
 def cernopendata_client():
     pass
@@ -24,6 +33,8 @@ def cernopendata_client():
 
 @cernopendata_client.command()
 @click.option('--recid',
+              type=click.INT,
+              callback=ensure_positive_int,
               help='Record ID')
 @click.option('--doi',
               help='Digital Object Identifier.')
@@ -36,7 +47,6 @@ def get_record(recid, doi, title, output_fields):
     """Get records content by its recid, doi or title filtered."""
     # TODO: Add decorator to require one of (recid, doi or title)
     record_json = get_record_as_json(recid, doi, title)
-
     if output_fields is not None:
         output_fields = [f.strip() for f in output_fields.split(',')]
     if output_fields and len(output_fields) > 0:
@@ -52,7 +62,7 @@ def get_record(recid, doi, title, output_fields):
                         "(see documentation for examples).".format(
                             top_level_fields
                         ), fg='red', err=True)
-            return 1
+            sys.exit()
     else:
         output_json = record_json
     click.echo(json.dumps(output_json, indent=4))
@@ -60,7 +70,9 @@ def get_record(recid, doi, title, output_fields):
 
 @cernopendata_client.command()
 @click.option('--recid',
-              help='Record ID')
+              help='Record ID',
+              type=click.INT,
+              callback=ensure_positive_int)
 @click.option('--doi',
               help='Digital Object Identifier.')
 @click.option('--title',
@@ -101,12 +113,12 @@ def get_recid(title=None, doi=None):
         if hits_total < 1:
             click.secho('Record with given {} does not exist.'.format(name),
                         fg='red', err=True)
-            return 1
+            sys.exit()
         elif hits_total > 1:
             click.secho('More than one record fit this {}.'
                         ' This should not happen.'.format(name),
                         fg='red', err=True)
-            return 1
+            sys.exit()
         elif hits_total == 1:
             return response.json()['hits']['hits'][0]['id']
 
