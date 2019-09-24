@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-# TODO: add Licence
+#
+# This file is part of cernopendata-client.
+#
+# Copyright (C) 2019 CERN.
+#
+# cernopendata-client is free software; you can redistribute it and/or modify
+# it under the terms of the GPLv3 license; see LICENSE file for more details.
 """cernopendata-client."""
 
 import os
@@ -57,7 +63,7 @@ setup(
     description=__doc__,
     long_description=readme + '\n\n' + history,
     author='CERN Open Data',
-    author_email='', #TODO: add email
+    author_email='opendata-team@cern.ch',
     packages=['cernopendata_client', ],
     extras_require=extras_require,
     install_requires=install_requires,
@@ -72,7 +78,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License', # TODO: check licence
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',

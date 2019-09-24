@@ -1,12 +1,13 @@
-# TODO: add licence
+# -*- coding: utf-8 -*-
+# This file is part of cernopendata-client.
+#
+# Copyright (C) 2019 CERN.
+#
+# cernopendata-client is free software; you can redistribute it and/or modify
+# it under the terms of the GPLv3 license; see LICENSE file for more details.
+
 import json
 import sys
-
-try:
-    from urllib.parse import quote
-except ImportError:
-    # fallback for Python 2
-    from urllib import quote
 
 import click
 import requests
@@ -14,6 +15,14 @@ from requests import HTTPError
 
 from cernopendata_client.opendata_analysis_query import (get_recid_api,
                                                          verify_recid)
+
+try:
+    from urllib.parse import quote
+except ImportError:
+    # fallback for Python 2
+    from urllib import quote
+
+
 
 SEARCH_URL = 'http://opendata.cern.ch/api/records/'
 
