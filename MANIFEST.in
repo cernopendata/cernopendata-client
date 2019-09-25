@@ -1,0 +1,11 @@
+include LICENSE
+include *.rst
+include *.sh
+include pytest.ini
+include docs/requirements.txt
+prune docs/_build
+recursive-include cernopendata_client *.py
+recursive-include docs *.png
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include tests *.py
