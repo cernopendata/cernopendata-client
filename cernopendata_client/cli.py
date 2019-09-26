@@ -89,12 +89,30 @@ def get_record(recid, doi, title, output_fields):
 @click.option('--protocol', default='root',
               type=click.Choice(['root', 'http']),
               help='Protocol to be used in links.')
-def get_file_locations(recid, doi, title, protocol):
+@click.option('--expand/--no-expand', default=True,
+              help='Expand file indexes? [default=yes]')
+def get_file_locations(recid, doi, title, protocol, expand):
     """Get a list of files belonging to a dataset."""
     record_json = get_record_as_json(recid, doi, title)
     file_locations = [
         file['uri'] for file in record_json['metadata']['files']
     ]
+    if expand:
+        # let's unwind file indexes
+        file_locations_expanded = []
+        for file in file_locations:
+            if file.endswith('_file_index.txt'):
+                url_file = file.replace('root://eospublic.cern.ch/', 'http://opendata.cern.ch')
+                req = requests.get(url_file)
+                for url_individual_file in req.text.split('\n'):
+                    if url_individual_file:
+                        file_locations_expanded.append(url_individual_file)
+            elif file.endswith('_file_index.json'):
+                pass
+            else:
+                file_locations_expanded.append(file)
+        file_locations = file_locations_expanded
+
     if protocol == 'http':
         file_locations = [
             f.replace('root://eospublic.cern.ch/', 'http://opendata.cern.ch')
