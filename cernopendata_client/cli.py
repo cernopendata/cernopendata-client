@@ -22,18 +22,15 @@ except ImportError:
     # fallback for Python 2
     from urllib import quote
 
-
-
 SEARCH_URL = 'http://opendata.cern.ch/api/records/'
 
 
-def ensure_positive_int(ctx, param, value):
-    if value < 0:
-        click.secho("Recid should be a positive integer", fg='red', err=True)
-        sys.exit()
-    else:
-        return value
-
+def validate_recid(recid):
+    if recid <= 0:
+        raise click.BadParameter(
+            'Recid should be a positive integer',
+            param_hint=["--recid"],
+        )
 
 @click.group()
 def cernopendata_client():
@@ -43,7 +40,6 @@ def cernopendata_client():
 @cernopendata_client.command()
 @click.option('--recid',
               type=click.INT,
-              callback=ensure_positive_int,
               help='Record ID')
 @click.option('--doi',
               help='Digital Object Identifier.')
@@ -55,6 +51,8 @@ def cernopendata_client():
 def get_record(recid, doi, title, output_fields):
     """Get records content by its recid, doi or title filtered."""
     # TODO: Add decorator to require one of (recid, doi or title)
+    if recid is not None:
+        validate_recid(recid)
     record_json = get_record_as_json(recid, doi, title)
     if output_fields is not None:
         output_fields = [f.strip() for f in output_fields.split(',')]
@@ -79,9 +77,8 @@ def get_record(recid, doi, title, output_fields):
 
 @cernopendata_client.command()
 @click.option('--recid',
-              help='Record ID',
               type=click.INT,
-              callback=ensure_positive_int)
+              help='Record ID')
 @click.option('--doi',
               help='Digital Object Identifier.')
 @click.option('--title',
@@ -93,6 +90,8 @@ def get_record(recid, doi, title, output_fields):
               help='Expand file indexes? [default=yes]')
 def get_file_locations(recid, doi, title, protocol, expand):
     """Get a list of files belonging to a dataset."""
+    if recid is not None:
+        validate_recid(recid)
     record_json = get_record_as_json(recid, doi, title)
     file_locations = [
         file['uri'] for file in record_json['metadata']['files']
