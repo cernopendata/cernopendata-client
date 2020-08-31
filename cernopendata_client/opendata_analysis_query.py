@@ -6,15 +6,16 @@ import sys
 
 import requests
 
-BASE_RECORD_URL = 'http://opendata.cern.ch/record/'
-BASE_API_URL = 'http://opendata.cern.ch/api/records/'
+BASE_RECORD_URL = "http://opendata.cern.ch/record/"
+BASE_API_URL = "http://opendata.cern.ch/api/records/"
 
 
 def verify_recid(recid):
     """Verify that recid corresponds to a valid Open Data record webpage."""
     if recid is None:
-        sys.exit("ERROR: You must supply a record id number as an "
-                 "input using -r flag.")
+        sys.exit(
+            "ERROR: You must supply a record id number as an " "input using -r flag."
+        )
     else:
         input_record_url = BASE_RECORD_URL + str(recid)
         input_record_url_check = requests.get(input_record_url)
@@ -47,12 +48,17 @@ def get_datasets(record_api):
     """
     try:
         dataset_links = record_api.json()["metadata"]["use_with"]["links"]
-        print("Getting index files for \'"
-              + record_api.json()["metadata"]["title"] + "\'...\n")
+        print(
+            "Getting index files for '"
+            + record_api.json()["metadata"]["title"]
+            + "'...\n"
+        )
         return dataset_links
     except KeyError:
-        sys.exit("ERROR: This Open Data record does not contain "
-                 "a list of links to dataset index files.")
+        sys.exit(
+            "ERROR: This Open Data record does not contain "
+            "a list of links to dataset index files."
+        )
 
 
 def dataset_convert_to_ids(dataset_links):
@@ -61,13 +67,15 @@ def dataset_convert_to_ids(dataset_links):
     twice within datset_links, the duplicates are skipped and the dataset id
     is only included once.
     """
-    dataset_ids =[]
+    dataset_ids = []
     for dataset_dict in dataset_links:
         rec_id = dataset_dict["recid"]
         if rec_id in dataset_ids:
-            print("Warning: The dataset for record "
-                  + rec_id
-                  + " is listed more than once. Skipping duplicate...")
+            print(
+                "Warning: The dataset for record "
+                + rec_id
+                + " is listed more than once. Skipping duplicate..."
+            )
         else:
             dataset_ids.append(rec_id)
 
@@ -76,15 +84,16 @@ def dataset_convert_to_ids(dataset_links):
 
 def check_file_size(file_size, file_path):
     """As a sanity check, we make sure that the file size of
-     the downloaded index file matches the size listed in the json info."""
+    the downloaded index file matches the size listed in the json info."""
     if file_size != os.path.getsize(file_path):
-        print("Warning: The file size for the download {} does not match"
-              " the size listed on the Open Data API."
-              .format(file_path))
+        print(
+            "Warning: The file size for the download {} does not match"
+            " the size listed on the Open Data API.".format(file_path)
+        )
 
 
 def get_record_from_url(record_num):
-    record_url = BASE_RECORD_URL + record_num + '/export/json'
+    record_url = BASE_RECORD_URL + record_num + "/export/json"
     record = requests.get(record_url)
     record.raise_for_status()
     return record
@@ -95,9 +104,13 @@ def get_index_files(record, database_title, record_num):
         index_files = record.json()["metadata"]["index_files"]
         return index_files
     except KeyError:
-        print("Warning: The database link to " +
-              database_title + " (record: " + record_num +
-              ") does not contain any index files.")
+        print(
+            "Warning: The database link to "
+            + database_title
+            + " (record: "
+            + record_num
+            + ") does not contain any index files."
+        )
 
 
 def get_database_title(record):
@@ -120,7 +133,7 @@ def foo(base_record_id, dataset_ids):
 
     # **********************************************************************
     total_file_count = 0
-    output_folder_path = 'rec' + base_record_id + '_datasets/'
+    output_folder_path = "rec" + base_record_id + "_datasets/"
 
     for record_num in dataset_ids:
 
@@ -131,29 +144,33 @@ def foo(base_record_id, dataset_ids):
         index_files = get_index_files(record, database_title, record_num)
 
         for index_file in index_files:
-            filename = index_file['filename']
+            filename = index_file["filename"]
 
-            if '.txt' in filename:
-                txt_file = requests.get(index_file['uri_http'])
+            if ".txt" in filename:
+                txt_file = requests.get(index_file["uri_http"])
                 file_size = index_file["size"]
                 filepath = output_folder_path + database_title + "/" + filename
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                with open(filepath, 'wb') as fi:
+                with open(filepath, "wb") as fi:
                     fi.write(txt_file.content)
                     database_file_count += 1
 
                 check_file_size(file_size, filepath)
 
-        print("Downloaded "
-              + str(database_file_count)
-              + " index files from "
-              + database_title)
+        print(
+            "Downloaded "
+            + str(database_file_count)
+            + " index files from "
+            + database_title
+        )
         total_file_count += database_file_count
 
-    print("\nQuery Complete: Downloaded "
-          + str(total_file_count)
-          + " index files to the folder ./"
-          + output_folder_path)
+    print(
+        "\nQuery Complete: Downloaded "
+        + str(total_file_count)
+        + " index files to the folder ./"
+        + output_folder_path
+    )
 
 
 def main():
@@ -164,13 +181,18 @@ def main():
     # TODO: remove this function when all functionalities are implemented-
     #   argument parsing was moved to click in cli.py
     parser = argparse.ArgumentParser(
-        description='Query an Open Data analysis record and download all'
-                    ' index files needed for the analysis.')
+        description="Query an Open Data analysis record and download all"
+        " index files needed for the analysis."
+    )
     parser._action_groups.pop()
-    required = parser.add_argument_group('required arguments')
-    required.add_argument('-r', '--record', type=int,
-                          help='Input the record id number for the Open Data'
-                               ' analysis you want to query.')
+    required = parser.add_argument_group("required arguments")
+    required.add_argument(
+        "-r",
+        "--record",
+        type=int,
+        help="Input the record id number for the Open Data"
+        " analysis you want to query.",
+    )
 
     args = parser.parse_args()
     input_record_id = args.record
@@ -182,5 +204,5 @@ def main():
     foo(base_record_id, dataset_ids)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
