@@ -7,11 +7,17 @@
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
 import json
-import sys
+import os, sys
+from sys import stderr as STREAM
+from datetime import datetime
 
 import click
 import requests
-from requests import HTTPError
+import pycurl
+from tqdm import tqdm
+import asyncio
+import aiohttp
+import async_timeout
 
 from cernopendata_client.opendata_analysis_query import get_recid_api, verify_recid
 
@@ -117,6 +123,103 @@ def get_file_locations(recid, doi, title, protocol, expand):
             f.replace("root://eospublic.cern.ch/", "http://opendata.cern.ch")
             for f in file_locations
         ]
+
+    # Download files with requests
+    path = str(recid) + "requests"
+    try:
+        os.mkdir(path)
+    except OSError:
+        print("Creation of the directory %s failed" % path)
+
+    time_now = datetime.now()
+    for file_url in file_locations:
+        r = requests.get(file_url, stream=True)
+        file_dest = path + "/" + file_url.split("/")[-1]
+        total_size = int(r.headers.get("content-length"))
+        initial_pos = 0
+        with open(file_dest, "wb") as f:
+            with tqdm(
+                total=total_size,
+                unit="iB",
+                unit_scale=True,
+                desc=file_dest,
+                initial=initial_pos,
+                ascii=True,
+            ) as pbar:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+                        pbar.update(len(chunk))
+    time_fin = datetime.now()
+    duration = time_fin - time_now
+    print("\n requests", duration.microseconds)
+
+    # Download files with pycurl
+
+    # function for progress bar (tqdm not required)
+    kb = 1024
+
+    def status(download_t, download_d, upload_t, upload_d):
+        STREAM.write(
+            "Downloading: {}/{} kiB ({}%)\r".format(
+                str(int(download_d / kb)),
+                str(int(download_t / kb)),
+                str(int(download_d / download_t * 100) if download_t > 0 else 0),
+            )
+        )
+        STREAM.flush()
+
+    path = str(recid) + "pycurl"
+    try:
+        os.mkdir(path)
+    except OSError:
+        print("Creation of the directory %s failed" % path)
+
+    time_now = datetime.now()
+    for file_location in file_locations:
+        file_dest = path + "/" + file_location.split("/")[-1]
+        with open(file_dest, "wb") as f:
+            print("File Downloading")
+            c = pycurl.Curl()
+            c.setopt(c.URL, file_location)
+            c.setopt(c.WRITEDATA, f)
+            c.setopt(c.NOPROGRESS, False)
+            c.setopt(c.XFERINFOFUNCTION, status)
+            c.perform()
+            c.close()
+    time_fin = datetime.now()
+    duration = time_fin - time_now
+    print("\n pycurl", duration.microseconds)
+
+    # Download files with asyncio
+    path = str(recid) + "asyncio"
+    try:
+        os.mkdir(path)
+    except OSError:
+        print("Creation of the directory %s failed" % path)
+
+    async def get_url(url, session):
+        file_name = path + "/" + url.split("/")[-1]
+        async with async_timeout.timeout(120):
+            async with session.get(url) as response:
+                with open(file_name, "wb") as fd:
+                    async for data in response.content.iter_chunked(1024):
+                        fd.write(data)
+
+        return "Successfully downloaded " + file_name
+
+    async def main(urls):
+        async with aiohttp.ClientSession() as session:
+            tasks = [get_url(url, session) for url in urls]
+            return await asyncio.gather(*tasks)
+
+    time_now = datetime.now()
+    urls = file_locations
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(urls))
+    time_fin = datetime.now()
+    duration = time_fin - time_now
+    print("\n asyncio", duration.microseconds)
     click.echo("\n".join(file_locations))
 
 
@@ -134,7 +237,7 @@ def get_recid(title=None, doi=None):
     response = requests.get(url)
     try:
         response.raise_for_status()
-    except HTTPError as e:
+    except requests.HTTPError as e:
         click.secho("Connection to server failed: \n reason: {}.".format(e), err=True)
     if "hits" in response.json():
         hits_total = response.json()["hits"]["total"]
