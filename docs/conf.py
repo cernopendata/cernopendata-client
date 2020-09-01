@@ -96,17 +96,18 @@ html_theme = "alabaster"
 #
 html_theme_options = {
     "logo": "logo-cernopendata-client.png",
-    "description": """<p>The CERN Open Data Client is a command line tool to 
-                      interact with CERN Open Data API.</p>""",
+    "description": """<p>The cernopendata-client is a command-line tool to
+                      interact with the CERN Open Data portal.</p>""",
     "github_user": "cernopendata",
     "github_repo": "cernopendata-client",
     "github_button": False,
     "github_banner": True,
     "show_powered_by": False,
     "extra_nav_links": {
-        "COD@GitHub": "https://github.com/cernopendata",
-        "COD@Twitter": "https://twitter.com/cernopendata",
-        "COD@Web": "http://opendata.cern.ch//",
+        "cernopendata@GitHub": "https://github.com/cernopendata",
+        "cernopendata@Twitter": "https://twitter.com/cernopendata",
+        "opendata-forum.cern.ch": "https://opendata-forum.cern.ch/",
+        "opendata.cern.ch": "http://opendata.cern.ch/",
     },
 }
 
@@ -163,7 +164,7 @@ latex_documents = [
     (
         master_doc,
         "cernopendata_client.tex",
-        "CERN Open Data Client Documentation",
+        "cernopedata-client documentation",
         "CERN Open Data",
         "manual",
     ),
@@ -178,7 +179,7 @@ man_pages = [
     (
         master_doc,
         "cernopendata_client",
-        "CERN Open Data Client Documentation",
+        "cernopendata-client documentation",
         [author],
         1,
     )
@@ -194,10 +195,10 @@ texinfo_documents = [
     (
         master_doc,
         "cernopendata_client",
-        "CERN Open Data Client Documentation",
+        "cernopendata-client documentation",
         author,
-        "cernopendata_client",
-        "Command line tool to interact with CERN Open Data API.",
+        "cernopendata-client",
+        "Command-line tool to interact with the CERN Open Data portal.",
         "Miscellaneous",
     ),
 ]

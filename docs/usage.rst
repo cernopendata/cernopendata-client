@@ -1,25 +1,7 @@
 .. _gettingstarted:
 
-User Guide
-===============
-
-Install cernopendata-client
----------------------------
-
-If you are interested in exploring resources of opendata.cern.ch from cli,
-all you need to install is the ``cernopendata-client``,
-ideally in a new virtual environment:
-
-.. code-block:: console
-
-   $ # create new virtual environment
-   $ virtualenv ~/.virtualenvs/cernopendata_client
-   $ source ~/.virtualenvs/cernopendata_client/bin/activate
-   $ # install cernopendata-client
-   $ pip install cernopendata-client
-
-Basic usage
------------
+Usage
+=====
 
 .. code-block:: console
 
@@ -52,15 +34,3 @@ Basic usage
     $ # with --protocol option:
     $ cernopendata-client get-file-locations --recid 43 --protocol http
     $ ...
-
-
-CLI API
--------
-
-.. click:: cernopendata_client.cli:get_record
-   :prog: get_record
-   :show-nested:
-
-.. click:: cernopendata_client.cli:get_file_locations
-   :prog: get_file_locations
-   :show-nested:

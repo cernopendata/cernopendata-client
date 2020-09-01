@@ -5,7 +5,7 @@ Issues
 ------
 
 Bug reports, feature requests, and other contributions are welcome. If you find
-a demonstrable problem that is caused by the cernopendata_client code, please:
+a demonstrable problem that is caused by the ``cernopendata-client`` code, please:
 
 1. Search for `already reported problems
    <https://github.com/cernopendata/cernopendata-client/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen>`_.
