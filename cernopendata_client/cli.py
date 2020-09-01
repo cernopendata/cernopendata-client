@@ -69,7 +69,7 @@ def get_record(recid, doi, title, output_fields):
                 fg="red",
                 err=True,
             )
-            sys.exit()
+            sys.exit(1)
     else:
         output_json = record_json
     click.echo(json.dumps(output_json, indent=4))
@@ -142,7 +142,7 @@ def get_recid(title=None, doi=None):
             click.secho(
                 "Record with given {} does not exist.".format(name), fg="red", err=True
             )
-            sys.exit()
+            sys.exit(2)
         elif hits_total > 1:
             click.secho(
                 "More than one record fit this {}."
@@ -150,7 +150,7 @@ def get_recid(title=None, doi=None):
                 fg="red",
                 err=True,
             )
-            sys.exit()
+            sys.exit(3)
         elif hits_total == 1:
             return response.json()["hits"]["hits"][0]["id"]
 
@@ -170,7 +170,7 @@ def get_record_as_json(recid, doi, title):
             fg="red",
             err=True,
         )
-        sys.exit()
+        sys.exit(1)
 
     record_id = verify_recid(record_id)
     record_api = get_recid_api(record_id)
