@@ -44,7 +44,7 @@ setup_requires = [
     "pytest-runner>=2.7",
 ]
 
-install_requires = ["click>=7,<8", "requests==2.22.0"]
+install_requires = ["click>=7,<8", "requests==2.22.0", "pycurl>=7"]
 
 # Get the version string. Cannot be done with import!
 with open(os.path.join("cernopendata_client", "version.py"), "rt") as f:

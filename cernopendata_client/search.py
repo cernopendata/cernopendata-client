@@ -108,3 +108,30 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
     record_id = verify_recid(server=server, recid=record_id)
     record_api = get_recid_api(server=server, base_record_id=record_id)
     return record_api.json()
+
+
+def get_files_list(server=None, record_json=None, protocol=None, expand=None):
+    """Get file list of a dataset by its recid, doi, or title."""
+    files_list = [file["uri"] for file in record_json["metadata"]["files"]]
+    if expand:
+        # let's unwind file indexes
+        files_list_expanded = []
+        for file_ in files_list:
+            if file_.endswith("_file_index.txt"):
+                url_file = file_.replace("root://eospublic.cern.ch/", server)
+                req = requests.get(url_file)
+                for url_individual_file in req.text.split("\n"):
+                    if url_individual_file:
+                        files_list_expanded.append(url_individual_file)
+            elif file_.endswith("_file_index.json"):
+                pass
+            else:
+                files_list_expanded.append(file_)
+        files_list = files_list_expanded
+
+    if protocol == "http":
+        files_list = [
+            file_.replace("root://eospublic.cern.ch/", server) for file_ in files_list
+        ]
+
+    return files_list

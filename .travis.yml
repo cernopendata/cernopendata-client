@@ -25,6 +25,8 @@ matrix:
     - python: 3.8
 
 before_install:
+  - travis_retry sudo apt-get update -y
+  - travis_retry sudo apt-get install libgnutls28-dev
   - travis_retry pip install --upgrade pip setuptools py
   - travis_retry pip install twine wheel coveralls
 

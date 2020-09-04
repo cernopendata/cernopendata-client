@@ -7,17 +7,19 @@
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
 import json
-import sys
+import os, sys
 
 import click
 import requests
-from requests import HTTPError
+import pycurl
 
+from cernopendata_client.tui import show_download_progress
 from cernopendata_client.search import (
     get_recid,
     verify_recid,
     get_recid_api,
     get_record_as_json,
+    get_files_list,
 )
 from cernopendata_client.validator import (
     validate_recid,
@@ -81,8 +83,8 @@ def get_record(server, recid, doi, title, output_fields):
 @click.option("--title", help="Record title")
 @click.option(
     "--protocol",
-    default="root",
-    type=click.Choice(["root", "http"]),
+    default="http",
+    type=click.Choice(["http", "root"]),
     help="Protocol to be used in links.",
 )
 @click.option(
@@ -100,25 +102,68 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
-    file_locations = [file["uri"] for file in record_json["metadata"]["files"]]
-    if expand:
-        # let's unwind file indexes
-        file_locations_expanded = []
-        for file in file_locations:
-            if file.endswith("_file_index.txt"):
-                url_file = file.replace("root://eospublic.cern.ch/", server)
-                req = requests.get(url_file)
-                for url_individual_file in req.text.split("\n"):
-                    if url_individual_file:
-                        file_locations_expanded.append(url_individual_file)
-            elif file.endswith("_file_index.json"):
-                pass
-            else:
-                file_locations_expanded.append(file)
-        file_locations = file_locations_expanded
-
-    if protocol == "http":
-        file_locations = [
-            f.replace("root://eospublic.cern.ch/", server) for f in file_locations
-        ]
+    file_locations = get_files_list(server, record_json, protocol, expand)
     click.echo("\n".join(file_locations))
+
+
+@cernopendata_client.command()
+@click.option("--recid", type=click.INT, help="Record ID")
+@click.option("--doi", help="Digital Object Identifier.")
+@click.option("--title", help="Record title")
+@click.option(
+    "--protocol",
+    default="http",
+    type=click.Choice(["http", "root"]),
+    help="Protocol to be used in links.",
+)
+@click.option(
+    "--expand/--no-expand", default=True, help="Expand file indexes? [default=yes]"
+)
+@click.option(
+    "--server",
+    default="http://opendata.cern.ch",
+    type=click.STRING,
+    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+)
+def download_files(server, recid, doi, title, protocol, expand):
+    """Download the list of files belonging to a dataset."""
+    validate_server(server)
+    if recid is not None:
+        validate_recid(recid)
+    if protocol == "root":
+        click.secho(
+            "Root protocol is not supported yet.",
+            fg="red",
+            err=True,
+        )
+        sys.exit(1)
+    record_json = get_record_as_json(server, recid, doi, title)
+    file_locations = get_files_list(server, record_json, protocol, expand)
+
+    path = str(recid)
+    if not os.path.isdir(path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory %s failed" % path)
+    total_files = len(file_locations)
+    for file_location in file_locations:
+        file_name = file_location.split("/")[-1]
+        file_dest = path + "/" + file_name
+        with open(file_dest, "wb") as f:
+            print(
+                "==> Downloading file {} of {}: ./{}/{}".format(
+                    file_locations.index(file_location) + 1,
+                    total_files,
+                    path,
+                    file_name,
+                )
+            )
+            c = pycurl.Curl()
+            c.setopt(c.URL, file_location)
+            c.setopt(c.WRITEDATA, f)
+            c.setopt(c.NOPROGRESS, False)
+            c.setopt(c.XFERINFOFUNCTION, show_download_progress)
+            c.perform()
+            c.close()
+    click.echo("\nDownload completed!")
