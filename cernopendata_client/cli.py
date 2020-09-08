@@ -6,12 +6,14 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
-import json
-import os, sys
+"""cernopendata-client command line tool."""
 
 import click
-import requests
+import json
+import os
 import pycurl
+import requests
+import sys
 
 from cernopendata_client.tui import show_download_progress
 from cernopendata_client.search import (
@@ -34,13 +36,13 @@ def cernopendata_client():
 
 @cernopendata_client.command()
 @click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier.")
-@click.option("--title", help="Record title")
+@click.option("--doi", help="Digital Object Identifier")
+@click.option("--title", help="Title of the record")
 @click.option(
     "--output-fields",
     is_flag=False,
     type=click.STRING,
-    help="Comma separated list of fields from the record "
+    help="Comma-separated list of fields from the record "
     "that should be included in the output.",
 )
 @click.option(
@@ -50,8 +52,16 @@ def cernopendata_client():
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
 def get_metadata(server, recid, doi, title, output_fields):
-    """Get records content by its recid, doi or title filtered."""
-    # TODO: Add decorator to require one of (recid, doi or title)
+    """Get metadata content of a record.
+
+    Select a CERN Open Data bibliographic record by a record ID, a
+    DOI, or a title and return its metadata in the JSON format.
+
+    \b
+    Examples:
+      $ cernopendata-client get-metadata --recid 1
+      $ cernopendata-client get-metadata --recid 1 | jq -S '.metadata.title'
+    """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
@@ -97,7 +107,17 @@ def get_metadata(server, recid, doi, title, output_fields):
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
 def get_file_locations(server, recid, doi, title, protocol, expand):
-    """Get a list of files belonging to a dataset."""
+    """Get a list of data file locations of a record.
+
+    Select a CERN Open Data bibliographic record by a record ID, a
+    DOI, or a title and return the list of data file locations
+    belonging to this record.
+
+    \b
+    Examples:
+      $ cernopendata-client get-file-locations --recid 5500
+      $ cernopendata-client get-file-locations --recid 5500 --protocol root
+    """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
@@ -126,8 +146,16 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
 def download_files(server, recid, doi, title, protocol, expand):
-    """Download the list of files belonging to a dataset."""
-    validate_server(server)
+    """Download data files belonging to a record.
+
+    Select a CERN Open Data bibliographic record by a record ID, a
+    DOI, or a title and download data files belonging to this record.
+
+    \b
+    Examples:
+      $ cernopendata-client download-files --recid 5500
+    """
+
     if recid is not None:
         validate_recid(recid)
     if protocol == "root":
