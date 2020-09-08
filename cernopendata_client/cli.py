@@ -15,23 +15,30 @@ import pycurl
 import requests
 import sys
 
-from cernopendata_client.tui import show_download_progress
 from cernopendata_client.search import (
+    get_files_list,
     get_recid,
-    verify_recid,
     get_recid_api,
     get_record_as_json,
-    get_files_list,
+    verify_recid,
 )
+from cernopendata_client.tui import show_download_progress
 from cernopendata_client.validator import (
     validate_recid,
     validate_server,
 )
+from cernopendata_client.version import __version__
 
 
 @click.group()
 def cernopendata_client():
     pass
+
+
+@cernopendata_client.command()
+def version():
+    """Return cernopendata-client version."""
+    print(__version__)
 
 
 @cernopendata_client.command()
