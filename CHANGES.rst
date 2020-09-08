@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 0.1.0 (2020-MM-DD)
+Version 0.0.1 (2020-09-09)
 --------------------------
 
 - Initial public release.
