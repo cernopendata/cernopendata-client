@@ -18,5 +18,4 @@ def test_get_file_locations():
     test_get_file_locations = CliRunner()
     test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 3005])
     assert test_result.exit_code == 0
-    assert type(test_result.output) == str
     assert "0d0714743f0204ed3c0144941e6ce248.configFile.py" in test_result.output

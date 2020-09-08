@@ -2,6 +2,7 @@ include LICENSE
 include *.rst
 include *.sh
 include pytest.ini
+include tox.ini
 include docs/requirements.txt
 prune docs/_build
 recursive-include cernopendata_client *.py
