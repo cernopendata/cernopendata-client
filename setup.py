@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019 CERN.
+# Copyright (C) 2019, 2020 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -17,6 +17,7 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
+    'black>=19.10b0 ; python_version>="3"',
     "check-manifest>=0.25",
     "coverage>=4.0",
     "pydocstyle>=1.0.0",
