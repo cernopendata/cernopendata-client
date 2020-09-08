@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019 CERN.
+# Copyright (C) 2019, 2020 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -49,7 +49,7 @@ def cernopendata_client():
     type=click.STRING,
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
-def get_record(server, recid, doi, title, output_fields):
+def get_metadata(server, recid, doi, title, output_fields):
     """Get records content by its recid, doi or title filtered."""
     # TODO: Add decorator to require one of (recid, doi or title)
     validate_server(server)

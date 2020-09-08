@@ -7,16 +7,16 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
-"""cernopendata-client cli command get-record test."""
+"""cernopendata-client cli command get-metadata test."""
 
 from click.testing import CliRunner
-from cernopendata_client.cli import get_record
+from cernopendata_client.cli import get_metadata
 
 
-def test_get_record():
-    """Test get-record command."""
-    test_get_record = CliRunner()
-    test_result = test_get_record.invoke(get_record, ["--recid", 3005])
+def test_get_metadata():
+    """Test get-metadata command."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(get_metadata, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert type(test_result.output) == str
     assert (
