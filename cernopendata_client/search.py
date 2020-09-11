@@ -60,6 +60,7 @@ def get_recid(server=None, title=None, doi=None):
         name, value = "doi", doi
     url = (
         server
+        + "/api/records"
         + "?page=1&size=1&q={}:".format(name)
         + quote('"{}"'.format(value), safe="")
     )
