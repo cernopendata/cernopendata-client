@@ -1,1 +1,5 @@
--e .[all]
+click>=7,<8
+requests==2.22.0
+Sphinx>=1.4.4,<2.0
+sphinx-click>=1.0.4
+sphinx-rtd-theme>=0.1.9
