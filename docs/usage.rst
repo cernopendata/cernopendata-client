@@ -250,6 +250,54 @@ We can download files by filtering out with multiple filters.
 
     ==> Success!
 
+Verifying files
+---------------
+
+If you have downloaded the data files for a record before, and you
+would like to verify their integrity and check whether there haven't
+been some critical updates on the CERN Open Data portal side, you can
+use the **verify-files** command:
+
+.. code-block:: console
+
+    $ cernopendata-client verify-files --recid 5500
+    ==> Verifying number of files for record 5500...
+     -> expected 11, found 11
+    ==> Verifying file BuildFile.xml...
+     -> expected size 305, found 305
+     -> expected checksum adler32:ff63668a, found adler32:ff63668a
+    ==> Verifying file HiggsDemoAnalyzer.cc...
+     -> expected size 83761, found 83761
+     -> expected checksum adler32:f205f068, found adler32:f205f068
+    ==> Verifying file List_indexfile.txt...
+     -> expected size 1669, found 1669
+     -> expected checksum adler32:46a907fc, found adler32:46a907fc
+    ==> Verifying file M4Lnormdatall.cc...
+     -> expected size 14943, found 14943
+     -> expected checksum adler32:af301992, found adler32:af301992
+    ==> Verifying file M4Lnormdatall_lvl3.cc...
+     -> expected size 15805, found 15805
+     -> expected checksum adler32:9d9b2126, found adler32:9d9b2126
+    ==> Verifying file demoanalyzer_cfg_level3MC.py...
+     -> expected size 3741, found 3741
+     -> expected checksum adler32:cc943381, found adler32:cc943381
+    ==> Verifying file demoanalyzer_cfg_level3data.py...
+     -> expected size 3689, found 3689
+     -> expected checksum adler32:1d3e2a43, found adler32:1d3e2a43
+    ==> Verifying file demoanalyzer_cfg_level4MC.py...
+     -> expected size 3874, found 3874
+     -> expected checksum adler32:9cbd53a3, found adler32:9cbd53a3
+    ==> Verifying file demoanalyzer_cfg_level4data.py...
+     -> expected size 3821, found 3821
+     -> expected checksum adler32:177b49c0, found adler32:177b49c0
+    ==> Verifying file mass4l_combine.pdf...
+     -> expected size 18170, found 18170
+     -> expected checksum adler32:19c6a6a2, found adler32:19c6a6a2
+    ==> Verifying file mass4l_combine.png...
+     -> expected size 93152, found 93152
+     -> expected checksum adler32:62e0c299, found adler32:62e0c299
+    ==> Success! Record 5500 files were successfully verified.
+
 
 More information
 ----------------

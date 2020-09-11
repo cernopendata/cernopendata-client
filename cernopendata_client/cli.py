@@ -15,25 +15,28 @@ import requests
 import sys
 import re
 
-from cernopendata_client.search import (
+from .search import (
+    get_file_info_remote,
     get_files_list,
     get_recid,
     get_recid_api,
     get_record_as_json,
     verify_recid,
 )
-from cernopendata_client.downloader import (
+from .downloader import (
     download_single_file,
     get_download_files_by_name,
     get_download_files_by_range,
     get_download_files_by_regexp,
 )
-from cernopendata_client.validator import (
+from .validator import (
+    validate_range,
     validate_recid,
     validate_server,
-    validate_range,
 )
-from cernopendata_client.version import __version__
+from .verifier import get_file_info_local
+
+from .version import __version__
 
 
 @click.group()
@@ -253,3 +256,76 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
         download_single_file(path=path, file_location=file_location)
 
     click.echo("\n==> Success!")
+
+
+@cernopendata_client.command()
+@click.option("--recid", type=click.INT, help="Record ID")
+@click.option(
+    "--server",
+    default="http://opendata.cern.ch",
+    type=click.STRING,
+    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+)
+def verify_files(server, recid):
+    """Verify downloaded data file integrity.
+
+    Select a CERN Open Data bibliographic record by a record ID and
+    verify integrity of downloaded data files belonging to this
+    record.
+
+    \b
+    Examples:
+      $ cernopendata-client verify-files --recid 5500
+    """
+
+    # Validate parameters
+    validate_recid(recid)
+
+    # Get remote file information
+    file_info_remote = get_file_info_remote(recid)
+
+    # Get local file information
+    file_info_local = get_file_info_local(recid)
+    if not file_info_local:
+        print(
+            "ERROR: No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
+                recid
+            )
+        )
+        sys.exit(1)
+
+    # Verify number of files
+    print("==> Verifying number of files for record {}... ".format(recid))
+    print(
+        " -> expected {}, found {}".format(len(file_info_remote), len(file_info_local))
+    )
+    if len(file_info_remote) != len(file_info_local):
+        print("ERROR: File count does not match.")
+        sys.exit(1)
+
+    # Verify size and checksum of each file
+    for afile_info_remote in file_info_remote:
+        afile_name = afile_info_remote["name"]
+        afile_size = afile_info_remote["size"]
+        afile_checksum = afile_info_remote["checksum"]
+        bfile_size = 0
+        bfile_checksum = ""
+        for bfile_info_local in file_info_local:
+            if bfile_info_local["name"] == afile_name:
+                bfile_size = bfile_info_local["size"]
+                bfile_checksum = bfile_info_local["checksum"]
+                break
+        print("==> Verifying file {}... ".format(afile_name))
+        print(" -> expected size {}, found {}".format(afile_size, bfile_size))
+        if afile_size != bfile_size:
+            print("ERROR: File size does not match.")
+            sys.exit(1)
+        print(
+            " -> expected checksum {}, found {}".format(afile_checksum, bfile_checksum)
+        )
+        if afile_checksum != bfile_checksum:
+            print("ERROR: File checksum does not match.")
+            sys.exit(1)
+
+    # Success!
+    print("==> Success!".format(recid))

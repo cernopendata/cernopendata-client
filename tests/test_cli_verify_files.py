@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of cernopendata-client.
+#
+# Copyright (C) 2020 CERN.
+#
+# cernopendata-client is free software; you can redistribute it and/or modify
+# it under the terms of the GPLv3 license; see LICENSE file for more details.
+
+"""cernopendata-client verify-files tests."""
+
+import os
+import pytest
+from click.testing import CliRunner
+from cernopendata_client.cli import download_files, verify_files
+
+
+def test_verify_files():
+    """Test verify-files command."""
+
+    # remove test file
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+    # first download it
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+
+    # now test verifier
+    test_verify_files = CliRunner()
+    test_result = test_verify_files.invoke(verify_files, ["--recid", 3005])
+    assert test_result.exit_code == 0
+    assert test_result.output.endswith("\n==> Success!\n")
+
+    # remove test file
+    if os.path.isfile(test_file):
+        os.remove(test_file)
