@@ -10,6 +10,9 @@ notifications:
 
 sudo: true
 
+services:
+  - docker
+
 language: python
 
 cache:
@@ -35,6 +38,8 @@ install:
 
 script:
   - ./run-tests.sh
+  - docker build -t cernopendata/cernopendata-client .
+  - docker run --rm cernopendata/cernopendata-client version
 
 after_success:
   - coveralls
