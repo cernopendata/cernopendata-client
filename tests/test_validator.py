@@ -12,7 +12,11 @@
 import click
 import pytest
 
-from cernopendata_client.validator import validate_recid, validate_server
+from cernopendata_client.validator import (
+    validate_recid,
+    validate_server,
+    validate_range,
+)
 
 
 def test_validate_recid():
@@ -29,3 +33,10 @@ def test_validate_server():
     assert validate_server("http://0.0.0.0:5000") is True
     pytest.raises(click.BadParameter, validate_server, "https://opendata.cern.ch")
     pytest.raises(click.BadParameter, validate_server, "opendata.cern.ch")
+
+
+def test_validate_range():
+    """Test validate_range()."""
+    assert validate_range(range="3-9", count=10) is True
+    assert validate_range(range="1-5", count=8) is True
+    pytest.raises(click.BadParameter, validate_range, "0-9", 5)

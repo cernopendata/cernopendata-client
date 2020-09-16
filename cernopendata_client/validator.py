@@ -33,3 +33,28 @@ def validate_server(server=None):
             param_hint=["--server"],
         )
     return True
+
+
+def validate_range(range=None, count=None):
+    """Validate filter range.
+
+    Return True if range lies in total files count,
+    raises click.BadParameter exception otherwise.
+    """
+    range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
+    if range_from <= 0:
+        raise click.BadParameter(
+            "Range should start from a positive integer",
+            param_hint=["--filter-range"],
+        )
+    if range_to > count:
+        raise click.BadParameter(
+            "Range is too big",
+            param_hint=["--filter-range"],
+        )
+    if range_to < range_from:
+        raise click.BadParameter(
+            "Range is not valid",
+            param_hint=["--filter-range"],
+        )
+    return True

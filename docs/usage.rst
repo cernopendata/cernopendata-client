@@ -142,6 +142,54 @@ In order to download data files belonging to a record, please use the
 
 The command will download files into a `5500` directory.
 
+**Filter by name**
+
+We can download a file matching exactly the file name by the **filter-name** option.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
+    ==> Downloading file 1 of 1: ./5500/BuildFile.xml
+    Download completed!
+
+**Filter by regular expression**
+
+We can download files matching a regular expression by the **filter-regexp** option.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-regexp py$
+    ==> Downloading file 1 of 4: ./5500/demoanalyzer_cfg_level3MC.py
+    ==> Downloading file 2 of 4: ./5500/demoanalyzer_cfg_level3data.py
+    ==> Downloading file 3 of 4: ./5500/demoanalyzer_cfg_level4MC.py
+    ==> Downloading file 4 of 4: ./5500/demoanalyzer_cfg_level4data.py
+    Download completed!
+
+**Filter by range**
+
+We can download files from a specified list range (i-j) by the **filter-range** option.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-range 1-4
+    ==> Downloading file 1 of 4: ./5500/BuildFile.xml
+    ==> Downloading file 2 of 4: ./5500/HiggsDemoAnalyzer.cc
+    ==> Downloading file 3 of 4: ./5500/List_indexfile.txt
+    ==> Downloading file 4 of 4: ./5500/M4Lnormdatall.cc
+    Download completed!
+
+**Filter by multiple options**
+
+We can download files by filtering out with multiple filters.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
+    ==> Downloading file 1 of 2: ./5500/demoanalyzer_cfg_level3MC.py
+    ==> Downloading file 2 of 2: ./5500/demoanalyzer_cfg_level3data.py
+    Download completed!
+
+
 More information
 ----------------
 

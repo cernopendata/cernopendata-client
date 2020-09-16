@@ -11,9 +11,9 @@
 import click
 import json
 import os
-import pycurl
 import requests
 import sys
+import re
 
 from cernopendata_client.search import (
     get_files_list,
@@ -22,10 +22,16 @@ from cernopendata_client.search import (
     get_record_as_json,
     verify_recid,
 )
-from cernopendata_client.tui import show_download_progress
+from cernopendata_client.downloader import (
+    download_single_file,
+    get_download_files_by_name,
+    get_download_files_by_range,
+    get_download_files_by_regexp,
+)
 from cernopendata_client.validator import (
     validate_recid,
     validate_server,
+    validate_range,
 )
 from cernopendata_client.version import __version__
 
@@ -152,7 +158,25 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
     type=click.STRING,
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
-def download_files(server, recid, doi, title, protocol, expand):
+@click.option(
+    "--filter-name",
+    "name",
+    type=click.STRING,
+    help="Download files matching exactly the file name",
+)
+@click.option(
+    "--filter-regexp",
+    "regexp",
+    type=click.STRING,
+    help="Download files matching the regular expression",
+)
+@click.option(
+    "--filter-range",
+    "range",
+    type=click.STRING,
+    help="Download files from a specified list range (i-j)",
+)
+def download_files(server, recid, doi, title, protocol, expand, name, regexp, range):
     """Download data files belonging to a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -161,6 +185,10 @@ def download_files(server, recid, doi, title, protocol, expand):
     \b
     Examples:
       $ cernopendata-client download-files --recid 5500
+      $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
+      $ cernopendata-client download-files --recid 5500 --filter-regexp py$
+      $ cernopendata-client download-files --recid 5500 --filter-range 1-4
+      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     """
 
     if recid is not None:
@@ -181,24 +209,44 @@ def download_files(server, recid, doi, title, protocol, expand):
             os.mkdir(path)
         except OSError:
             print("Creation of the directory %s failed" % path)
-    total_files = len(file_locations)
-    for file_location in file_locations:
-        file_name = file_location.split("/")[-1]
-        file_dest = path + "/" + file_name
-        with open(file_dest, "wb") as f:
-            print(
-                "==> Downloading file {} of {}: ./{}/{}".format(
-                    file_locations.index(file_location) + 1,
-                    total_files,
-                    path,
-                    file_name,
-                )
+
+    download_file_locations = []
+
+    if name:
+        dload_file_location_name = get_download_files_by_name(
+            name=name, file_locations=file_locations
+        )
+        download_file_locations = dload_file_location_name
+    if regexp:
+        dload_file_location_regexp = get_download_files_by_regexp(
+            regexp=regexp,
+            file_locations=file_locations,
+            dload=dload_file_location_name if name else None,
+        )
+        download_file_locations = dload_file_location_regexp
+    if range:
+        validate_range(range=range, count=len(file_locations))
+        dload_file_location_range = get_download_files_by_range(
+            range=range,
+            file_locations=file_locations,
+            dload=dload_file_location_regexp if regexp else None,
+        )
+        download_file_locations = dload_file_location_range
+
+    if name or regexp or range:
+        if not download_file_locations:
+            click.echo("\nNo files matching the filters")
+            sys.exit(1)
+    else:
+        download_file_locations = file_locations
+
+    total_files = len(download_file_locations)
+    for file_location in download_file_locations:
+        print(
+            "==> Downloading file {} of {}".format(
+                download_file_locations.index(file_location) + 1, total_files
             )
-            c = pycurl.Curl()
-            c.setopt(c.URL, file_location)
-            c.setopt(c.WRITEDATA, f)
-            c.setopt(c.NOPROGRESS, False)
-            c.setopt(c.XFERINFOFUNCTION, show_download_progress)
-            c.perform()
-            c.close()
+        )
+        download_single_file(path=path, file_location=file_location)
+
     click.echo("\nDownload completed!")

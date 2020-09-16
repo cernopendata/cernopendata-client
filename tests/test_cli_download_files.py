@@ -27,3 +27,57 @@ def test_download_files():
     assert test_result.output.endswith("\nDownload completed!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
+
+
+def test_download_files_filter_name():
+    """Test download_files() command with filter-name options."""
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files_filter = CliRunner()
+    test_result_name = test_download_files_filter.invoke(
+        download_files,
+        [
+            "--recid",
+            3005,
+            "--filter-name",
+            "0d0714743f0204ed3c0144941e6ce248.configFile.py",
+        ],
+    )
+    assert test_result_name.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert test_result_name.output.endswith("\nDownload completed!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_filter_regexp():
+    """Test download_files() command with filter-regexp options."""
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files_filter = CliRunner()
+    test_result_regexp = test_download_files_filter.invoke(
+        download_files, ["--recid", 3005, "--filter-regexp", "py$"]
+    )
+    assert test_result_regexp.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert test_result_regexp.output.endswith("\nDownload completed!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_filter_range():
+    """Test download_files() command with filter-range options."""
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files_filter = CliRunner()
+    test_result_regexp = test_download_files_filter.invoke(
+        download_files, ["--recid", 3005, "--filter-range", "1-1"]
+    )
+    assert test_result_regexp.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert test_result_regexp.output.endswith("\nDownload completed!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
