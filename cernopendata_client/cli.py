@@ -249,4 +249,4 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
         )
         download_single_file(path=path, file_location=file_location)
 
-    click.echo("\nDownload completed!")
+    click.echo("\n==> Success!")

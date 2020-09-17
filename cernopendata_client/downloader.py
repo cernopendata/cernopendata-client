@@ -15,7 +15,7 @@ def show_download_progress(download_t, download_d, upload_t, upload_d):
     """Show download progress of a file"""
     kb = 1024
     STREAM.write(
-        "Downloading: {}/{} kiB ({}%)\r".format(
+        " -> Progress: {}/{} kiB ({}%)\r".format(
             str(int(download_d / kb)),
             str(int(download_t / kb)),
             str(int(download_d / download_t * 100) if download_t > 0 else 0),
@@ -30,7 +30,7 @@ def download_single_file(path=None, file_location=None):
     file_dest = path + "/" + file_name
     with open(file_dest, "wb") as f:
         print(
-            "==> Downloading file: ./{}/{}".format(
+            " -> File: ./{}/{}".format(
                 path,
                 file_name,
             )
@@ -42,6 +42,7 @@ def download_single_file(path=None, file_location=None):
         c.setopt(c.XFERINFOFUNCTION, show_download_progress)
         c.perform()
         c.close()
+    print()
     return
 
 

@@ -126,19 +126,51 @@ In order to download data files belonging to a record, please use the
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500
-    ==> Downloading file 1 of 11: ./5500/BuildFile.xml
-    ==> Downloading file 2 of 11: ./5500/HiggsDemoAnalyzer.cc
-    ==> Downloading file 3 of 11: ./5500/List_indexfile.txt
-    ==> Downloading file 4 of 11: ./5500/M4Lnormdatall.cc
-    ==> Downloading file 5 of 11: ./5500/M4Lnormdatall_lvl3.cc
-    ==> Downloading file 6 of 11: ./5500/demoanalyzer_cfg_level3MC.py
-    ==> Downloading file 7 of 11: ./5500/demoanalyzer_cfg_level3data.py
-    ==> Downloading file 8 of 11: ./5500/demoanalyzer_cfg_level4MC.py
-    ==> Downloading file 9 of 11: ./5500/demoanalyzer_cfg_level4data.py
-    ==> Downloading file 10 of 11: ./5500/mass4l_combine.pdf
-    ==> Downloading file 11 of 11: ./5500/mass4l_combine.png
-    Downloading: 90/90 kiB (100%)
-    Download completed!
+    ==> Downloading file 1 of 11
+      -> File: ./5500/BuildFile.xml
+      -> Progress: 0/0 kiB (100%)
+
+    ==> Downloading file 2 of 11
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+      -> Progress: 81/81 kiB (100%)
+
+    ==> Downloading file 3 of 11
+      -> File: ./5500/List_indexfile.txt
+      -> Progress: 1/1 kiB (100%)
+
+    ==> Downloading file 4 of 11
+      -> File: ./5500/M4Lnormdatall.cc
+      -> Progress: 14/14 kiB (100%)
+
+    ==> Downloading file 5 of 11
+      -> File: ./5500/M4Lnormdatall_lvl3.cc
+      -> Progress: 15/15 kiB (100%)
+
+    ==> Downloading file 6 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 7 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 8 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4MC.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 9 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4data.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 10 of 11
+      -> File: ./5500/mass4l_combine.pdf
+      -> Progress: 17/17 kiB (100%)
+
+    ==> Downloading file 11 of 11
+      -> File: ./5500/mass4l_combine.png
+      -> Progress: 90/90 kiB (100%)
+
+    ==> Success!
 
 The command will download files into a `5500` directory.
 
@@ -159,11 +191,23 @@ We can download files matching a regular expression by the **filter-regexp** opt
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-regexp py$
-    ==> Downloading file 1 of 4: ./5500/demoanalyzer_cfg_level3MC.py
-    ==> Downloading file 2 of 4: ./5500/demoanalyzer_cfg_level3data.py
-    ==> Downloading file 3 of 4: ./5500/demoanalyzer_cfg_level4MC.py
-    ==> Downloading file 4 of 4: ./5500/demoanalyzer_cfg_level4data.py
-    Download completed!
+    ==> Downloading file 1 of 4
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 2 of 4
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 3 of 4
+      -> File: ./5500/demoanalyzer_cfg_level4MC.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 4 of 4
+      -> File: ./5500/demoanalyzer_cfg_level4data.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Success!
 
 **Filter by range**
 
@@ -172,11 +216,23 @@ We can download files from a specified list range (i-j) by the **filter-range** 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-range 1-4
-    ==> Downloading file 1 of 4: ./5500/BuildFile.xml
-    ==> Downloading file 2 of 4: ./5500/HiggsDemoAnalyzer.cc
-    ==> Downloading file 3 of 4: ./5500/List_indexfile.txt
-    ==> Downloading file 4 of 4: ./5500/M4Lnormdatall.cc
-    Download completed!
+    ==> Downloading file 1 of 4
+      -> File: ./5500/BuildFile.xml
+      -> Progress: 0/0 kiB (100%)
+
+    ==> Downloading file 2 of 4
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+      -> Progress: 81/81 kiB (100%)
+
+    ==> Downloading file 3 of 4
+      -> File: ./5500/List_indexfile.txt
+      -> Progress: 1/1 kiB (100%)
+
+    ==> Downloading file 4 of 4
+      -> File: ./5500/M4Lnormdatall.cc
+      -> Progress: 14/14 kiB (100%)
+
+    ==> Success!
 
 **Filter by multiple options**
 
@@ -185,9 +241,15 @@ We can download files by filtering out with multiple filters.
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
-    ==> Downloading file 1 of 2: ./5500/demoanalyzer_cfg_level3MC.py
-    ==> Downloading file 2 of 2: ./5500/demoanalyzer_cfg_level3data.py
-    Download completed!
+    ==> Downloading file 1 of 2
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Downloading file 2 of 2
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+      -> Progress: 3/3 kiB (100%)
+
+    ==> Success!
 
 
 More information

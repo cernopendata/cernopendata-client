@@ -24,7 +24,7 @@ def test_download_files():
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
-    assert test_result.output.endswith("\nDownload completed!\n")
+    assert test_result.output.endswith("\n==> Success!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
 
@@ -46,7 +46,7 @@ def test_download_files_filter_name():
     )
     assert test_result_name.exit_code == 0
     assert os.path.isfile(test_file) is True
-    assert test_result_name.output.endswith("\nDownload completed!\n")
+    assert test_result_name.output.endswith("\n==> Success!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
 
@@ -62,7 +62,7 @@ def test_download_files_filter_regexp():
     )
     assert test_result_regexp.exit_code == 0
     assert os.path.isfile(test_file) is True
-    assert test_result_regexp.output.endswith("\nDownload completed!\n")
+    assert test_result_regexp.output.endswith("\n==> Success!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
 
@@ -78,6 +78,6 @@ def test_download_files_filter_range():
     )
     assert test_result_regexp.exit_code == 0
     assert os.path.isfile(test_file) is True
-    assert test_result_regexp.output.endswith("\nDownload completed!\n")
+    assert test_result_regexp.output.endswith("\n==> Success!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
