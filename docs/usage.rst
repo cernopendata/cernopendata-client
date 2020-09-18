@@ -60,15 +60,14 @@ contain interesting physics information describing the dataset.
 
 If you would like to extract parts of metadata, for example to extract
 only the dataset title, or only the Global Tag information for CMS
-datasets, you can pipe the output with suitable command-line tools
-such as **jq**:
+datasets, you can use **--output-value** command-line option.
 
 .. code-block:: console
 
-    $ cernopendata-client get-metadata --recid 1 | jq -S '.metadata.title'
-    "/BTau/Run2010B-Apr21ReReco-v1/AOD"
-    $ cernopendata-client get-metadata --recid 1 | jq -S '.metadata.system_details.global_tag'
-    "FT_R_42_V10A::All"
+    $ cernopendata-client get-metadata --recid 1 --output-value title
+      /BTau/Run2010B-Apr21ReReco-v1/AOD
+    $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
+      "FT_R_42_V10A::All"
 
 Listing available data files
 ----------------------------

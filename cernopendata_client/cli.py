@@ -52,11 +52,10 @@ def version():
 @click.option("--doi", help="Digital Object Identifier")
 @click.option("--title", help="Title of the record")
 @click.option(
-    "--output-fields",
+    "--output-value",
     is_flag=False,
     type=click.STRING,
-    help="Comma-separated list of fields from the record "
-    "that should be included in the output.",
+    help="Value of fields from the record that should be included in the output.",
 )
 @click.option(
     "--server",
@@ -64,7 +63,7 @@ def version():
     type=click.STRING,
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
-def get_metadata(server, recid, doi, title, output_fields):
+def get_metadata(server, recid, doi, title, output_value):
     """Get metadata content of a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -73,37 +72,34 @@ def get_metadata(server, recid, doi, title, output_fields):
     \b
     Examples:
       $ cernopendata-client get-metadata --recid 1
-      $ cernopendata-client get-metadata --recid 1 | jq -S '.metadata.title'
+      $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
     """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
-    if output_fields is not None:
-        output_fields = [f.strip() for f in output_fields.split(",")]
-    if output_fields and len(output_fields) > 0:
-        try:
-            output_json = {field: record_json[field] for field in output_fields}
-        except KeyError:
-            top_level_fields = ", ".join(field for field in record_json)
+    output_json = record_json["metadata"]
+    if output_value is not None:
+        fields = output_value.split(".")
+        for field in fields:
+            try:
+                output_json = output_json[field]
+            except:
+                click.secho(
+                    "Key '{}' is not present in metadata".format(field),
+                    fg="red",
+                    err=True,
+                )
+                sys.exit(1)
+        if not output_json:
             click.secho(
-                "Provided field is not top level field of this record."
-                "\nFor this record top level fields are: {}"
-                "\n\nFor deeper more complex queries you can use jq "
-                "(see documentation for examples).".format(top_level_fields),
+                "Provided field is not of this record.",
                 fg="red",
                 err=True,
             )
             sys.exit(1)
-    else:
-        output_json = record_json["metadata"]
-        if "_files" in output_json:
-            del output_json["_files"]
-        for field in output_json["files"]:
-            if "bucket" in field:
-                del field["bucket"]
-            if "version_id" in field:
-                del field["version_id"]
+        click.echo(output_json)
+        sys.exit(0)
     click.echo(json.dumps(output_json, indent=4))
 
 
@@ -215,7 +211,7 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
         try:
             os.mkdir(path)
         except OSError:
-            print("Creation of the directory %s failed" % path)
+            print("Creation of the directory {} failed".format(path))
 
     download_file_locations = []
 

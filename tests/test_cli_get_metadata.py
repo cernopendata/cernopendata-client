@@ -50,3 +50,23 @@ def test_get_metadata_from_doi_wrong():
     test_get_metadata = CliRunner()
     test_result = test_get_metadata.invoke(get_metadata, ["--doi", "NONEXISTING"])
     assert test_result.exit_code == 2
+
+
+def test_get_metadata_from_output_fields():
+    """Test `get-metadata --recid --output-value` command."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata, ["--recid", 1, "--output-value", "system_details.global_tag"]
+    )
+    assert test_result.exit_code == 0
+    assert "FT_R_42_V10A::All" in test_result.output
+
+
+def test_get_metadata_from_output_fields_wrong():
+    """Test `get-metadata --recid --output-value` command for wrong values."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata, ["--recid", 1, "--output-value", "title.global_tag"]
+    )
+    assert test_result.exit_code == 1
+    assert "Key 'global_tag' is not present in metadata\n" in test_result.output
