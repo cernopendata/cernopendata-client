@@ -22,6 +22,10 @@ def test_get_metadata_from_recid():
         '"title": "Configuration file for LHE step HIG-Summer11pLHE-00114_1_cfg.py"'
         in test_result.output
     )
+    assert '"bucket": "1c1c9b67-ff5c-46bf-9e73-ef463d5bb1c6"' not in test_result.output
+    assert (
+        '"version_id": "d301cb45-86a2-4d8d-824e-f8ab7a716535"' not in test_result.output
+    )
 
 
 def test_get_metadata_from_recid_wrong():

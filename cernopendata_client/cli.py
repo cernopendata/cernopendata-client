@@ -96,7 +96,14 @@ def get_metadata(server, recid, doi, title, output_fields):
             )
             sys.exit(1)
     else:
-        output_json = record_json
+        output_json = record_json["metadata"]
+        if "_files" in output_json:
+            del output_json["_files"]
+        for field in output_json["files"]:
+            if "bucket" in field:
+                del field["bucket"]
+            if "version_id" in field:
+                del field["version_id"]
     click.echo(json.dumps(output_json, indent=4))
 
 
