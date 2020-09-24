@@ -7,10 +7,11 @@
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
 """Version information for cernopendata-client.
+
 This file is imported by ``cernopendata-client.__init__`` and parsed by
 ``setup.py``.
 """
 
 from __future__ import absolute_import, print_function
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
