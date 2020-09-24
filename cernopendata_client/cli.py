@@ -58,7 +58,7 @@ def version():
     "--output-value",
     is_flag=False,
     type=click.STRING,
-    help="Value of fields from the record that should be included in the output.",
+    help="Output only value of a desired metadata field.",
 )
 @click.option(
     "--server",
@@ -82,28 +82,31 @@ def get_metadata(server, recid, doi, title, output_value):
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
     output_json = record_json["metadata"]
-    if output_value is not None:
+    if not output_value:
+        click.echo(json.dumps(output_json, indent=4))
+    else:
         fields = output_value.split(".")
         for field in fields:
             try:
                 output_json = output_json[field]
-            except KeyError:
+            except (KeyError, TypeError):
                 click.secho(
-                    "Key '{}' is not present in metadata".format(field),
+                    "Field '{}' is not present in metadata".format(field),
                     fg="red",
                     err=True,
                 )
                 sys.exit(1)
         if not output_json:
             click.secho(
-                "Provided field is not of this record.",
+                "Field '{}' is not present in metadata.".format(fields),
                 fg="red",
                 err=True,
             )
             sys.exit(1)
-        click.echo(output_json)
-        sys.exit(0)
-    click.echo(json.dumps(output_json, indent=4))
+        if type(output_json) is dict or type(output_json) is list:
+            click.echo(json.dumps(output_json, indent=4))
+        else:  # print strings or numbers more simply
+            click.echo(output_json)
 
 
 @cernopendata_client.command()

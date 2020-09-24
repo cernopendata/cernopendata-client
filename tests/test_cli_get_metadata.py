@@ -69,4 +69,4 @@ def test_get_metadata_from_output_fields_wrong():
         get_metadata, ["--recid", 1, "--output-value", "title.global_tag"]
     )
     assert test_result.exit_code == 1
-    assert "Key 'global_tag' is not present in metadata\n" in test_result.output
+    assert "Field 'global_tag' is not present in metadata\n" in test_result.output

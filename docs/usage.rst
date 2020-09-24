@@ -44,14 +44,20 @@ In order to get metadata information about a record, please use the
 
     $ cernopendata-client get-metadata --recid 1
     {
-	"created": "2020-08-27T00:39:40.879546+00:00",
-	"id": 1,
-	"links": {
-	    "bucket": "http://opendata.cern.ch/api/files/09e99f71-ed58-4314-af55-7b28149f0861",
-	    "self": "http://opendata.cern.ch/api/records/1"
+	"$schema": "http://opendata.cern.ch/schema/records/record-v1.0.0.json",
+	"abstract": {
+	    "description": "<p>BTau primary dataset in AOD format from RunB of 2010</p> <p>This dataset contains all runs from 2010 RunB. The list of validated runs, which must be applied to all analyses, can be found in</p>",
+	    "links": [
+		{
+		    "recid": "1000"
+		}
+	    ]
 	},
-	"metadata": {
-	    "$schema": "http://opendata.cern.ch/schema/records/record-v1.0.0.json",
+	"accelerator": "CERN-LHC",
+	"collaboration": {
+	    "name": "CMS collaboration",
+	    "recid": "450"
+	},
     ...
 
 This will output a JSON containing all the record metadata, such as
@@ -60,14 +66,14 @@ contain interesting physics information describing the dataset.
 
 If you would like to extract parts of metadata, for example to extract
 only the dataset title, or only the Global Tag information for CMS
-datasets, you can use **--output-value** command-line option.
+datasets, you can use **--output-value** command-line option:
 
 .. code-block:: console
 
     $ cernopendata-client get-metadata --recid 1 --output-value title
-      /BTau/Run2010B-Apr21ReReco-v1/AOD
+    /BTau/Run2010B-Apr21ReReco-v1/AOD
     $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
-      "FT_R_42_V10A::All"
+    FT_R_42_V10A::All
 
 Listing available data files
 ----------------------------
