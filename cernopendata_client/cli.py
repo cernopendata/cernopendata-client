@@ -15,7 +15,7 @@ import requests
 import sys
 import re
 
-from .search import (
+from .searcher import (
     get_file_info_remote,
     get_files_list,
     get_recid,
@@ -87,7 +87,7 @@ def get_metadata(server, recid, doi, title, output_value):
         for field in fields:
             try:
                 output_json = output_json[field]
-            except:
+            except KeyError:
                 click.secho(
                     "Key '{}' is not present in metadata".format(field),
                     fg="red",
@@ -328,4 +328,4 @@ def verify_files(server, recid):
             sys.exit(1)
 
     # Success!
-    print("==> Success!".format(recid))
+    print("==> Success!")
