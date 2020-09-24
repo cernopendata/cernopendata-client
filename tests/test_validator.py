@@ -41,3 +41,5 @@ def test_validate_range():
     assert validate_range(range="1-5", count=8) is True
     pytest.raises(click.BadParameter, validate_range, "0-9", 5)
     pytest.raises(click.BadParameter, validate_range, "0", 5)
+    pytest.raises(click.BadParameter, validate_range, "1-9", 5)
+    pytest.raises(click.BadParameter, validate_range, "3-2", 5)
