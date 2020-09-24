@@ -258,7 +258,7 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
         )
         download_single_file(path=path, file_location=file_location)
 
-    click.echo("\n==> Success!")
+    click.echo("==> Success!")
 
 
 @cernopendata_client.command()
@@ -300,7 +300,7 @@ def verify_files(server, recid):
     # Verify number of files
     print("==> Verifying number of files for record {}... ".format(recid))
     print(
-        " -> expected {}, found {}".format(len(file_info_remote), len(file_info_local))
+        "  -> expected {}, found {}".format(len(file_info_remote), len(file_info_local))
     )
     if len(file_info_remote) != len(file_info_local):
         print("ERROR: File count does not match.")
@@ -319,12 +319,12 @@ def verify_files(server, recid):
                 bfile_checksum = bfile_info_local["checksum"]
                 break
         print("==> Verifying file {}... ".format(afile_name))
-        print(" -> expected size {}, found {}".format(afile_size, bfile_size))
+        print("  -> expected size {}, found {}".format(afile_size, bfile_size))
         if afile_size != bfile_size:
             print("ERROR: File size does not match.")
             sys.exit(1)
         print(
-            " -> expected checksum {}, found {}".format(afile_checksum, bfile_checksum)
+            "  -> expected checksum {}, found {}".format(afile_checksum, bfile_checksum)
         )
         if afile_checksum != bfile_checksum:
             print("ERROR: File checksum does not match.")
