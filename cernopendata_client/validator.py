@@ -6,13 +6,19 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
+"""cernopendata-client input validation methods."""
+
 import click
 
 
 def validate_recid(recid=None):
-    """Validate record ID.
+    """Return True if OK, raises click.BadParameter exception otherwise.
 
-    Returns True if OK, raises click.BadParameter exception otherwise.
+    :param recid: Record ID
+    :type recid: int
+
+    :return: Bool after verifying record ID
+    :rtype: bool
     """
     if recid <= 0:
         raise click.BadParameter(
@@ -23,9 +29,13 @@ def validate_recid(recid=None):
 
 
 def validate_server(server=None):
-    """Validate server URL.
+    """Return True if OK, raises click.BadParameter exception otherwise.
 
-    Returns True if OK, raises click.BadParameter exception otherwise.
+    :param server: CERN Open Data server to query
+    :type server: str
+
+    :return: Bool after verfying server url
+    :rtype: bool
     """
     if not server.startswith("http://"):
         raise click.BadParameter(
@@ -36,10 +46,15 @@ def validate_server(server=None):
 
 
 def validate_range(range=None, count=None):
-    """Validate filter range.
+    """Return True if range lies in total files count.
 
-    Return True if range lies in total files count,
-    raises click.BadParameter exception otherwise.
+    :param range: Range of files indexes
+    :param count: Total files in a record
+    :type range: str
+    :type count: int
+
+    :return: Bool after verifying range
+    :rtype: bool
     """
     try:
         if len(range.split("-")) != 2:

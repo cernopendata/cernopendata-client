@@ -6,6 +6,8 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
+"""cernopendata-client file downloading related utilities."""
+
 from sys import stderr as STREAM
 import re
 import pycurl
@@ -14,7 +16,7 @@ from .validator import validate_range
 
 
 def show_download_progress(download_t, download_d, upload_t, upload_d):
-    """Show download progress of a file"""
+    """Show download progress of a file."""
     kb = 1024
     STREAM.write(
         "  -> Progress: {}/{} kiB ({}%)\r".format(
@@ -27,7 +29,7 @@ def show_download_progress(download_t, download_d, upload_t, upload_d):
 
 
 def download_single_file(path=None, file_location=None):
-    """Download single file"""
+    """Download single file."""
     file_name = file_location.split("/")[-1]
     file_dest = path + "/" + file_name
     with open(file_dest, "wb") as f:
@@ -49,7 +51,16 @@ def download_single_file(path=None, file_location=None):
 
 
 def get_download_files_by_name(names=None, file_locations=None):
-    """Returns the file filtered by the name"""
+    """Return the files filtered by file names.
+
+    :param names: List of file names to be filtered
+    :param file_locations: List of file locations
+    :type names: list
+    :type file_locations: list
+
+    :return: List of file locations to be downloaded
+    :rtype: list
+    """
     download_file_locations = []
     for name in names:
         for file_location in file_locations:
@@ -60,9 +71,17 @@ def get_download_files_by_name(names=None, file_locations=None):
 
 
 def get_download_files_by_regexp(regexp=None, file_locations=None, filtered_files=None):
-    """
-    Kwarg filtered_files - List of file locations filtered by previous filters(if any)
-    Returns the list of files filtered by a regular expression
+    """Return the list of files filtered by a regular expression.
+
+    :param regexp: Regexp string for filtering of file locations
+    :param file_locations: List of file locations
+    :param filtered_files: List of file locations filtered by previous filters(if any).
+    :type regexp: str
+    :type file_locations: list
+    :type filtered_files: list
+
+    :return: List of file locations to be downloaded
+    :rtype: list
     """
     file_locations = filtered_files if filtered_files else file_locations
     download_file_locations = []
@@ -74,9 +93,17 @@ def get_download_files_by_regexp(regexp=None, file_locations=None, filtered_file
 
 
 def get_download_files_by_range(ranges=None, file_locations=None, filtered_files=None):
-    """
-    Kwarg filtered_files - List of file locations filtered by previous filters(if any)
-    Returns the list of files filtered by a range of files
+    """Return the list of files filtered by a range of files.
+
+    :param ranges: List of ranges for filtering of files
+    :param file_locations: List of file locations
+    :param filtered_files: List of file locations filtered by previous filters(if any).
+    :type ranges: list
+    :type file_locations: list
+    :type filtered_files: list
+
+    :return: List of file locations to be downloaded
+    :rtype: list
     """
     file_locations = filtered_files if filtered_files else file_locations
     download_file_locations = []

@@ -13,6 +13,9 @@ set -o errexit
 # Quit on unbound symbols
 set -o nounset
 
+# Check compliance with Python docstring conventions
+pydocstyle cernopendata_client
+
 # Check Python code formatting
 if which black; then
     black --check .

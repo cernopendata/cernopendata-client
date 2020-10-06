@@ -6,6 +6,8 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
+"""cernopendata-client record search related utilities."""
+
 from __future__ import print_function
 
 import argparse
@@ -23,7 +25,16 @@ except ImportError:
 
 
 def verify_recid(server=None, recid=None):
-    """Verify that recid corresponds to a valid Open Data record webpage."""
+    """Verify that recid corresponds to a valid Open Data record webpage.
+
+    :param server: CERN Open Data server to query
+    :param recid: Record ID
+    :type server: str
+    :type recid: int
+
+    :return: Boolean after verifying the record id
+    :rtype: bool
+    """
     if recid is None:
         sys.exit(
             "ERROR: You must supply a record id number as an " "input using -r flag."
@@ -45,7 +56,16 @@ def verify_recid(server=None, recid=None):
 
 
 def get_recid_api(server=None, base_record_id=None):
-    """Get the api for the record with given recid."""
+    """Return api for the record with given recid.
+
+    :param server: CERN Open Data server to query
+    :param base_record_id: Record ID
+    :type server: str
+    :type base_record_id: int
+
+    :return: String of record api
+    :rtype: str
+    """
     record_api_url = server + "/api/records/" + base_record_id
     record_api = requests.get(record_api_url)
     record_api.raise_for_status()
@@ -53,7 +73,18 @@ def get_recid_api(server=None, base_record_id=None):
 
 
 def get_recid(server=None, title=None, doi=None):
-    """Get record id by either title or doi."""
+    """Return record id by either title or doi.
+
+    :param server: CERN Open Data server to query
+    :param title: Record title
+    :param doi: Digital Object Identifier of record
+    :type server: str
+    :type title: str
+    :type doi: str
+
+    :return: record id
+    :rtype: int
+    """
     if title:
         name, value = "title", title
     elif doi:
@@ -90,7 +121,20 @@ def get_recid(server=None, title=None, doi=None):
 
 
 def get_record_as_json(server=None, recid=None, doi=None, title=None):
-    """Get record content in json by its recid, doi or title."""
+    """Return record content in json by its recid, doi or title.
+
+    :param server: CERN Open Data server to query
+    :param recid: Record ID
+    :param title: Record title
+    :param doi: Digital Object Identifier of record
+    :type server: str
+    :type recid: int
+    :type title: str
+    :type doi: str
+
+    :return: record content in JSON
+    :rtype: json(dict)
+    """
     if recid:
         record_id = recid
     elif title:
@@ -121,7 +165,20 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
 
 
 def get_files_list(server=None, record_json=None, protocol=None, expand=None):
-    """Get file list of a dataset by its recid, doi, or title."""
+    """Return file list of a dataset by its recid, doi, or title.
+
+    :param server: CERN Open Data server to query
+    :param record_json: Record content in JSON
+    :protocol: Protocol to be used in links(http/root)
+    :expand: Flag for expanding file indexes
+    :type server: str
+    :type record_json: json(dict)
+    :type protocol: str
+    :type expand: bool
+
+    :return: List of files list
+    :rtype: list
+    """
     files_list = [file["uri"] for file in record_json["metadata"]["files"]]
     if expand:
         # let's unwind file indexes
@@ -148,14 +205,18 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
 
 
 def get_file_info_remote(recid, filtered_files=None):
-    """
-    Kwarg filtered_files - list of file locations after applying filters(if any).
+    """Return remote file information list for given record.
 
-    Return remote file information list for given record.
-    Returns a list of dictionaries containing (checksum, name, size,
+    :param recid: Record ID
+    :param filtered_files: list of file locations after applying filters(if any)
+    :type recid: int
+    :type filtered_files: list
+
+    :return: Returns a list of dictionaries containing (checksum, name, size,
     uri) for each file in the record.  Note that 'name' property is
     not stored remotely, but is calculated in this function for
     convenience.
+    :rtype: list
     """
     server = "http://opendata.cern.ch"
     file_info_remote = []

@@ -42,6 +42,7 @@ from .version import __version__
 
 @click.group()
 def cernopendata_client():
+    """Command-line client for interacting with CERN Open Data portal."""
     pass
 
 
@@ -68,6 +69,7 @@ def version():
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
 def get_metadata(server, recid, doi, title, output_value):
+    # noqa: D301
     """Get metadata content of a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -221,7 +223,6 @@ def download_files(
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2,3-4
     """
-
     if recid is not None:
         validate_recid(recid)
     if protocol == "root" and not dryrun:
@@ -312,7 +313,6 @@ def verify_files(server, recid):
     Examples:
       $ cernopendata-client verify-files --recid 5500
     """
-
     # Validate parameters
     validate_recid(recid)
 
