@@ -35,6 +35,7 @@ from .validator import (
     validate_server,
 )
 from .verifier import get_file_info_local
+from .utils import parse_parameters
 
 from .version import __version__
 
@@ -128,48 +129,16 @@ def get_metadata(server, recid, doi, title, output_value):
     type=click.STRING,
     help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
 )
-def get_file_locations(server, recid, doi, title, protocol, expand):
-    """Get a list of data file locations of a record.
-
-    Select a CERN Open Data bibliographic record by a record ID, a
-    DOI, or a title and return the list of data file locations
-    belonging to this record.
-
-    \b
-    Examples:
-      $ cernopendata-client get-file-locations --recid 5500
-      $ cernopendata-client get-file-locations --recid 5500 --protocol root
-    """
-    validate_server(server)
-    if recid is not None:
-        validate_recid(recid)
-    record_json = get_record_as_json(server, recid, doi, title)
-    file_locations = get_files_list(server, record_json, protocol, expand)
-    click.echo("\n".join(file_locations))
-
-
-@cernopendata_client.command()
-@click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier.")
-@click.option("--title", help="Record title")
 @click.option(
-    "--protocol",
-    default="http",
-    type=click.Choice(["http", "root"]),
-    help="Protocol to be used in links.",
-)
-@click.option(
-    "--expand/--no-expand", default=True, help="Expand file indexes? [default=yes]"
-)
-@click.option(
-    "--server",
-    default="http://opendata.cern.ch",
-    type=click.STRING,
-    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+    "--dry-run/--no-dry-run",
+    "dryrun",
+    default=False,
+    help="Get the list of data file locations to be downloaded.",
 )
 @click.option(
     "--filter-name",
-    "name",
+    "names",
+    multiple=True,
     type=click.STRING,
     help="Download files matching exactly the file name",
 )
@@ -181,11 +150,14 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
 )
 @click.option(
     "--filter-range",
-    "range",
+    "ranges",
+    multiple=True,
     type=click.STRING,
     help="Download files from a specified list range (i-j)",
 )
-def download_files(server, recid, doi, title, protocol, expand, name, regexp, range):
+def download_files(
+    server, recid, doi, title, protocol, expand, names, regexp, ranges, dryrun
+):
     """Download data files belonging to a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -194,15 +166,18 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
     \b
     Examples:
       $ cernopendata-client download-files --recid 5500
-      $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
+      $ cernopendata-client download-files --recid 5500 --filter-name name=BuildFile.xml
+      $ cernopendata-client download-files --recid 5500 --filter-name name=BuildFile.xml,name=List_indexfile.txt
       $ cernopendata-client download-files --recid 5500 --filter-regexp py$
-      $ cernopendata-client download-files --recid 5500 --filter-range 1-4
-      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
+      $ cernopendata-client download-files --recid 5500 --filter-range range=1-4
+      $ cernopendata-client download-files --recid 5500 --filter-range range=1-2,range=5-7
+      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range range=1-2
+      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range range=1-2,range=3-4
     """
 
     if recid is not None:
         validate_recid(recid)
-    if protocol == "root":
+    if protocol == "root" and not dryrun:
         click.secho(
             "Root protocol is not supported yet.",
             fg="red",
@@ -211,45 +186,48 @@ def download_files(server, recid, doi, title, protocol, expand, name, regexp, ra
         sys.exit(1)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand)
-
-    path = str(recid)
-    if not os.path.isdir(path):
-        try:
-            os.mkdir(path)
-        except OSError:
-            print("Creation of the directory {} failed".format(path))
-
     download_file_locations = []
 
-    if name:
+    if names:
+        parsed_name_filters = parse_parameters(names)
         dload_file_location_name = get_download_files_by_name(
-            name=name, file_locations=file_locations
+            names=parsed_name_filters, file_locations=file_locations
         )
         download_file_locations = dload_file_location_name
     if regexp:
         dload_file_location_regexp = get_download_files_by_regexp(
             regexp=regexp,
             file_locations=file_locations,
-            dload=dload_file_location_name if name else None,
+            dload=download_file_locations if names else None,
         )
         download_file_locations = dload_file_location_regexp
-    if range:
-        validate_range(range=range, count=len(file_locations))
+    if ranges:
+        parsed_range_filters = parse_parameters(ranges)
         dload_file_location_range = get_download_files_by_range(
-            range=range,
+            ranges=parsed_range_filters,
             file_locations=file_locations,
-            dload=dload_file_location_regexp if regexp else None,
+            dload=download_file_locations if names or regexp else None,
         )
         download_file_locations = dload_file_location_range
 
-    if name or regexp or range:
+    if names or regexp or ranges:
         if not download_file_locations:
             click.echo("\nNo files matching the filters")
             sys.exit(1)
     else:
         download_file_locations = file_locations
 
+    if dryrun:
+        click.echo("\n".join(download_file_locations))
+        sys.exit(0)
+
     total_files = len(download_file_locations)
+    path = str(recid)
+    if not os.path.isdir(path):
+        try:
+            os.mkdir(path)
+        except OSError:
+            print("Creation of the directory {} failed".format(path))
     for file_location in download_file_locations:
         print(
             "==> Downloading file {} of {}".format(

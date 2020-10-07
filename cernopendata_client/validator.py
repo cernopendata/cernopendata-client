@@ -41,12 +41,18 @@ def validate_range(range=None, count=None):
     Return True if range lies in total files count,
     raises click.BadParameter exception otherwise.
     """
-    if len(range.split("-")) != 2:
+    try:
+        if len(range.split("-")) != 2:
+            raise click.BadParameter(
+                "Range should have start and end index(i-j)",
+                param_hint=["--filter-range"],
+            )
+        range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
+    except:
         raise click.BadParameter(
             "Range should have start and end index(i-j)",
             param_hint=["--filter-range"],
         )
-    range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
     if range_from <= 0:
         raise click.BadParameter(
             "Range should start from a positive integer",

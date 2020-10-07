@@ -10,6 +10,8 @@ from sys import stderr as STREAM
 import re
 import pycurl
 
+from .validator import validate_range
+
 
 def show_download_progress(download_t, download_d, upload_t, upload_d):
     """Show download progress of a file"""
@@ -46,12 +48,16 @@ def download_single_file(path=None, file_location=None):
     return
 
 
-def get_download_files_by_name(name=None, file_locations=None):
+def get_download_files_by_name(names=None, file_locations=None):
     """Returns the file filtered by the name"""
-    for file_location in file_locations:
-        file_name = file_location.split("/")[-1]
-        if file_name == name:
-            return [file_location]
+    names = [name["value"] for name in names]
+    download_file_locations = []
+    for name in names:
+        for file_location in file_locations:
+            file_name = file_location.split("/")[-1]
+            if file_name == name:
+                download_file_locations.append(file_location)
+    return download_file_locations
 
 
 def get_download_files_by_regexp(regexp=None, file_locations=None, **kwargs):
@@ -69,15 +75,21 @@ def get_download_files_by_regexp(regexp=None, file_locations=None, **kwargs):
     return download_file_locations
 
 
-def get_download_files_by_range(range=None, file_locations=None, **kwargs):
+def get_download_files_by_range(ranges=None, file_locations=None, **kwargs):
     """
     dload kwarg - List of file locations filtered by previous filters(if any)
     Returns the list of files filtered by a range of files
     """
     _file_locations = kwargs.get("dload", None)
     file_locations = _file_locations if _file_locations else file_locations
-    file_range = range.split("-")
-    download_file_locations = file_locations[
-        int(file_range[0]) - 1 : int(file_range[-1])
-    ]
+    ranges = [range["value"] for range in ranges]
+    download_file_locations = []
+    for range in ranges:
+        validate_range(range=range, count=len(file_locations))
+        file_range = range.split("-")
+        _range_file_locations = file_locations[
+            int(file_range[0]) - 1 : int(file_range[-1])
+        ]
+        for file in _range_file_locations:
+            download_file_locations.append(file)
     return download_file_locations

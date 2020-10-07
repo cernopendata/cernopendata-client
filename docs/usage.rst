@@ -19,7 +19,6 @@ In order to get help for any ``cernopendata-client`` command, use the
 
     Commands:
     download-files      Download data files belonging to a record.
-    get-file-locations  Get a list of data file locations of a record.
     get-metadata        Get metadata content of a record.
     verify-files        Verify downloaded data file integrity.
     version             Return cernopendata-client version.
@@ -92,11 +91,11 @@ Listing available data files
 **HTTP protocol**
 
 In order to get a list of data files belonging to a record, please use
-the **get-file-locations** command:
+the **download-files --dry-run** command:
 
 .. code-block:: console
 
-    $ cernopendata-client get-file-locations --recid 5500
+    $ cernopendata-client download-files --recid 5500 --dry-run
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt
@@ -109,7 +108,7 @@ the **get-file-locations** command:
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.pdf
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png
 
-This command will output URIs for all the files associated with the record ID 550, using the HTTP protocol.
+This command will output URIs for all the files associated with the record ID 5500, using the HTTP protocol.
 
 **XRootD protocol**
 
@@ -118,7 +117,7 @@ would rather see the equivalent XRootD endpoints for the files:
 
 .. code-block:: console
 
-    $ cernopendata-client get-file-locations --recid 5500 --protocol root
+    $ cernopendata-client download-files --recid 5500 --dry-run --protocol root
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt
@@ -185,10 +184,21 @@ We can download a file matching exactly the file name by the **filter-name** opt
 
 .. code-block:: console
 
-    $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
+    $ cernopendata-client download-files --recid 5500 --filter-name name=BuildFile.xml
     ==> Downloading file 1 of 1
       -> File: ./5500/BuildFile.xml
       -> Progress: 0/0 kiB (100%)
+    ==> Success!
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-name name=BuildFile.xml,name=List_indexfile.txt
+    ==> Downloading file 1 of 2
+      -> File: ./5500/BuildFile.xml
+      -> Progress: 0/0 kiB (100%)
+    ==> Downloading file 2 of 2
+      -> File: ./5500/List_indexfile.txt
+      -> Progress: 1/1 kiB (100%)
     ==> Success!
 
 **Filter by regular expression**
@@ -218,7 +228,7 @@ We can download files from a specified list range (i-j) by the **filter-range** 
 
 .. code-block:: console
 
-    $ cernopendata-client download-files --recid 5500 --filter-range 1-4
+    $ cernopendata-client download-files --recid 5500 --filter-range range=1-4
     ==> Downloading file 1 of 4
       -> File: ./5500/BuildFile.xml
       -> Progress: 0/0 kiB (100%)
@@ -233,19 +243,45 @@ We can download files from a specified list range (i-j) by the **filter-range** 
       -> Progress: 14/14 kiB (100%)
     ==> Success!
 
-**Filter by multiple options**
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-range range=1-2,range=5-7
+    ==> Downloading file 1 of 5
+      -> File: ./5500/BuildFile.xml
+    ==> Downloading file 2 of 5
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+    ==> Downloading file 3 of 5
+      -> File: ./5500/M4Lnormdatall_lvl3.cc
+    ==> Downloading file 4 of 5
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+    ==> Downloading file 5 of 5
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+    ==> Success!
+
+**Filter by multiple options with multiple filters**
 
 We can download files by filtering out with multiple filters.
 
 .. code-block:: console
 
-    $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
+    $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range range=1-2
     ==> Downloading file 1 of 2
       -> File: ./5500/demoanalyzer_cfg_level3MC.py
       -> Progress: 3/3 kiB (100%)
     ==> Downloading file 2 of 2
       -> File: ./5500/demoanalyzer_cfg_level3data.py
       -> Progress: 3/3 kiB (100%)
+    ==> Success!
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range range=1-2,range=4-4
+    ==> Downloading file 1 of 3
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+    ==> Downloading file 2 of 3
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+    ==> Downloading file 3 of 3
+      -> File: ./5500/demoanalyzer_cfg_level4data.py
     ==> Success!
 
 Verifying files
