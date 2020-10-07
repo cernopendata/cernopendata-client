@@ -34,7 +34,7 @@ from .validator import (
     validate_recid,
     validate_server,
 )
-from .verifier import get_file_info_local
+from .verifier import get_file_info_local, verify_file_info
 from .utils import parse_parameters
 
 from .version import __version__
@@ -155,8 +155,15 @@ def get_metadata(server, recid, doi, title, output_value):
     type=click.STRING,
     help="Download files from a specified list range (i-j)",
 )
+@click.option(
+    "--verify",
+    "verify",
+    is_flag=True,
+    default=False,
+    help="Verify downloaded data file integrity.",
+)
 def download_files(
-    server, recid, doi, title, protocol, expand, names, regexp, ranges, dryrun
+    server, recid, doi, title, protocol, expand, names, regexp, ranges, dryrun, verify
 ):
     """Download data files belonging to a record.
 
@@ -236,6 +243,13 @@ def download_files(
         )
         download_single_file(path=path, file_location=file_location)
 
+    if verify:
+        file_info_remote = get_file_info_remote(
+            recid, filtered_files=download_file_locations
+        )
+        file_info_local = get_file_info_local(recid)
+        click.secho("==> Verifying downloaded files for record {}.".format(recid))
+        verify_file_info(file_info_local, file_info_remote)
     click.echo("==> Success!")
 
 
@@ -285,28 +299,7 @@ def verify_files(server, recid):
         sys.exit(1)
 
     # Verify size and checksum of each file
-    for afile_info_remote in file_info_remote:
-        afile_name = afile_info_remote["name"]
-        afile_size = afile_info_remote["size"]
-        afile_checksum = afile_info_remote["checksum"]
-        bfile_size = 0
-        bfile_checksum = ""
-        for bfile_info_local in file_info_local:
-            if bfile_info_local["name"] == afile_name:
-                bfile_size = bfile_info_local["size"]
-                bfile_checksum = bfile_info_local["checksum"]
-                break
-        print("==> Verifying file {}... ".format(afile_name))
-        print("  -> expected size {}, found {}".format(afile_size, bfile_size))
-        if afile_size != bfile_size:
-            print("ERROR: File size does not match.")
-            sys.exit(1)
-        print(
-            "  -> expected checksum {}, found {}".format(afile_checksum, bfile_checksum)
-        )
-        if afile_checksum != bfile_checksum:
-            print("ERROR: File checksum does not match.")
-            sys.exit(1)
+    verify_file_info(file_info_local, file_info_remote)
 
     # Success!
     print("==> Success!")

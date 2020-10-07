@@ -332,6 +332,35 @@ use the **verify-files** command:
       -> expected checksum adler32:62e0c299, found adler32:62e0c299
     ==> Success!
 
+We can verify files just after downloading files with help of **download-files --verify** command.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-range range=1-4 --verify
+    ==> Downloading file 1 of 4
+      -> File: ./5500/BuildFile.xml
+    ==> Downloading file 2 of 4
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+    ==> Downloading file 3 of 4
+      -> File: ./5500/List_indexfile.txt
+    ==> Downloading file 4 of 4
+      -> File: ./5500/M4Lnormdatall.cc
+    ==> Verifying downloaded files for record 5500.
+      -> expected 4, found 4.
+    ==> Verifying file BuildFile.xml... 
+      -> expected size 305, found 305
+      -> expected checksum adler32:ff63668a, found adler32:ff63668a
+    ==> Verifying file HiggsDemoAnalyzer.cc... 
+      -> expected size 83761, found 83761
+      -> expected checksum adler32:f205f068, found adler32:f205f068
+    ==> Verifying file List_indexfile.txt... 
+      -> expected size 1669, found 1669
+      -> expected checksum adler32:46a907fc, found adler32:46a907fc
+    ==> Verifying file M4Lnormdatall.cc... 
+      -> expected size 14943, found 14943
+      -> expected checksum adler32:af301992, found adler32:af301992
+    ==> Success!
+
 More information
 ----------------
 

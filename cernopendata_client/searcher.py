@@ -147,27 +147,31 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
     return files_list
 
 
-def get_file_info_remote(recid):
-    """Return remote file information list for given record.
+def get_file_info_remote(recid, filtered_files=None):
+    """
+    Kwarg filtered_files - list of file locations after applying filters(if any).
 
+    Return remote file information list for given record.
     Returns a list of dictionaries containing (checksum, name, size,
     uri) for each file in the record.  Note that 'name' property is
     not stored remotely, but is calculated in this function for
     convenience.
     """
+    server = "http://opendata.cern.ch"
     file_info_remote = []
-    record_json = get_record_as_json(server="http://opendata.cern.ch", recid=recid)
+    record_json = get_record_as_json(server=server, recid=recid)
     for file_info in record_json["metadata"]["files"]:
         file_checksum = file_info["checksum"]
         file_size = file_info["size"]
-        file_uri = file_info["uri"]
+        file_uri = file_info["uri"].replace("root://eospublic.cern.ch/", server)
         file_name = file_info["uri"].rsplit("/", 1)[1]
-        file_info_remote.append(
-            {
-                "checksum": file_checksum,
-                "name": file_name,
-                "size": file_size,
-                "uri": file_uri,
-            }
-        )
+        if not filtered_files or file_uri in filtered_files:
+            file_info_remote.append(
+                {
+                    "checksum": file_checksum,
+                    "name": file_name,
+                    "size": file_size,
+                    "uri": file_uri,
+                }
+            )
     return file_info_remote
