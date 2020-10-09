@@ -52,14 +52,6 @@ def get_file_info_local(recid):
 
 def verify_file_info(file_info_local, file_info_remote):
     """Return True if local file info matches with the remote file info."""
-    click.secho(
-        "  -> expected {}, found {}.".format(
-            len(file_info_remote), len(file_info_local)
-        )
-    )
-    if len(file_info_remote) != len(file_info_local):
-        click.secho("ERROR: File count does not match.")
-        sys.exit(1)
     for afile_info_remote in file_info_remote:
         afile_name = afile_info_remote["name"]
         afile_size = afile_info_remote["size"]

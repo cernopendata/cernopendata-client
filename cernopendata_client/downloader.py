@@ -50,7 +50,6 @@ def download_single_file(path=None, file_location=None):
 
 def get_download_files_by_name(names=None, file_locations=None):
     """Returns the file filtered by the name"""
-    names = [name["value"] for name in names]
     download_file_locations = []
     for name in names:
         for file_location in file_locations:
@@ -60,13 +59,12 @@ def get_download_files_by_name(names=None, file_locations=None):
     return download_file_locations
 
 
-def get_download_files_by_regexp(regexp=None, file_locations=None, **kwargs):
+def get_download_files_by_regexp(regexp=None, file_locations=None, filtered_files=None):
     """
-    dload kwarg - List of file locations filtered by previous filters(if any)
+    Kwarg filtered_files - List of file locations filtered by previous filters(if any)
     Returns the list of files filtered by a regular expression
     """
-    _file_locations = kwargs.get("dload", None)
-    file_locations = _file_locations if _file_locations else file_locations
+    file_locations = filtered_files if filtered_files else file_locations
     download_file_locations = []
     for file_location in file_locations:
         file_name = file_location.split("/")[-1]
@@ -75,14 +73,12 @@ def get_download_files_by_regexp(regexp=None, file_locations=None, **kwargs):
     return download_file_locations
 
 
-def get_download_files_by_range(ranges=None, file_locations=None, **kwargs):
+def get_download_files_by_range(ranges=None, file_locations=None, filtered_files=None):
     """
-    dload kwarg - List of file locations filtered by previous filters(if any)
+    Kwarg filtered_files - List of file locations filtered by previous filters(if any)
     Returns the list of files filtered by a range of files
     """
-    _file_locations = kwargs.get("dload", None)
-    file_locations = _file_locations if _file_locations else file_locations
-    ranges = [range["value"] for range in ranges]
+    file_locations = filtered_files if filtered_files else file_locations
     download_file_locations = []
     for range in ranges:
         validate_range(range=range, count=len(file_locations))
