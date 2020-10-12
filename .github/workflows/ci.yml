@@ -1,0 +1,137 @@
+name: CI
+
+on:
+    push:
+        branches: master
+    pull_request:
+        branches: master
+
+jobs:
+    Lint-black:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+
+          - name: Setup Python
+            uses: actions/setup-python@v2
+            with:
+              python-version: 3.8
+
+          - name: Check Python code formatting
+            run: |
+              pip install black
+              ./run-tests.sh --check-black
+
+    Lint-pydocstyle:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+
+        - name: Check compliance with Python docstring conventions
+          run: |
+            pip install pydocstyle
+            ./run-tests.sh --check-pydocstyle
+
+    Lint-flake8:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+
+        - name: Check compliance with pep8, pyflakes and circular complexity
+          run: |
+            pip install flake8
+            ./run-tests.sh --check-flake8
+
+    Lint-check-manifest:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+
+        - name: Check Python manifest completeness
+          run: |
+            pip install check-manifest
+            ./run-tests.sh --check-manifest
+
+    Docs-sphinx:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup Python
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.8
+
+        - name: Install system dependencies
+          run: |
+            sudo apt-get update -y
+            sudo apt install libcurl4-openssl-dev libssl-dev
+            sudo apt-get install libgnutls28-dev
+
+        - name: Install Python dependencies
+          run: |
+            pip install --upgrade pip setuptools py
+            pip install -e .[all]
+
+        - name: Run Sphinx documentation with doctests
+          run: ./run-tests.sh --check-sphinx
+
+    Python-tests:
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+              python-version: [2.7, 3.6, 3.7, 3.8]
+
+        steps:
+          - uses: actions/checkout@v2
+
+          - name: Set up Python ${{ matrix.python-version }}
+            uses: actions/setup-python@v2
+            with:
+              python-version: ${{ matrix.python-version }}
+
+          - name: Install system dependencies
+            run: |
+              sudo apt-get update -y
+              sudo apt install libcurl4-openssl-dev libssl-dev
+              sudo apt-get install libgnutls28-dev
+
+          - name: Install Python dependencies
+            run: |
+              pip install --upgrade pip setuptools py
+              pip install -e .[all]
+
+          - name: Run pytest
+            run: ./run-tests.sh --pytest
+
+          - name: Codecov Coverage
+            if: matrix.python-version == 3.8
+            uses: codecov/codecov-action@v1
+            with:
+              token: ${{ secrets.CODECOV_TOKEN }}
+              files: coverage.xml
+
+    Docker-build:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+
+          - name: Build and Run
+            run: |
+              docker build -t cernopendata/cernopendata-client .
+              docker run --rm cernopendata/cernopendata-client version

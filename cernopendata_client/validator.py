@@ -63,7 +63,7 @@ def validate_range(range=None, count=None):
                 param_hint=["--filter-range"],
             )
         range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
-    except:
+    except Exception:
         raise click.BadParameter(
             "Range should have start and end index(i-j)",
             param_hint=["--filter-range"],

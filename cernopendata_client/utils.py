@@ -23,5 +23,5 @@ def parse_parameters(filter_input):
     try:
         filters = " ".join(filter_input).split(",")
         return filters
-    except:
+    except Exception:
         raise click.BadParameter("Wrong input format \n")

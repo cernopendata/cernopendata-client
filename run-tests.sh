@@ -13,22 +13,37 @@ set -o errexit
 # Quit on unbound symbols
 set -o nounset
 
-# Check compliance with Python docstring conventions
-pydocstyle cernopendata_client
-
-# Check Python code formatting
-if which black; then
-    black --check .
-fi
-
-# Check Python manifest completeness
-check-manifest --ignore ".travis-*"
-
-# Check Sphinx documentation
-sphinx-build -qnNW docs docs/_build/html
-
-# Run test suite
-python setup.py test
-
-# Check Sphinx documentation with doctests
-sphinx-build -qnNW -b doctest docs docs/_build/doctest
+for arg in "$@"
+do
+    case $arg in
+        --check-black) # Check Python code formatting
+        black --check .
+        ;;
+        --check-pydocstyle) # Check compliance with Python docstring conventions
+        pydocstyle cernopendata_client
+        ;;
+        --check-flake8) # Check compliance with pep8, pyflakes and circular complexity
+        flake8 .
+        ;;
+        --check-manifest) # Check Python manifest completeness
+        check-manifest
+        ;;
+        --check-sphinx) # Check Sphinx documentation with doctests
+        sphinx-build -qnNW docs docs/_build/html
+        sphinx-build -qnNW -b doctest docs docs/_build/doctest
+        ;;
+        --pytest) # Run test suite
+        python setup.py test
+        ;;
+        --all) # Run all tests locally
+        black --check .
+        pydocstyle cernopendata_client
+        flake8 .
+        check-manifest
+        sphinx-build -qnNW docs docs/_build/html
+        sphinx-build -qnNW -b doctest docs docs/_build/doctest
+        python setup.py test
+        ;;
+        *)
+    esac
+done
