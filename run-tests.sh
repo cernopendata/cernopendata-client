@@ -13,37 +13,54 @@ set -o errexit
 # Quit on unbound symbols
 set -o nounset
 
+check_script () {
+    shellcheck run-tests.sh
+}
+
+check_black () {
+    black --check .
+}
+
+check_pydocstyle () {
+    pydocstyle cernopendata_client
+}
+
+check_flake8 () {
+    flake8 .
+}
+
+check_manifest () {
+    check-manifest
+}
+
+check_sphinx () {
+    sphinx-build -qnNW docs docs/_build/html
+    sphinx-build -qnNW -b doctest docs docs/_build/doctest
+}
+
+check_pytest () {
+    python setup.py test
+}
+
 for arg in "$@"
 do
     case $arg in
-        --check-black) # Check Python code formatting
-        black --check .
-        ;;
-        --check-pydocstyle) # Check compliance with Python docstring conventions
-        pydocstyle cernopendata_client
-        ;;
-        --check-flake8) # Check compliance with pep8, pyflakes and circular complexity
-        flake8 .
-        ;;
-        --check-manifest) # Check Python manifest completeness
-        check-manifest
-        ;;
-        --check-sphinx) # Check Sphinx documentation with doctests
-        sphinx-build -qnNW docs docs/_build/html
-        sphinx-build -qnNW -b doctest docs docs/_build/doctest
-        ;;
-        --pytest) # Run test suite
-        python setup.py test
-        ;;
-        --all) # Run all tests locally
-        black --check .
-        pydocstyle cernopendata_client
-        flake8 .
-        check-manifest
-        sphinx-build -qnNW docs docs/_build/html
-        sphinx-build -qnNW -b doctest docs docs/_build/doctest
-        python setup.py test
-        ;;
+        --check-shellscript) check_script;;
+        --check-black) check_black;;
+        --check-pydocstyle) check_pydocstyle;;
+        --check-flake8) check_flake8;;
+        --check-manifest) check_manifest;;
+        --check-sphinx) check_sphinx;;
+        --check-pytest) check_pytest;;
+        --check-all)
+            check_script
+            check_black
+            check_pydocstyle
+            check_flake8
+            check_manifest
+            check_sphinx
+            check_pytest
+            ;;
         *)
     esac
 done

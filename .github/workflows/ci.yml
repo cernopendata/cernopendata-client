@@ -7,6 +7,16 @@ on:
         branches: master
 
 jobs:
+    Lint-Shellcheck:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+
+          - name: Runs shell script static analysis
+            run: |
+              sudo apt-get install shellcheck
+              ./run-tests.sh --check-shellscript
+
     Lint-black:
         runs-on: ubuntu-latest
         steps:
