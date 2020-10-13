@@ -35,6 +35,7 @@ from .validator import (
     validate_server,
 )
 from .verifier import get_file_info_local, verify_file_info
+from .config import SERVER_HTTP_URI
 from .utils import parse_parameters
 
 from .version import __version__
@@ -64,9 +65,9 @@ def version():
 )
 @click.option(
     "--server",
-    default="http://opendata.cern.ch",
+    default=SERVER_HTTP_URI,
     type=click.STRING,
-    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+    help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
 def get_metadata(server, recid, doi, title, output_value):
     # noqa: D301
@@ -127,9 +128,9 @@ def get_metadata(server, recid, doi, title, output_value):
 )
 @click.option(
     "--server",
-    default="http://opendata.cern.ch",
+    default=SERVER_HTTP_URI,
     type=click.STRING,
-    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+    help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
 def get_file_locations(server, recid, doi, title, protocol, expand):
     """Get a list of data file locations of a record.
@@ -166,9 +167,9 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
 )
 @click.option(
     "--server",
-    default="http://opendata.cern.ch",
+    default=SERVER_HTTP_URI,
     type=click.STRING,
-    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+    help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
 @click.option(
     "--dry-run",
@@ -298,9 +299,9 @@ def download_files(
 @click.option("--recid", type=click.INT, help="Record ID")
 @click.option(
     "--server",
-    default="http://opendata.cern.ch",
+    default=SERVER_HTTP_URI,
     type=click.STRING,
-    help="Which CERN Open Data server to query? [default=http://opendata.cern.ch]",
+    help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
 def verify_files(server, recid):
     """Verify downloaded data file integrity.

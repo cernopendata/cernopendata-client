@@ -17,6 +17,8 @@ import sys
 import click
 import requests
 
+from .config import SERVER_HTTP_URI, SERVER_ROOT_URI
+
 try:
     from urllib.parse import quote
 except ImportError:
@@ -185,7 +187,7 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
         files_list_expanded = []
         for file_ in files_list:
             if file_.endswith("_file_index.txt"):
-                url_file = file_.replace("root://eospublic.cern.ch/", server)
+                url_file = file_.replace(SERVER_ROOT_URI, server)
                 req = requests.get(url_file)
                 for url_individual_file in req.text.split("\n"):
                     if url_individual_file:
@@ -197,9 +199,7 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
         files_list = files_list_expanded
 
     if protocol == "http":
-        files_list = [
-            file_.replace("root://eospublic.cern.ch/", server) for file_ in files_list
-        ]
+        files_list = [file_.replace(SERVER_ROOT_URI, server) for file_ in files_list]
 
     return files_list
 
@@ -218,13 +218,12 @@ def get_file_info_remote(recid, filtered_files=None):
     convenience.
     :rtype: list
     """
-    server = "http://opendata.cern.ch"
     file_info_remote = []
-    record_json = get_record_as_json(server=server, recid=recid)
+    record_json = get_record_as_json(server=SERVER_HTTP_URI, recid=recid)
     for file_info in record_json["metadata"]["files"]:
         file_checksum = file_info["checksum"]
         file_size = file_info["size"]
-        file_uri = file_info["uri"].replace("root://eospublic.cern.ch/", server)
+        file_uri = file_info["uri"].replace(SERVER_ROOT_URI, SERVER_HTTP_URI)
         file_name = file_info["uri"].rsplit("/", 1)[1]
         if not filtered_files or file_uri in filtered_files:
             file_info_remote.append(
