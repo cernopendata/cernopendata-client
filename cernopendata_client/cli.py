@@ -284,14 +284,12 @@ def download_files(
             )
         )
         download_single_file(path=path, file_location=file_location)
-
-    if verify:
-        file_info_remote = get_file_info_remote(
-            recid, filtered_files=download_file_locations
-        )
-        file_info_local = get_file_info_local(recid)
-        click.secho("==> Verifying downloaded files for record {}.".format(recid))
-        verify_file_info(file_info_local, file_info_remote)
+        if verify:
+            file_info_remote = get_file_info_remote(
+                server, recid, filtered_files=[file_location]
+            )
+            file_info_local = get_file_info_local(recid)
+            verify_file_info(file_info_local, file_info_remote)
     click.echo("==> Success!")
 
 
@@ -318,7 +316,7 @@ def verify_files(server, recid):
     validate_recid(recid)
 
     # Get remote file information
-    file_info_remote = get_file_info_remote(recid)
+    file_info_remote = get_file_info_remote(server, recid)
 
     # Get local file information
     file_info_local = get_file_info_local(recid)

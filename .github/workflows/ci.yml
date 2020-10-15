@@ -127,7 +127,7 @@ jobs:
               pip install -e .[all]
 
           - name: Run pytest
-            run: ./run-tests.sh --pytest
+            run: ./run-tests.sh --check-pytest
 
           - name: Codecov Coverage
             if: matrix.python-version == 3.8
