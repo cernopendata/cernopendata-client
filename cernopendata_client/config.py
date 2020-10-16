@@ -14,3 +14,12 @@ SERVER_HTTP_URI = "http://opendata.cern.ch"
 
 SERVER_ROOT_URI = "root://eospublic.cern.ch/"
 """Default CERN Open Data server to query over XRootD protocol."""
+
+PRINTER_COLOUR_INFO = "bright_yellow"
+"""Default Color for info message on terminal"""
+
+PRINTER_COLOUR_ERROR = "bright_red"
+"""Default Color for error message on terminal"""
+
+PRINTER_COLOUR_SUCCESS = "bright_green"
+"""Default Color for success message on terminal"""

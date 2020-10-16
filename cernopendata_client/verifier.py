@@ -14,6 +14,8 @@ import sys
 import click
 import zlib
 
+from .printer import display_message
+
 
 def get_file_size(afile):
     """Return the size of a file.
@@ -89,15 +91,29 @@ def verify_file_info(file_info_local, file_info_remote):
                 bfile_size = bfile_info_local["size"]
                 bfile_checksum = bfile_info_local["checksum"]
                 break
-        click.secho("==> Verifying file {}... ".format(afile_name))
-        click.secho("  -> expected size {}, found {}".format(afile_size, bfile_size))
+        display_message(
+            prefix="double",
+            msg_type="info",
+            msg="Verifying file {}... ".format(afile_name),
+        )
+        display_message(
+            prefix="single",
+            msg="expected size {}, found {}".format(afile_size, bfile_size),
+        )
         if afile_size != bfile_size:
-            click.secho("ERROR: File size does not match.")
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="File size does not match.",
+            )
             sys.exit(1)
-        click.secho(
-            "  -> expected checksum {}, found {}".format(afile_checksum, bfile_checksum)
+        display_message(
+            prefix="single",
+            msg="expected checksum {}, found {}".format(afile_checksum, bfile_checksum),
         )
         if afile_checksum != bfile_checksum:
-            click.secho("ERROR: File checksum does not match.")
+            display_message(
+                prefix="double", msg_type="error", msg="File checksum does not match."
+            )
             sys.exit(1)
     return True

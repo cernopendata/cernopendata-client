@@ -14,10 +14,10 @@ import argparse
 import os
 import sys
 
-import click
 import requests
 
 from .config import SERVER_HTTP_URI, SERVER_ROOT_URI
+from .printer import display_message
 
 try:
     from urllib.parse import quote
@@ -38,9 +38,12 @@ def verify_recid(server=None, recid=None):
     :rtype: bool
     """
     if recid is None:
-        sys.exit(
-            "ERROR: You must supply a record id number as an " "input using -r flag."
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="You must supply a record id number as an " "input using -r flag.",
         )
+        sys.exit(1)
     else:
         input_record_url = server + "/record/" + str(recid)
         input_record_url_check = requests.get(input_record_url)
@@ -51,9 +54,13 @@ def verify_recid(server=None, recid=None):
         else:
             try:
                 input_record_url_check.raise_for_status()
-            except requests.HTTPError as http_error_msg:
-                print("ERROR: The record id number you supplied is not valid.")
-                sys.exit(http_error_msg)
+            except requests.HTTPError:
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="The record id number you supplied is not valid.",
+                )
+                sys.exit(1)
             return False
 
 
@@ -102,20 +109,26 @@ def get_recid(server=None, title=None, doi=None):
     try:
         response.raise_for_status()
     except requests.HTTPError as e:
-        click.secho("Connection to server failed: \n reason: {}.".format(e), err=True)
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Connection to server failed: \n reason: {}.".format(e),
+        )
     if "hits" in response_json:
         hits_total = response_json["hits"]["total"]
         if hits_total < 1:
-            click.secho(
-                "Record with given {} does not exist.".format(name), fg="red", err=True
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="Record with given {} does not exist.".format(name),
             )
             sys.exit(2)
         elif hits_total > 1:
-            click.secho(
-                "More than one record fit this {}."
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="More than one record fit this {}."
                 "This should not happen.".format(name),
-                fg="red",
-                err=True,
             )
             sys.exit(3)
         elif hits_total == 1:
@@ -144,11 +157,11 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
     elif doi:
         record_id = get_recid(server=server, doi=doi)
     else:
-        click.secho(
-            "Please provide at least one of following arguments: "
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Please provide at least one of following arguments: "
             "(recid, doi, title)",
-            fg="red",
-            err=True,
         )
         sys.exit(1)
 

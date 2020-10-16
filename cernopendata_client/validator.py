@@ -10,6 +10,8 @@
 
 import click
 
+from .printer import display_message
+
 
 def validate_recid(recid=None):
     """Return True if OK, raises click.BadParameter exception otherwise.
@@ -22,7 +24,13 @@ def validate_recid(recid=None):
     """
     if recid <= 0:
         raise click.BadParameter(
-            "Recid should be a positive integer",
+            "{}".format(
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="Recid should be a positive integer",
+                )
+            ),
             param_hint=["--recid"],
         )
     return True
@@ -39,7 +47,13 @@ def validate_server(server=None):
     """
     if not server.startswith("http://"):
         raise click.BadParameter(
-            "Server should be a valid URL",
+            "{}".format(
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="Server should be a valid URL",
+                )
+            ),
             param_hint=["--server"],
         )
     return True
@@ -59,28 +73,54 @@ def validate_range(range=None, count=None):
     try:
         if len(range.split("-")) != 2:
             raise click.BadParameter(
-                "Range should have start and end index(i-j)",
+                "{}".format(
+                    display_message(
+                        prefix="double",
+                        msg_type="error",
+                        msg="Range should have start and end index(i-j)",
+                    )
+                ),
                 param_hint=["--filter-range"],
             )
         range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
     except Exception:
         raise click.BadParameter(
-            "Range should have start and end index(i-j)",
+            "{}".format(
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="Range should have start and end index(i-j)",
+                )
+            ),
             param_hint=["--filter-range"],
         )
     if range_from <= 0:
         raise click.BadParameter(
-            "Range should start from a positive integer",
+            "{}".format(
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="Range should start from a positive integer",
+                )
+            ),
             param_hint=["--filter-range"],
         )
     if range_to > count:
         raise click.BadParameter(
-            "Range is too big",
+            "{}".format(
+                display_message(
+                    prefix="double", msg_type="error", msg="Range is too big"
+                )
+            ),
             param_hint=["--filter-range"],
         )
     if range_to < range_from:
         raise click.BadParameter(
-            "Range is not valid",
+            "{}".format(
+                display_message(
+                    prefix="double", msg_type="error", msg="Range is not valid"
+                )
+            ),
             param_hint=["--filter-range"],
         )
     return True

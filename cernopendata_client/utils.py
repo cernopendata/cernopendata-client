@@ -10,6 +10,8 @@
 
 import click
 
+from .printer import display_message
+
 
 def parse_parameters(filter_input):
     """Return parsed filter parameters.
@@ -24,4 +26,10 @@ def parse_parameters(filter_input):
         filters = " ".join(filter_input).split(",")
         return filters
     except Exception:
-        raise click.BadParameter("Wrong input format \n")
+        raise click.BadParameter(
+            "{}".format(
+                display_message(
+                    prefix="double", msg_type="error", msg="Wrong input format \n"
+                )
+            )
+        )

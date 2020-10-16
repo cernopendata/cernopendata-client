@@ -122,7 +122,7 @@ def test_download_files_filter_name_wrong():
         download_files, ["--recid", 5500, "--filter-name", "test_name.py"]
     )
     assert test_result_name.exit_code == 1
-    assert test_result_name.output == "\nNo files matching the filters\n"
+    assert "No files matching the filters" in test_result_name.output
 
 
 def test_download_files_filter_regexp_single_file():
@@ -172,7 +172,7 @@ def test_download_files_filter_regexp_wrong():
         download_files, ["--recid", 5500, "--filter-regexp", "wontmatchanything"]
     )
     assert test_result_regexp_three.exit_code == 1
-    assert test_result_regexp_three.output == "\nNo files matching the filters\n"
+    assert "No files matching the filters" in test_result_regexp_three.output
 
 
 def test_download_files_filter_range():

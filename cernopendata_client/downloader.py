@@ -13,6 +13,7 @@ import re
 import pycurl
 
 from .validator import validate_range
+from .printer import display_message
 
 
 def show_download_progress(download_t, download_d, upload_t, upload_d):
@@ -33,11 +34,12 @@ def download_single_file(path=None, file_location=None):
     file_name = file_location.split("/")[-1]
     file_dest = path + "/" + file_name
     with open(file_dest, "wb") as f:
-        print(
-            "  -> File: ./{}/{}".format(
+        display_message(
+            prefix="single",
+            msg="File: ./{}/{}".format(
                 path,
                 file_name,
-            )
+            ),
         )
         c = pycurl.Curl()
         c.setopt(c.URL, file_location)

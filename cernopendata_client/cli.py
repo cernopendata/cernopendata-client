@@ -37,6 +37,7 @@ from .validator import (
 from .verifier import get_file_info_local, verify_file_info
 from .config import SERVER_HTTP_URI
 from .utils import parse_parameters
+from .printer import display_message
 
 from .version import __version__
 
@@ -87,30 +88,30 @@ def get_metadata(server, recid, doi, title, output_value):
     record_json = get_record_as_json(server, recid, doi, title)
     output_json = record_json["metadata"]
     if not output_value:
-        click.echo(json.dumps(output_json, indent=4))
+        display_message(msg=json.dumps(output_json, indent=4))
     else:
         fields = output_value.split(".")
         for field in fields:
             try:
                 output_json = output_json[field]
             except (KeyError, TypeError):
-                click.secho(
-                    "Field '{}' is not present in metadata".format(field),
-                    fg="red",
-                    err=True,
+                display_message(
+                    prefix="double",
+                    msg_type="error",
+                    msg="Field '{}' is not present in metadata".format(field),
                 )
                 sys.exit(1)
         if not output_json:
-            click.secho(
-                "Field '{}' is not present in metadata.".format(fields),
-                fg="red",
-                err=True,
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="Field '{}' is not present in metadata.".format(fields),
             )
             sys.exit(1)
         if type(output_json) is dict or type(output_json) is list:
-            click.echo(json.dumps(output_json, indent=4))
+            display_message(msg=json.dumps(output_json, indent=4))
         else:  # print strings or numbers more simply
-            click.echo(output_json)
+            display_message(msg=output_json)
 
 
 @cernopendata_client.command()
@@ -149,7 +150,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand)
-    click.echo("\n".join(file_locations))
+    display_message(msg="\n".join(file_locations))
 
 
 @cernopendata_client.command()
@@ -227,10 +228,10 @@ def download_files(
     if recid is not None:
         validate_recid(recid)
     if protocol == "root" and not dryrun:
-        click.secho(
-            "Root protocol is not supported yet.",
-            fg="red",
-            err=True,
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Root protocol is not supported yet.",
         )
         sys.exit(1)
     record_json = get_record_as_json(server, recid, doi, title)
@@ -261,13 +262,17 @@ def download_files(
 
     if names or regexp or ranges:
         if not download_file_locations:
-            click.echo("\nNo files matching the filters")
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="No files matching the filters",
+            )
             sys.exit(1)
     else:
         download_file_locations = file_locations
 
     if dryrun:
-        click.echo("\n".join(download_file_locations))
+        display_message(msg="\n".join(download_file_locations))
         sys.exit(0)
 
     total_files = len(download_file_locations)
@@ -276,12 +281,18 @@ def download_files(
         try:
             os.mkdir(path)
         except OSError:
-            print("Creation of the directory {} failed".format(path))
-    for file_location in download_file_locations:
-        print(
-            "==> Downloading file {} of {}".format(
-                download_file_locations.index(file_location) + 1, total_files
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="Creation of the directory {} failed".format(path),
             )
+    for file_location in download_file_locations:
+        display_message(
+            prefix="double",
+            msg_type="info",
+            msg="Downloading file {} of {}".format(
+                download_file_locations.index(file_location) + 1, total_files
+            ),
         )
         download_single_file(path=path, file_location=file_location)
         if verify:
@@ -290,7 +301,11 @@ def download_files(
             )
             file_info_local = get_file_info_local(recid)
             verify_file_info(file_info_local, file_info_remote)
-    click.echo("==> Success!")
+    display_message(
+        prefix="double",
+        msg_type="success",
+        msg="Success!",
+    )
 
 
 @cernopendata_client.command()
@@ -321,24 +336,39 @@ def verify_files(server, recid):
     # Get local file information
     file_info_local = get_file_info_local(recid)
     if not file_info_local:
-        print(
-            "ERROR: No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
                 recid
-            )
+            ),
         )
         sys.exit(1)
 
     # Verify number of files
-    print("==> Verifying number of files for record {}... ".format(recid))
-    print(
-        "  -> expected {}, found {}".format(len(file_info_remote), len(file_info_local))
+    display_message(
+        prefix="double",
+        msg_type="info",
+        msg="Verifying number of files for record {}... ".format(recid),
+    )
+    display_message(
+        prefix="single",
+        msg="expected {}, found {}".format(len(file_info_remote), len(file_info_local)),
     )
     if len(file_info_remote) != len(file_info_local):
-        print("ERROR: File count does not match.")
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="File count does not match.",
+        )
         sys.exit(1)
 
     # Verify size and checksum of each file
     verify_file_info(file_info_local, file_info_remote)
 
     # Success!
-    print("==> Success!")
+    display_message(
+        prefix="double",
+        msg_type="success",
+        msg="Success!",
+    )
