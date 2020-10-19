@@ -68,6 +68,25 @@ def test_download_files():
         os.remove(test_file)
 
 
+def test_download_files_empty_value():
+    """Test download_files() command with empty value."""
+    test_download_files_empty_value = CliRunner()
+    test_result = test_download_files_empty_value.invoke(download_files)
+    assert test_result.exit_code == 1
+    assert "Please provide at least one of following arguments" in test_result.output
+
+
+def test_download_files_wrong_value():
+    """Test download_files() command with wrong value."""
+    test_download_files_empty_value = CliRunner()
+    test_result = test_download_files_empty_value.invoke(
+        download_files,
+        ["--recid", 5500, "--server", "foo"],
+    )
+    assert test_result.exit_code == 2
+    assert "Invalid value for --server" in test_result.output
+
+
 def test_download_files_filter_name():
     """Test download_files() command with --filter-name <name>."""
     test_file = "5500/BuildFile.xml"

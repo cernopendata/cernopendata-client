@@ -9,6 +9,7 @@
 """cernopendata-client utility functions."""
 
 import click
+import sys
 
 from .printer import display_message
 
@@ -26,10 +27,9 @@ def parse_parameters(filter_input):
         filters = " ".join(filter_input).split(",")
         return filters
     except Exception:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double", msg_type="error", msg="Wrong input format \n"
-                )
-            )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="{} - Wrong input format".format(filter_input),
         )
+        sys.exit(2)

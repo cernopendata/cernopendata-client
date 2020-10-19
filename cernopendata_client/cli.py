@@ -225,6 +225,7 @@ def download_files(
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2,3-4
     """
+    validate_server(server)
     if recid is not None:
         validate_recid(recid)
     if protocol == "root" and not dryrun:
@@ -328,7 +329,9 @@ def verify_files(server, recid):
       $ cernopendata-client verify-files --recid 5500
     """
     # Validate parameters
-    validate_recid(recid)
+    validate_server(server)
+    if recid is not None:
+        validate_recid(recid)
 
     # Get remote file information
     file_info_remote = get_file_info_remote(server, recid)

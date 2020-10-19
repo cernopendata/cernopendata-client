@@ -9,12 +9,13 @@
 """cernopendata-client input validation methods."""
 
 import click
+import sys
 
 from .printer import display_message
 
 
 def validate_recid(recid=None):
-    """Return True if OK, raises click.BadParameter exception otherwise.
+    """Return True if record ID is valid, exit otherwise.
 
     :param recid: Record ID
     :type recid: int
@@ -23,21 +24,19 @@ def validate_recid(recid=None):
     :rtype: bool
     """
     if recid <= 0:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double",
-                    msg_type="error",
-                    msg="Recid should be a positive integer",
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Recid should be a positive integer".format(
+                "--recid", recid
             ),
-            param_hint=["--recid"],
         )
+        sys.exit(2)
     return True
 
 
 def validate_server(server=None):
-    """Return True if OK, raises click.BadParameter exception otherwise.
+    """Return True if server uri is valid, exit otherwise.
 
     :param server: CERN Open Data server to query
     :type server: str
@@ -46,21 +45,19 @@ def validate_server(server=None):
     :rtype: bool
     """
     if not server.startswith("http://"):
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double",
-                    msg_type="error",
-                    msg="Server should be a valid URL",
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Server should be a valid HTTP URI".format(
+                "--server", server
             ),
-            param_hint=["--server"],
         )
+        sys.exit(2)
     return True
 
 
 def validate_range(range=None, count=None):
-    """Return True if range lies in total files count.
+    """Return True if range lies in total files count, exit otherwise.
 
     :param range: Range of files indexes
     :param count: Total files in a record
@@ -72,55 +69,49 @@ def validate_range(range=None, count=None):
     """
     try:
         if len(range.split("-")) != 2:
-            raise click.BadParameter(
-                "{}".format(
-                    display_message(
-                        prefix="double",
-                        msg_type="error",
-                        msg="Range should have start and end index(i-j)",
-                    )
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="Invalid value for {}: {} - Range should have start and end index(i-j)".format(
+                    "--filter-range", range
                 ),
-                param_hint=["--filter-range"],
             )
+            sys.exit(2)
         range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
     except Exception:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double",
-                    msg_type="error",
-                    msg="Range should have start and end index(i-j)",
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Range should have start and end index(i-j)".format(
+                "--filter-range", range
             ),
-            param_hint=["--filter-range"],
         )
+        sys.exit(2)
     if range_from <= 0:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double",
-                    msg_type="error",
-                    msg="Range should start from a positive integer",
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Range should start from a positive integer".format(
+                "--filter-range", range_from
             ),
-            param_hint=["--filter-range"],
         )
+        sys.exit(2)
     if range_to > count:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double", msg_type="error", msg="Range is too big"
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Range is too big. There are total {} files".format(
+                "--filter-range", range, count
             ),
-            param_hint=["--filter-range"],
         )
+        sys.exit(2)
     if range_to < range_from:
-        raise click.BadParameter(
-            "{}".format(
-                display_message(
-                    prefix="double", msg_type="error", msg="Range is not valid"
-                )
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="Invalid value for {}: {} - Range is not valid".format(
+                "--filter-range", range
             ),
-            param_hint=["--filter-range"],
         )
+        sys.exit(2)
     return True

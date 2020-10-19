@@ -40,3 +40,22 @@ def test_verify_files():
     # remove test file
     if os.path.isfile(test_file):
         os.remove(test_file)
+
+
+def test_verify_files_empty_value():
+    """Test verify-files command with empty value."""
+    test_verify_files_empty_value = CliRunner()
+    test_result = test_verify_files_empty_value.invoke(verify_files)
+    assert test_result.exit_code == 1
+    assert "Please provide at least one of following arguments" in test_result.output
+
+
+def test_verify_files_wrong_value():
+    """Test verify-files command with wrong value."""
+    test_verify_files_wrong_value = CliRunner()
+    test_result = test_verify_files_wrong_value.invoke(
+        verify_files,
+        ["--recid", 5500, "--server", "foo"],
+    )
+    assert test_result.exit_code == 2
+    assert "Invalid value for --server" in test_result.output

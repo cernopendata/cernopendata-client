@@ -70,3 +70,22 @@ def test_get_metadata_from_output_fields_wrong():
     )
     assert test_result.exit_code == 1
     assert "Field 'global_tag' is not present in metadata\n" in test_result.output
+
+
+def test_get_metadata_empty_value():
+    """Test get_metadata() command with empty value."""
+    test_get_metadata_empty_value = CliRunner()
+    test_result = test_get_metadata_empty_value.invoke(get_metadata)
+    assert test_result.exit_code == 1
+    assert "Please provide at least one of following arguments" in test_result.output
+
+
+def test_get_metadata_wrong_value():
+    """Test download_files() command with wrong value."""
+    test_get_metadata_wrong_value = CliRunner()
+    test_result = test_get_metadata_wrong_value.invoke(
+        get_metadata,
+        ["--recid", 5500, "--server", "foo"],
+    )
+    assert test_result.exit_code == 2
+    assert "Invalid value for --server" in test_result.output

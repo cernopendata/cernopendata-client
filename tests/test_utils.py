@@ -17,6 +17,6 @@ from cernopendata_client.utils import parse_parameters
 
 def test_parse_parameters():
     """Test parse_parameters() method."""
-    pytest.raises(click.BadParameter, parse_parameters, (9))
+    pytest.raises(SystemExit, parse_parameters, (9))
     assert parse_parameters(("test.py",)) == ["test.py"]
     assert parse_parameters(("2-4,9-12",)) == ["2-4", "9-12"]
