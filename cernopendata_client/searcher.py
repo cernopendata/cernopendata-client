@@ -37,31 +37,23 @@ def verify_recid(server=None, recid=None):
     :return: Boolean after verifying the record id
     :rtype: bool
     """
-    if recid is None:
-        display_message(
-            prefix="double",
-            msg_type="error",
-            msg="You must supply a record id number as an " "input using -r flag.",
-        )
-        sys.exit(1)
-    else:
-        input_record_url = server + "/record/" + str(recid)
-        input_record_url_check = requests.get(input_record_url)
+    input_record_url = server + "/record/" + str(recid)
+    input_record_url_check = requests.get(input_record_url)
 
-        if input_record_url_check.status_code == 200:
-            base_record_id = str(recid)
-            return base_record_id
-        else:
-            try:
-                input_record_url_check.raise_for_status()
-            except requests.HTTPError:
-                display_message(
-                    prefix="double",
-                    msg_type="error",
-                    msg="The record id number you supplied is not valid.",
-                )
-                sys.exit(1)
-            return False
+    if input_record_url_check.status_code == 200:
+        base_record_id = str(recid)
+        return base_record_id
+    else:
+        try:
+            input_record_url_check.raise_for_status()
+        except requests.HTTPError:
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="The record id number you supplied is not valid.",
+            )
+            sys.exit(1)
+        return False
 
 
 def get_recid_api(server=None, base_record_id=None):

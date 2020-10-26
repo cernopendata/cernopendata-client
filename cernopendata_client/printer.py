@@ -33,9 +33,6 @@ def display_message(prefix=None, msg_type=None, msg=None):
     if prefix == "double":
         if msg_color:
             click.secho("==> ", bold=True, nl=False, fg="{}".format(msg_color))
-        else:
-            click.secho("==> ", bold=True, nl=False)
-
         if msg_type == "error":
             click.secho(
                 "{}: ".format(msg_type.upper()),

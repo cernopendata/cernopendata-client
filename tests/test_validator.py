@@ -23,6 +23,7 @@ def test_validate_recid():
     """Test validate_recid()."""
     pytest.raises(SystemExit, validate_recid, -1)
     pytest.raises(SystemExit, validate_recid, 0)
+    pytest.raises(SystemExit, validate_recid, None)
     assert validate_recid(1) is True
 
 
@@ -43,3 +44,4 @@ def test_validate_range():
     pytest.raises(SystemExit, validate_range, "0", 5)
     pytest.raises(SystemExit, validate_range, "1-9", 5)
     pytest.raises(SystemExit, validate_range, "3-2", 5)
+    pytest.raises(SystemExit, validate_range, "3,2", 5)

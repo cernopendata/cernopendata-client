@@ -23,6 +23,13 @@ def validate_recid(recid=None):
     :return: Bool after verifying record ID
     :rtype: bool
     """
+    if recid is None:
+        display_message(
+            prefix="double",
+            msg_type="error",
+            msg="You must supply a record id number as an " "input using -r flag.",
+        )
+        sys.exit(1)
     if recid <= 0:
         display_message(
             prefix="double",
@@ -68,15 +75,6 @@ def validate_range(range=None, count=None):
     :rtype: bool
     """
     try:
-        if len(range.split("-")) != 2:
-            display_message(
-                prefix="double",
-                msg_type="error",
-                msg="Invalid value for {}: {} - Range should have start and end index(i-j)".format(
-                    "--filter-range", range
-                ),
-            )
-            sys.exit(2)
         range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
     except Exception:
         display_message(

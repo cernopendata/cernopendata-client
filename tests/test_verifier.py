@@ -252,3 +252,41 @@ def test_verify_file_info_wrong_input():
     pytest.raises(
         SystemExit, verify_file_info, test_file_info_local, test_file_info_remote
     )
+
+
+def test_verify_file_info_wrong_checksum():
+    """Test verify_file_info() for wrong checksum."""
+
+    # Remote test files info
+    test_file_info_remote = [
+        {
+            "checksum": "adler32:ff63668a",
+            "name": "BuildFile.xml",
+            "size": 305,
+            "uri": "http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml",
+        },
+        {
+            "checksum": "adler32:46a907fd",
+            "name": "List_indexfile.txt",
+            "size": 1669,
+            "uri": "http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt",
+        },
+        {
+            "checksum": "adler32:af301992",
+            "name": "M4Lnormdatall.cc",
+            "size": 14943,
+            "uri": "http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/M4Lnormdatall.cc",
+        },
+    ]
+
+    # Local test files info
+    test_file_info_local = [
+        {"name": "List_indexfile.txt", "size": 1669, "checksum": "adler32:46a907fc"},
+        {"name": "M4Lnormdatall.cc", "size": 14943, "checksum": "adler32:af301992"},
+        {"name": "BuildFile.xml", "size": 305, "checksum": "adler32:ff63668a"},
+    ]
+
+    # Simualting function call to exit for wrong input
+    pytest.raises(
+        SystemExit, verify_file_info, test_file_info_local, test_file_info_remote
+    )

@@ -68,6 +68,23 @@ def test_download_files():
         os.remove(test_file)
 
 
+def test_download_files_with_verify():
+    """Test download_files() --verify command."""
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--verify"]
+    )
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
 def test_download_files_empty_value():
     """Test download_files() command with empty value."""
     test_download_files_empty_value = CliRunner()

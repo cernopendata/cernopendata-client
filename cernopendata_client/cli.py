@@ -51,7 +51,7 @@ def cernopendata_client():
 @cernopendata_client.command()
 def version():
     """Return cernopendata-client version."""
-    print(__version__)
+    display_message(msg=__version__)
 
 
 @cernopendata_client.command()
@@ -101,13 +101,6 @@ def get_metadata(server, recid, doi, title, output_value):
                     msg="Field '{}' is not present in metadata".format(field),
                 )
                 sys.exit(1)
-        if not output_json:
-            display_message(
-                prefix="double",
-                msg_type="error",
-                msg="Field '{}' is not present in metadata.".format(fields),
-            )
-            sys.exit(1)
         if type(output_json) is dict or type(output_json) is list:
             display_message(msg=json.dumps(output_json, indent=4))
         else:  # print strings or numbers more simply

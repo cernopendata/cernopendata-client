@@ -59,3 +59,11 @@ def test_verify_files_wrong_value():
     )
     assert test_result.exit_code == 2
     assert "Invalid value for --server" in test_result.output
+
+
+def test_verify_files_witout_download():
+    """Test verify-files command."""
+    test_verify_files = CliRunner()
+    test_result = test_verify_files.invoke(verify_files, ["--recid", 3005])
+    assert test_result.exit_code == 1
+    assert "No local files found for record 3005" in test_result.output

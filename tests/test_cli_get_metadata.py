@@ -52,6 +52,13 @@ def test_get_metadata_from_doi_wrong():
     assert test_result.exit_code == 2
 
 
+def test_get_metadata_from_title_wrong():
+    """Test `get-metadata --title` command for wrong values."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(get_metadata, ["--title", "NONEXISTING"])
+    assert test_result.exit_code == 2
+
+
 def test_get_metadata_from_output_fields():
     """Test `get-metadata --recid --output-value` command."""
     test_get_metadata = CliRunner()
@@ -60,6 +67,15 @@ def test_get_metadata_from_output_fields():
     )
     assert test_result.exit_code == 0
     assert "FT_R_42_V10A::All" in test_result.output
+
+
+def test_get_metadata_from_output_fields_one():
+    """Test `get-metadata --recid --output-value` command."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata, ["--recid", 1, "--output-value", "usage.links"]
+    )
+    assert test_result.exit_code == 0
 
 
 def test_get_metadata_from_output_fields_wrong():
