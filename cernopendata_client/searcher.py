@@ -209,7 +209,7 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
     return files_list
 
 
-def get_file_info_remote(server, recid, filtered_files=None):
+def get_file_info_remote(server, recid, protocol=None, filtered_files=None):
     """Return remote file information list for given record.
 
     :param server: CERN Open Data server to query
@@ -230,8 +230,10 @@ def get_file_info_remote(server, recid, filtered_files=None):
     for file_info in record_json["metadata"]["files"]:
         file_checksum = file_info["checksum"]
         file_size = file_info["size"]
-        file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
+        file_uri = file_info["uri"]
         file_name = file_info["uri"].rsplit("/", 1)[1]
+        if protocol == "http":
+            file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
         if not filtered_files or file_uri in filtered_files:
             file_info_remote.append(
                 {

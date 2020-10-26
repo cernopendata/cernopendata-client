@@ -139,6 +139,8 @@ Downloading data files
 In order to download data files belonging to a record, please use the
 **download-files** command:
 
+**HTTP protocol**
+
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500
@@ -178,6 +180,38 @@ In order to download data files belonging to a record, please use the
     ==> Success!
 
 The command will download files into a `5500` directory.
+
+**XRootD protocol**
+
+Note that you can use ``--protocol root`` command-line option if you
+would rather want to download files with root protocol:
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --protocol root
+    ==> Downloading file 1 of 11
+      -> File: ./5500/BuildFile.xml
+    ==> Downloading file 2 of 11
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+    ==> Downloading file 3 of 11
+      -> File: ./5500/List_indexfile.txt
+    ==> Downloading file 4 of 11
+      -> File: ./5500/M4Lnormdatall.cc
+    ==> Downloading file 5 of 11
+      -> File: ./5500/M4Lnormdatall_lvl3.cc
+    ==> Downloading file 6 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+    ==> Downloading file 7 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+    ==> Downloading file 8 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4MC.py
+    ==> Downloading file 9 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4data.py
+    ==> Downloading file 10 of 11
+      -> File: ./5500/mass4l_combine.pdf
+    ==> Downloading file 11 of 11
+      -> File: ./5500/mass4l_combine.png
+    ==> Success!
 
 **Filter by name**
 

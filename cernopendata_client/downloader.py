@@ -8,9 +8,17 @@
 
 """cernopendata-client file downloading related utilities."""
 
+import sys
 from sys import stderr as STREAM
 import re
 import pycurl
+
+try:
+    from xrootdpyfs import XRootDPyFS
+
+    xrootd_available = True
+except ImportError:
+    xrootd_available = False
 
 from .validator import validate_range
 from .printer import display_message
@@ -29,26 +37,49 @@ def show_download_progress(download_t, download_d, upload_t, upload_d):
     STREAM.flush()
 
 
-def download_single_file(path=None, file_location=None):
+def download_single_file(path=None, file_location=None, protocol=None):
     """Download single file."""
-    file_name = file_location.split("/")[-1]
-    file_dest = path + "/" + file_name
-    with open(file_dest, "wb") as f:
-        display_message(
-            prefix="single",
-            msg="File: ./{}/{}".format(
-                path,
-                file_name,
-            ),
-        )
-        c = pycurl.Curl()
-        c.setopt(c.URL, file_location)
-        c.setopt(c.WRITEDATA, f)
-        c.setopt(c.NOPROGRESS, False)
-        c.setopt(c.XFERINFOFUNCTION, show_download_progress)
-        c.perform()
-        c.close()
-    print()
+    if protocol == "http":
+        file_name = file_location.split("/")[-1]
+        file_dest = path + "/" + file_name
+        with open(file_dest, "wb") as f:
+            display_message(
+                prefix="single",
+                msg="File: ./{}/{}".format(
+                    path,
+                    file_name,
+                ),
+            )
+            c = pycurl.Curl()
+            c.setopt(c.URL, file_location)
+            c.setopt(c.WRITEDATA, f)
+            c.setopt(c.NOPROGRESS, False)
+            c.setopt(c.XFERINFOFUNCTION, show_download_progress)
+            c.perform()
+            c.close()
+        print()
+    elif protocol == "root":
+        if not xrootd_available:
+            display_message(
+                prefix="double",
+                msg_type="error",
+                msg="xrootd is not installed on system. Please use the 'http' protocol instead.",
+            )
+            sys.exit(1)
+        file_src = file_location.split("root://eospublic.cern.ch/")[-1]
+        file_name = file_location.split("/")[-1]
+        file_dest = path + "/" + file_name
+        fs = XRootDPyFS("root://eospublic.cern.ch//")
+        with open(file_dest, "wb") as dest, fs.open(file_src, "rb") as src:
+            display_message(
+                prefix="single",
+                msg="File: ./{}/{}".format(
+                    path,
+                    file_name,
+                ),
+            )
+            src_data = src.read()
+            dest.write(src_data)
     return
 
 

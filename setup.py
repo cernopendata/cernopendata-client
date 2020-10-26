@@ -24,6 +24,8 @@ tests_require = [
     "pytest-cache>=1.0",
     "pytest-cov>=1.8.0",
     "pytest>=2.8.0",
+    'pytest-mock>=2.0,<3.0 ; python_version=="2.7"',
+    'pytest-mock>=3.0 ; python_version>="3"',
 ]
 
 extras_require = {
@@ -33,6 +35,7 @@ extras_require = {
         "sphinx-click>=1.0.4",
     ],
     "tests": tests_require,
+    "xroot": ["xrootdpyfs>=0.2"],
 }
 
 extras_require["all"] = []

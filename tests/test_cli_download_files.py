@@ -11,6 +11,7 @@
 
 import os
 import pytest
+
 from click.testing import CliRunner
 from cernopendata_client.cli import download_files
 
@@ -53,8 +54,8 @@ def test_dry_run_from_doi_wrong():
     assert test_result.exit_code == 2
 
 
-def test_download_files():
-    """Test download_files() command."""
+def test_download_files_http():
+    """Test download_files() command with http protocol."""
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
     if os.path.isfile(test_file):
         os.remove(test_file)
@@ -66,6 +67,35 @@ def test_download_files():
     assert test_result.output.endswith("\n==> Success!\n")
     if os.path.isfile(test_file):
         os.remove(test_file)
+
+
+def test_download_files_root():
+    """Test download_files() command with root protocol."""
+    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--protocol", "root"]
+    )
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_root_wrong(mocker):
+    """Test download_files() command with root protocol without xrootd."""
+    mocker.patch("cernopendata_client.downloader.xrootd_available", False)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--protocol", "root"]
+    )
+    assert test_result.exit_code == 1
+    assert "xrootd is not installed on system" in test_result.output
 
 
 def test_download_files_with_verify():

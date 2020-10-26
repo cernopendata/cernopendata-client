@@ -221,13 +221,6 @@ def download_files(
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
-    if protocol == "root" and not dryrun:
-        display_message(
-            prefix="double",
-            msg_type="error",
-            msg="Root protocol is not supported yet.",
-        )
-        sys.exit(1)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand)
     download_file_locations = []
@@ -288,10 +281,13 @@ def download_files(
                 download_file_locations.index(file_location) + 1, total_files
             ),
         )
-        download_single_file(path=path, file_location=file_location)
+        download_single_file(path=path, file_location=file_location, protocol=protocol)
         if verify:
             file_info_remote = get_file_info_remote(
-                server, recid, filtered_files=[file_location]
+                server,
+                recid,
+                protocol=protocol,
+                filtered_files=[file_location],
             )
             file_info_local = get_file_info_local(recid)
             verify_file_info(file_info_local, file_info_remote)
