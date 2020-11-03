@@ -80,7 +80,7 @@ def get_metadata(server, recid, doi, title, output_value):
     \b
     Examples:
       $ cernopendata-client get-metadata --recid 1
-      $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
+      $ cernopendata-client get-metadata --recid 1 --output-value title
     """
     validate_server(server)
     if recid is not None:
@@ -211,12 +211,10 @@ def download_files(
     Examples:
       $ cernopendata-client download-files --recid 5500
       $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
-      $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml,List_indexfile.txt
       $ cernopendata-client download-files --recid 5500 --filter-regexp py$
       $ cernopendata-client download-files --recid 5500 --filter-range 1-4
       $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
-      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2,3-4
     """
     validate_server(server)
     if recid is not None:

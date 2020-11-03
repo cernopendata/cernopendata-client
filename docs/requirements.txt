@@ -1,5 +1,8 @@
-click>=7,<8
-requests==2.22.0
-Sphinx>=1.4.4,<2.0
-sphinx-click>=1.0.4
-sphinx-rtd-theme>=0.1.9
+# This file is part of cernopendata-client.
+#
+# Copyright (C) 2019, 2020 CERN.
+#
+# cernopendata-client is free software; you can redistribute it and/or modify
+# it under the terms of the GPLv3 license; see LICENSE file for more details.
+
+-e .[docs]

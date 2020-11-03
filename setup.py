@@ -32,7 +32,7 @@ extras_require = {
     "docs": [
         "Sphinx>=1.4.4,<2.0",
         "sphinx-rtd-theme>=0.1.9",
-        "sphinx-click>=1.0.4",
+        "sphinx-click>=2.5.0",
     ],
     "tests": tests_require,
     "xroot": ["xrootdpyfs>=0.2"],

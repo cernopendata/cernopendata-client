@@ -56,7 +56,7 @@ extensions = [
 ]
 
 # Autodoc mocking to fix ReadTheDocs builds missing system dependencies
-autodoc_mock_imports = ["pycurl"]
+autodoc_mock_imports = ["pycurl", "xrootdpyfs"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
