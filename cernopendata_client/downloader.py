@@ -9,9 +9,15 @@
 """cernopendata-client file downloading related utilities."""
 
 import sys
-from sys import stderr as STREAM
 import re
-import pycurl
+import requests
+
+try:
+    import pycurl
+
+    pycurl_available = True
+except ImportError:
+    pycurl_available = False
 
 try:
     from xrootdpyfs import XRootDPyFS
@@ -24,17 +30,19 @@ from .validator import validate_range
 from .printer import display_message
 
 
-def show_download_progress(download_t, download_d, upload_t, upload_d):
+def show_download_progress(
+    download_t=None, download_d=None, upload_t=None, upload_d=None
+):
     """Show download progress of a file."""
     kb = 1024
-    STREAM.write(
+    sys.stdout.write(
         "  -> Progress: {}/{} kiB ({}%)\r".format(
             str(int(download_d / kb)),
             str(int(download_t / kb)),
             str(int(download_d / download_t * 100) if download_t > 0 else 0),
         )
     )
-    STREAM.flush()
+    sys.stdout.flush()
 
 
 def download_single_file(path=None, file_location=None, protocol=None):
@@ -50,13 +58,29 @@ def download_single_file(path=None, file_location=None, protocol=None):
                     file_name,
                 ),
             )
-            c = pycurl.Curl()
-            c.setopt(c.URL, file_location)
-            c.setopt(c.WRITEDATA, f)
-            c.setopt(c.NOPROGRESS, False)
-            c.setopt(c.XFERINFOFUNCTION, show_download_progress)
-            c.perform()
-            c.close()
+            if pycurl_available:
+                c = pycurl.Curl()
+                c.setopt(c.URL, file_location)
+                c.setopt(c.WRITEDATA, f)
+                c.setopt(c.NOPROGRESS, False)
+                c.setopt(c.XFERINFOFUNCTION, show_download_progress)
+                c.perform()
+                c.close()
+            else:
+                response = requests.get(file_location, stream=True)
+                total_size = response.headers.get("content-length", 0)
+                if total_size is None:
+                    f.write(response.content)
+                else:
+                    downloaded = 0
+                    kb = 1024
+                    total_size = int(total_size)
+                    for data in response.iter_content(chunk_size=kb):
+                        downloaded += len(data)
+                        f.write(data)
+                        show_download_progress(
+                            download_t=total_size, download_d=downloaded
+                        )
         print()
     elif protocol == "root":
         if not xrootd_available:

@@ -39,7 +39,7 @@ WORKDIR /code
 ADD . /code
 
 # Install cernopendata-client
-RUN pip3 install .[xroot]
+RUN pip3 install .[all]
 
 # Remove /code to make image slimmer
 RUN rm -rf /code

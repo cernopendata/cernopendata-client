@@ -36,6 +36,7 @@ extras_require = {
     ],
     "tests": tests_require,
     "xroot": ["xrootdpyfs>=0.2"],
+    "pycurl": ["pycurl>=7"],
 }
 
 extras_require["all"] = []
@@ -48,7 +49,7 @@ setup_requires = [
     "pytest-runner>=2.7",
 ]
 
-install_requires = ["click>=7,<8", "requests==2.22.0", "pycurl>=7"]
+install_requires = ["click>=7", "requests>=2"]
 
 # Get the version string. Cannot be done with import!
 with open(os.path.join("cernopendata_client", "version.py"), "rt") as f:
