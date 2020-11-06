@@ -87,14 +87,14 @@ def test_download_files_http_requests(mocker):
 
 
 def test_download_files_root():
-    """Test download_files() command with root protocol."""
+    """Test download_files() command with xrootd protocol."""
     xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
     if os.path.isfile(test_file):
         os.remove(test_file)
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
-        download_files, ["--recid", 3005, "--protocol", "root"]
+        download_files, ["--recid", 3005, "--protocol", "xrootd"]
     )
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
@@ -105,11 +105,11 @@ def test_download_files_root():
 
 
 def test_download_files_root_wrong(mocker):
-    """Test download_files() command with root protocol without xrootd."""
+    """Test download_files() command with xrootd protocol without xrootd."""
     mocker.patch("cernopendata_client.downloader.xrootd_available", False)
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
-        download_files, ["--recid", 3005, "--protocol", "root"]
+        download_files, ["--recid", 3005, "--protocol", "xrootd"]
     )
     assert test_result.exit_code == 1
     assert "xrootd is not installed on system" in test_result.output

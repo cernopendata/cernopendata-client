@@ -35,7 +35,7 @@ extras_require = {
         "sphinx-click>=2.5.0",
     ],
     "tests": tests_require,
-    "xroot": ["xrootdpyfs>=0.2"],
+    "xrootd": ["xrootdpyfs>=0.2"],
     "pycurl": ["pycurl>=7"],
 }
 

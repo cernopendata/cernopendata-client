@@ -114,7 +114,7 @@ def get_metadata(server, recid, doi, title, output_value):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "root"]),
+    type=click.Choice(["http", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(
@@ -136,7 +136,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
     \b
     Examples:
       $ cernopendata-client get-file-locations --recid 5500
-      $ cernopendata-client get-file-locations --recid 5500 --protocol root
+      $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd
     """
     validate_server(server)
     if recid is not None:
@@ -153,7 +153,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "root"]),
+    type=click.Choice(["http", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(

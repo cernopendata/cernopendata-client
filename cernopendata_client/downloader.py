@@ -82,7 +82,7 @@ def download_single_file(path=None, file_location=None, protocol=None):
                             download_t=total_size, download_d=downloaded
                         )
         print()
-    elif protocol == "root":
+    elif protocol == "xrootd":
         if not xrootd_available:
             display_message(
                 prefix="double",

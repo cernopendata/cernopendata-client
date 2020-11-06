@@ -113,12 +113,12 @@ This command will output URIs for all the files associated with the record ID 55
 
 **XRootD protocol**
 
-Note that you can use ``--protocol root`` command-line option if you
+Note that you can use ``--protocol xrootd`` command-line option if you
 would rather see the equivalent XRootD endpoints for the files:
 
 .. code-block:: console
 
-    $ cernopendata-client get-file-locations --recid 5500 --protocol root
+    $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt
@@ -183,12 +183,12 @@ The command will download files into a `5500` directory.
 
 **XRootD protocol**
 
-Note that you can use ``--protocol root`` command-line option if you
-would rather want to download files with root protocol:
+Note that you can use ``--protocol xrootd`` command-line option if you
+would rather want to download files with xrootd protocol:
 
 .. code-block:: console
 
-    $ cernopendata-client download-files --recid 5500 --protocol root
+    $ cernopendata-client download-files --recid 5500 --protocol xrootd
     ==> Downloading file 1 of 11
       -> File: ./5500/BuildFile.xml
     ==> Downloading file 2 of 11

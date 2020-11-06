@@ -176,7 +176,7 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
 
     :param server: CERN Open Data server to query
     :param record_json: Record content in JSON
-    :protocol: Protocol to be used in links(http/root)
+    :protocol: Protocol to be used in links(http/xrootd)
     :expand: Flag for expanding file indexes
     :type server: str
     :type record_json: json(dict)
