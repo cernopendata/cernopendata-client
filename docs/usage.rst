@@ -21,6 +21,7 @@ In order to get help for any ``cernopendata-client`` command, use the
     download-files      Download data files belonging to a record.
     get-file-locations  Get a list of data file locations of a record.
     get-metadata        Get metadata content of a record.
+    list-directory      List contents of a EOSPUBLIC Open Data directory.
     verify-files        Verify downloaded data file integrity.
     version             Return cernopendata-client version.
 
@@ -151,6 +152,58 @@ would rather see the equivalent XRootD endpoints for the files:
     root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png
 
 The data files can be downloaded via XRootD protocol using the **xrdcp** command.
+
+List directory
+--------------
+
+The CERN Open Data files are hosted on the EOSPUBLIC data storage service.
+In order to get a list of files belonging to a certain EOSPUBLIC directory, please use
+the **list-directory** command:
+
+It uses XRootD protocol to list the data files.
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
+    Commissioning10-May19ReReco_7TeV.json
+    Commissioning10-May19ReReco_900GeV.json
+
+**Iterate recursively**
+
+Note that you can use ``--recursive`` command-line option if you would
+like to iterate also through all the subdirectories:
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs --recursive
+    Commissioning10-May19ReReco_7TeV.json
+    Commissioning10-May19ReReco_900GeV.json
+    Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt
+    Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt
+    Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt
+
+**Iterate recursively with timeout**
+
+If you would like to list a directory that contains a large amount of files, you
+can specify ``--timeout`` option in order to exit after a certain amount of time.
+The default timeout is 60 seconds.
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive --timeout 30
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.txt
+    ..
 
 Downloading data files
 ----------------------

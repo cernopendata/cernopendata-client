@@ -16,6 +16,7 @@ from cernopendata_client.validator import (
     validate_recid,
     validate_server,
     validate_range,
+    validate_directory,
 )
 
 
@@ -45,3 +46,14 @@ def test_validate_range():
     pytest.raises(SystemExit, validate_range, "1-9", 5)
     pytest.raises(SystemExit, validate_range, "3-2", 5)
     pytest.raises(SystemExit, validate_range, "3,2", 5)
+
+
+def test_validate_directory():
+    """Test validate_directory()."""
+    assert validate_directory(directory="/eos/opendata/cms/validated-runs/") is True
+    pytest.raises(
+        SystemExit,
+        validate_directory,
+        "root://eospublic.cern.ch//eos/opendata/cms/validated-runs",
+    )
+    pytest.raises(SystemExit, validate_directory, 90)

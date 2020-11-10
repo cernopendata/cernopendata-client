@@ -22,6 +22,7 @@ from .searcher import (
     get_recid_api,
     get_record_as_json,
     verify_recid,
+    get_list_directory,
 )
 from .downloader import (
     download_single_file,
@@ -33,9 +34,10 @@ from .validator import (
     validate_range,
     validate_recid,
     validate_server,
+    validate_directory,
 )
 from .verifier import get_file_info_local, verify_file_info
-from .config import SERVER_HTTP_URI
+from .config import SERVER_HTTP_URI, LIST_DIRECTORY_TIMEOUT
 from .utils import parse_parameters
 from .printer import display_message
 
@@ -353,3 +355,43 @@ def verify_files(server, recid):
         msg_type="info",
         msg="Success!",
     )
+
+
+@cernopendata_client.command()
+@click.option(
+    "-R",
+    "--recursive",
+    "recursive",
+    is_flag=True,
+    default=False,
+    help="Iterate recursively in the given directory path.",
+)
+@click.option(
+    "--timeout",
+    default=LIST_DIRECTORY_TIMEOUT,
+    type=click.INT,
+    help="Timeout for list-directory command. [Deafult={}]".format(
+        LIST_DIRECTORY_TIMEOUT
+    ),
+)
+@click.argument("path", type=click.STRING)
+def list_directory(path, recursive, timeout):
+    """List contents of a EOSPUBLIC Open Data directory.
+
+    Returns the list of files and subdirectories of a given EOSPUBLIC directory.
+
+    \b
+    Examples:
+      $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
+      $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive
+      $ cernopendata-client list-directory /eos/opendata/cms/Run2010B --recursive --timeout 10
+    """
+    validate_directory(directory=path)
+    files = get_list_directory(path, recursive, timeout)
+    if not files:
+        display_message(
+            msg_type="info",
+            msg="No files in the directory.",
+        )
+        sys.exit(2)
+    display_message(msg="\n".join(files))

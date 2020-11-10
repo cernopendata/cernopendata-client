@@ -106,3 +106,32 @@ def validate_range(range=None, count=None):
         )
         sys.exit(2)
     return True
+
+
+def validate_directory(directory=None):
+    """Return True if directory path is correct, exit otherwise.
+
+    :param directory: EOSPUBLIC path
+
+    :return: Bool after verifying directory
+    :rtype: bool
+    """
+    if sys.version_info[0] < 3:
+        if isinstance(directory, unicode):  # noqa F821
+            directory = directory.encode("utf-8")
+    if isinstance(directory, str):
+        if not directory.startswith("/eos/opendata/"):
+            display_message(
+                msg_type="error",
+                msg="Invalid value for directory. {} is not valid EOSPUBLIC path".format(
+                    directory
+                ),
+            )
+            sys.exit(2)
+    else:
+        display_message(
+            msg_type="error",
+            msg="Invalid directory. {} is not valid string".format(directory),
+        )
+        sys.exit(2)
+    return True

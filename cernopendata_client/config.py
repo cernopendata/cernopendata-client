@@ -26,3 +26,6 @@ PRINTER_COLOUR_NOTE = "blue"
 
 PRINTER_COLOUR_ERROR = "red"
 """Default colour for error messages on terminal."""
+
+LIST_DIRECTORY_TIMEOUT = 60
+"""Default timeout for list-directory command."""

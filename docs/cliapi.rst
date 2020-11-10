@@ -19,6 +19,7 @@ In order to get help for any ``cernopendata-client`` command, use the
     download-files      Download data files belonging to a record.
     get-file-locations  Get a list of data file locations of a record.
     get-metadata        Get metadata content of a record.
+    list-directory      List contents of a EOSPUBLIC Open Data directory.
     verify-files        Verify downloaded data file integrity.
     version             Return cernopendata-client version.
 
