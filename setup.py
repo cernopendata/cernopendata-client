@@ -20,6 +20,7 @@ tests_require = [
     'black>=19.10b0 ; python_version>="3"',
     "check-manifest>=0.25",
     "coverage>=4.0",
+    "mock>=3.0,<4.0",
     "pydocstyle>=1.0.0",
     "pytest-cache>=1.0",
     "pytest-cov>=1.8.0",

@@ -25,14 +25,12 @@ def validate_recid(recid=None):
     """
     if recid is None:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="You must supply a record id number as an " "input using -r flag.",
         )
         sys.exit(1)
     if recid <= 0:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Recid should be a positive integer".format(
                 "--recid", recid
@@ -53,7 +51,6 @@ def validate_server(server=None):
     """
     if not server.startswith("http://"):
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Server should be a valid HTTP URI".format(
                 "--server", server
@@ -78,7 +75,6 @@ def validate_range(range=None, count=None):
         range_from, range_to = int(range.split("-")[0]), int(range.split("-")[-1])
     except Exception:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Range should have start and end index(i-j)".format(
                 "--filter-range", range
@@ -87,7 +83,6 @@ def validate_range(range=None, count=None):
         sys.exit(2)
     if range_from <= 0:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Range should start from a positive integer".format(
                 "--filter-range", range_from
@@ -96,7 +91,6 @@ def validate_range(range=None, count=None):
         sys.exit(2)
     if range_to > count:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Range is too big. There are total {} files".format(
                 "--filter-range", range, count
@@ -105,7 +99,6 @@ def validate_range(range=None, count=None):
         sys.exit(2)
     if range_to < range_from:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Invalid value for {}: {} - Range is not valid".format(
                 "--filter-range", range

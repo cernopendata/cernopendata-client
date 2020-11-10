@@ -10,40 +10,41 @@
 
 import click
 
-from .config import PRINTER_COLOUR_ERROR, PRINTER_COLOUR_INFO, PRINTER_COLOUR_SUCCESS
+from .config import PRINTER_COLOUR_ERROR, PRINTER_COLOUR_INFO, PRINTER_COLOUR_NOTE
 
 
-def display_message(prefix=None, msg_type=None, msg=None):
+def display_message(msg_type=None, msg=None):
     """Display message in a similar style as run_command().
 
-    :param prefix: prefix to be added in output (==> / ->)
-    :param msg_type: Type of message - Error/Progress/Success
+    :param msg_type: Type of message (info/note/error)
     :param msg: message to display
-    :type prefix: str
     :type msg_type: str
     :type msg: str
     """
     msg_color_map = {
         "info": PRINTER_COLOUR_INFO,
+        "note": PRINTER_COLOUR_NOTE,
+        "progress": PRINTER_COLOUR_NOTE,
         "error": PRINTER_COLOUR_ERROR,
-        "success": PRINTER_COLOUR_SUCCESS,
     }
-    msg_color = msg_color_map.get(msg_type, None)
+    msg_color = msg_color_map.get(msg_type, "")
 
-    if prefix == "double":
-        if msg_color:
-            click.secho("==> ", bold=True, nl=False, fg="{}".format(msg_color))
-        if msg_type == "error":
-            click.secho(
-                "{}: ".format(msg_type.upper()),
-                bold=True,
-                nl=False,
-                fg=PRINTER_COLOUR_ERROR,
-            )
-    elif prefix == "single":
-        click.secho("  -> ", bold=False, nl=False)
-
-    if msg_color:
-        click.secho("{}".format(msg), bold=True, nl=True, fg="{}".format(msg_color))
-    else:
+    if msg_type == "info":
+        click.secho("==> ", bold=True, nl=False, fg="{}".format(msg_color))
+        click.secho("{}".format(msg), bold=True, nl=True)
+    elif msg_type == "note":
+        click.secho("  -> ", bold=False, nl=False, fg="{}".format(msg_color))
         click.secho("{}".format(msg), bold=False, nl=True)
+    elif msg_type == "progress":
+        click.secho("  -> ", bold=False, nl=False, fg="{}".format(msg_color))
+        click.secho("{}".format(msg), bold=False, nl=False)
+    elif msg_type == "error":
+        click.secho(
+            "==> {}: ".format(msg_type.upper()),
+            bold=True,
+            nl=False,
+            fg="{}".format(msg_color),
+        )
+        click.secho("{}".format(msg), bold=False, nl=True)
+    else:
+        click.secho("{}".format(msg), nl=True)

@@ -28,7 +28,6 @@ def parse_parameters(filter_input):
         return filters
     except Exception:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="{} - Wrong input format".format(filter_input),
         )

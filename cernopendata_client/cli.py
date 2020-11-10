@@ -96,7 +96,6 @@ def get_metadata(server, recid, doi, title, output_value):
                 output_json = output_json[field]
             except (KeyError, TypeError):
                 display_message(
-                    prefix="double",
                     msg_type="error",
                     msg="Field '{}' is not present in metadata".format(field),
                 )
@@ -248,7 +247,6 @@ def download_files(
     if names or regexp or ranges:
         if not download_file_locations:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="No files matching the filters",
             )
@@ -267,13 +265,11 @@ def download_files(
             os.mkdir(path)
         except OSError:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="Creation of the directory {} failed".format(path),
             )
     for file_location in download_file_locations:
         display_message(
-            prefix="double",
             msg_type="info",
             msg="Downloading file {} of {}".format(
                 download_file_locations.index(file_location) + 1, total_files
@@ -290,8 +286,7 @@ def download_files(
             file_info_local = get_file_info_local(recid)
             verify_file_info(file_info_local, file_info_remote)
     display_message(
-        prefix="double",
-        msg_type="success",
+        msg_type="info",
         msg="Success!",
     )
 
@@ -327,7 +322,6 @@ def verify_files(server, recid):
     file_info_local = get_file_info_local(recid)
     if not file_info_local:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
                 recid
@@ -337,17 +331,15 @@ def verify_files(server, recid):
 
     # Verify number of files
     display_message(
-        prefix="double",
         msg_type="info",
         msg="Verifying number of files for record {}... ".format(recid),
     )
     display_message(
-        prefix="single",
-        msg="expected {}, found {}".format(len(file_info_remote), len(file_info_local)),
+        msg_type="note",
+        msg="Expected {}, found {}".format(len(file_info_remote), len(file_info_local)),
     )
     if len(file_info_remote) != len(file_info_local):
         display_message(
-            prefix="double",
             msg_type="error",
             msg="File count does not match.",
         )
@@ -358,7 +350,6 @@ def verify_files(server, recid):
 
     # Success!
     display_message(
-        prefix="double",
-        msg_type="success",
+        msg_type="info",
         msg="Success!",
     )

@@ -331,40 +331,40 @@ use the **verify-files** command:
 
     $ cernopendata-client verify-files --recid 5500
     ==> Verifying number of files for record 5500...
-      -> expected 11, found 11
+      -> Expected 11, found 11
     ==> Verifying file BuildFile.xml...
-      -> expected size 305, found 305
-      -> expected checksum adler32:ff63668a, found adler32:ff63668a
+      -> Expected size 305, found 305
+      -> Expected checksum adler32:ff63668a, found adler32:ff63668a
     ==> Verifying file HiggsDemoAnalyzer.cc...
-      -> expected size 83761, found 83761
-      -> expected checksum adler32:f205f068, found adler32:f205f068
+      -> Expected size 83761, found 83761
+      -> Expected checksum adler32:f205f068, found adler32:f205f068
     ==> Verifying file List_indexfile.txt...
-      -> expected size 1669, found 1669
-      -> expected checksum adler32:46a907fc, found adler32:46a907fc
+      -> Expected size 1669, found 1669
+      -> Expected checksum adler32:46a907fc, found adler32:46a907fc
     ==> Verifying file M4Lnormdatall.cc...
-      -> expected size 14943, found 14943
-      -> expected checksum adler32:af301992, found adler32:af301992
+      -> Expected size 14943, found 14943
+      -> Expected checksum adler32:af301992, found adler32:af301992
     ==> Verifying file M4Lnormdatall_lvl3.cc...
-      -> expected size 15805, found 15805
-      -> expected checksum adler32:9d9b2126, found adler32:9d9b2126
+      -> Expected size 15805, found 15805
+      -> Expected checksum adler32:9d9b2126, found adler32:9d9b2126
     ==> Verifying file demoanalyzer_cfg_level3MC.py...
-      -> expected size 3741, found 3741
-      -> expected checksum adler32:cc943381, found adler32:cc943381
+      -> Expected size 3741, found 3741
+      -> Expected checksum adler32:cc943381, found adler32:cc943381
     ==> Verifying file demoanalyzer_cfg_level3data.py...
-      -> expected size 3689, found 3689
-      -> expected checksum adler32:1d3e2a43, found adler32:1d3e2a43
+      -> Expected size 3689, found 3689
+      -> Expected checksum adler32:1d3e2a43, found adler32:1d3e2a43
     ==> Verifying file demoanalyzer_cfg_level4MC.py...
-      -> expected size 3874, found 3874
-      -> expected checksum adler32:9cbd53a3, found adler32:9cbd53a3
+      -> Expected size 3874, found 3874
+      -> Expected checksum adler32:9cbd53a3, found adler32:9cbd53a3
     ==> Verifying file demoanalyzer_cfg_level4data.py...
-      -> expected size 3821, found 3821
-      -> expected checksum adler32:177b49c0, found adler32:177b49c0
+      -> Expected size 3821, found 3821
+      -> Expected checksum adler32:177b49c0, found adler32:177b49c0
     ==> Verifying file mass4l_combine.pdf...
-      -> expected size 18170, found 18170
-      -> expected checksum adler32:19c6a6a2, found adler32:19c6a6a2
+      -> Expected size 18170, found 18170
+      -> Expected checksum adler32:19c6a6a2, found adler32:19c6a6a2
     ==> Verifying file mass4l_combine.png...
-      -> expected size 93152, found 93152
-      -> expected checksum adler32:62e0c299, found adler32:62e0c299
+      -> Expected size 93152, found 93152
+      -> Expected checksum adler32:62e0c299, found adler32:62e0c299
     ==> Success!
 
 We can verify each file just after downloading with help of **download-files --verify** command.
@@ -374,24 +374,24 @@ We can verify each file just after downloading with help of **download-files --v
     $ cernopendata-client download-files --recid 5500 --filter-range 1-4 --verify
     ==> Downloading file 1 of 4
       -> File: ./5500/BuildFile.xml
-    ==> Verifying file BuildFile.xml... 
-      -> expected size 305, found 305
-      -> expected checksum adler32:ff63668a, found adler32:ff63668a
+    ==> Verifying file BuildFile.xml...
+      -> Expected size 305, found 305
+      -> Expected checksum adler32:ff63668a, found adler32:ff63668a
     ==> Downloading file 2 of 4
       -> File: ./5500/HiggsDemoAnalyzer.cc
-    ==> Verifying file HiggsDemoAnalyzer.cc... 
-      -> expected size 83761, found 83761
-      -> expected checksum adler32:f205f068, found adler32:f205f068
+    ==> Verifying file HiggsDemoAnalyzer.cc...
+      -> Expected size 83761, found 83761
+      -> Expected checksum adler32:f205f068, found adler32:f205f068
     ==> Downloading file 3 of 4
       -> File: ./5500/List_indexfile.txt
-    ==> Verifying file List_indexfile.txt... 
-      -> expected size 1669, found 1669
-      -> expected checksum adler32:46a907fc, found adler32:46a907fc
+    ==> Verifying file List_indexfile.txt...
+      -> Expected size 1669, found 1669
+      -> Expected checksum adler32:46a907fc, found adler32:46a907fc
     ==> Downloading file 4 of 4
       -> File: ./5500/M4Lnormdatall.cc
-    ==> Verifying file M4Lnormdatall.cc... 
-      -> expected size 14943, found 14943
-      -> expected checksum adler32:af301992, found adler32:af301992
+    ==> Verifying file M4Lnormdatall.cc...
+      -> Expected size 14943, found 14943
+      -> Expected checksum adler32:af301992, found adler32:af301992
     ==> Success!
 
 More information

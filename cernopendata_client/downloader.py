@@ -35,12 +35,13 @@ def show_download_progress(
 ):
     """Show download progress of a file."""
     kb = 1024
-    sys.stdout.write(
-        "  -> Progress: {}/{} kiB ({}%)\r".format(
+    display_message(
+        msg_type="progress",
+        msg="Progress: {}/{} kiB ({}%)\r".format(
             str(int(download_d / kb)),
             str(int(download_t / kb)),
             str(int(download_d / download_t * 100) if download_t > 0 else 0),
-        )
+        ),
     )
     sys.stdout.flush()
 
@@ -52,7 +53,7 @@ def download_single_file(path=None, file_location=None, protocol=None):
         file_dest = path + "/" + file_name
         with open(file_dest, "wb") as f:
             display_message(
-                prefix="single",
+                msg_type="note",
                 msg="File: ./{}/{}".format(
                     path,
                     file_name,
@@ -85,7 +86,6 @@ def download_single_file(path=None, file_location=None, protocol=None):
     elif protocol == "xrootd":
         if not xrootd_available:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="xrootd is not installed on system. Please use the 'http' protocol instead.",
             )
@@ -96,7 +96,7 @@ def download_single_file(path=None, file_location=None, protocol=None):
         fs = XRootDPyFS("root://eospublic.cern.ch//")
         with open(file_dest, "wb") as dest, fs.open(file_src, "rb") as src:
             display_message(
-                prefix="single",
+                msg_type="note",
                 msg="File: ./{}/{}".format(
                     path,
                     file_name,

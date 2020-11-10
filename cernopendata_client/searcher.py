@@ -48,7 +48,6 @@ def verify_recid(server=None, recid=None):
             input_record_url_check.raise_for_status()
         except requests.HTTPError:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="The record id number you supplied is not valid.",
             )
@@ -102,7 +101,6 @@ def get_recid(server=None, title=None, doi=None):
         response.raise_for_status()
     except requests.HTTPError as e:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Connection to server failed: \n reason: {}.".format(e),
         )
@@ -110,14 +108,12 @@ def get_recid(server=None, title=None, doi=None):
         hits_total = response_json["hits"]["total"]
         if hits_total < 1:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="Record with given {} does not exist.".format(name),
             )
             sys.exit(2)
         elif hits_total > 1:
             display_message(
-                prefix="double",
                 msg_type="error",
                 msg="More than one record fit this {}."
                 "This should not happen.".format(name),
@@ -150,7 +146,6 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
         record_id = get_recid(server=server, doi=doi)
     else:
         display_message(
-            prefix="double",
             msg_type="error",
             msg="Please provide at least one of following arguments: "
             "(recid, doi, title)",
