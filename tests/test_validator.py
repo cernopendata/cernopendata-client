@@ -33,7 +33,8 @@ def test_validate_server():
     assert validate_server("http://opendata.cern.ch") is True
     assert validate_server("http://opendata-dev.cern.ch") is True
     assert validate_server("http://0.0.0.0:5000") is True
-    pytest.raises(SystemExit, validate_server, "https://opendata.cern.ch")
+    assert validate_server("https://opendata.cern.ch") is True
+    pytest.raises(SystemExit, validate_server, "root://opendata.cern.ch")
     pytest.raises(SystemExit, validate_server, "opendata.cern.ch")
 
 

@@ -173,45 +173,60 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
     return record_json
 
 
-def get_files_list(server=None, record_json=None, protocol=None, expand=None):
+def get_files_list(
+    server=None, record_json=None, protocol=None, expand=None, verbose=None
+):
     """Return file list of a dataset by its recid, doi, or title.
 
     :param server: CERN Open Data server to query
     :param record_json: Record content in JSON
     :protocol: Protocol to be used in links(http | https | xrootd)
     :expand: Flag for expanding file indexes
+    :verbose: Flag for showing size and checksum of file
     :type server: str
     :type record_json: json(dict)
     :type protocol: str
     :type expand: bool
+    :type verbose: bool
 
     :return: List of files list
     :rtype: list
     """
-    files_list = [file["uri"] for file in record_json["metadata"]["files"]]
-    if expand:
-        # let's unwind file indexes
-        files_list_expanded = []
-        for file_ in files_list:
-            if file_.endswith("_file_index.txt"):
-                url_file = file_.replace(SERVER_ROOT_URI, server)
-                req = requests.get(url_file)
-                for url_individual_file in req.text.split("\n"):
-                    if url_individual_file:
-                        files_list_expanded.append(url_individual_file)
-            elif file_.endswith("_file_index.json"):
-                pass
-            else:
-                files_list_expanded.append(file_)
-        files_list = files_list_expanded
-
-    if protocol == "http":
-        files_list = [file_.replace(SERVER_ROOT_URI, server) for file_ in files_list]
-    elif protocol == "https":
+    if verbose:
         files_list = [
-            file_.replace(SERVER_ROOT_URI, SERVER_HTTPS_URI) for file_ in files_list
+            (file["uri"], file["size"], file["checksum"])
+            for file in record_json["metadata"]["files"]
         ]
-
+        if protocol == "http":
+            files_list = [
+                (file_[0].replace(SERVER_ROOT_URI, server), file_[1], file_[2])
+                for file_ in files_list
+            ]
+    else:
+        files_list = [file["uri"] for file in record_json["metadata"]["files"]]
+        if expand:
+            # let's unwind file indexes
+            files_list_expanded = []
+            for file_ in files_list:
+                if file_.endswith("_file_index.txt"):
+                    url_file = file_.replace(SERVER_ROOT_URI, server)
+                    req = requests.get(url_file)
+                    for url_individual_file in req.text.split("\n"):
+                        if url_individual_file:
+                            files_list_expanded.append(url_individual_file)
+                elif file_.endswith("_file_index.json"):
+                    pass
+                else:
+                    files_list_expanded.append(file_)
+            files_list = files_list_expanded
+        if protocol == "http":
+            files_list = [
+                file_.replace(SERVER_ROOT_URI, server) for file_ in files_list
+            ]
+        elif protocol == "https":
+            files_list = [
+                file_.replace(SERVER_ROOT_URI, SERVER_HTTPS_URI) for file_ in files_list
+            ]
     return files_list
 
 

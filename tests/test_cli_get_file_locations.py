@@ -48,3 +48,13 @@ def test_get_file_locations_from_doi_wrong():
         get_file_locations, ["--doi", "NONEXISTING", "--no-expand"]
     )
     assert test_result.exit_code == 2
+
+
+def test_get_file_locations_with_verbose():
+    """Test `get-file-locations --verbose` command."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations, ["--recid", 5500, "--verbose"]
+    )
+    assert test_result.exit_code == 0
+    assert "\t93152\tadler32:62e0c299\n" in test_result.output

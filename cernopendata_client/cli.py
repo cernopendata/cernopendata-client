@@ -127,7 +127,13 @@ def get_metadata(server, recid, doi, title, output_value):
     type=click.STRING,
     help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
-def get_file_locations(server, recid, doi, title, protocol, expand):
+@click.option(
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Output also the file size (in the second column) and the file checksum (in the third column).",
+)
+def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     """Get a list of data file locations of a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -138,13 +144,18 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
     Examples:
       $ cernopendata-client get-file-locations --recid 5500
       $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd
+      $ cernopendata-client get-file-locations --recid 5500 --verbose
     """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
-    file_locations = get_files_list(server, record_json, protocol, expand)
-    display_message(msg="\n".join(file_locations))
+    file_locations = get_files_list(server, record_json, protocol, expand, verbose)
+    if verbose:
+        for file_ in file_locations:
+            display_message(msg="{}\t{}\t{}".format(file_[0], file_[1], file_[2]))
+    else:
+        display_message(msg="\n".join(file_locations))
 
 
 @cernopendata_client.command()

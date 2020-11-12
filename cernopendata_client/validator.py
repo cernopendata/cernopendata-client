@@ -49,10 +49,11 @@ def validate_server(server=None):
     :return: Bool after verfying server url
     :rtype: bool
     """
-    if not server.startswith("http://"):
+    server = server.split(":")
+    if server[0] not in ["http", "https"]:
         display_message(
             msg_type="error",
-            msg="Invalid value for {}: {} - Server should be a valid HTTP URI".format(
+            msg="Invalid value for {}: {} - Server should be a valid HTTP/HTTPS URI".format(
                 "--server", server
             ),
         )

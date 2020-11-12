@@ -205,6 +205,25 @@ The default timeout is 60 seconds.
     CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.txt
     ..
 
+**File sizes and checksums**
+
+If you would like to know in advance the file sizes and checksums, you can use --verbose option:
+
+.. code-block:: console
+
+    $ cernopendata-client get-file-locations --recid 5500 --verbose
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml	305	adler32:ff63668a
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc	83761	adler32:f205f068
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt	1669	adler32:46a907fc
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/M4Lnormdatall.cc	14943	adler32:af301992
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/M4Lnormdatall_lvl3.cc	15805	adler32:9d9b2126
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level3MC.py	3741	adler32:cc943381
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level3data.py	3689	adler32:1d3e2a43
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level4MC.py	3874	adler32:9cbd53a3
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level4data.py	3821	adler32:177b49c0
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.pdf	18170	adler32:19c6a6a2
+    http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png	93152	adler32:62e0c299
+
 Downloading data files
 ----------------------
 
