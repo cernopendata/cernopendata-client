@@ -12,6 +12,9 @@
 SERVER_HTTP_URI = "http://opendata.cern.ch"
 """Default CERN Open Data server to query over HTTP protocol."""
 
+SERVER_HTTPS_URI = "https://opendata.cern.ch"
+"""Default CERN Open Data server to query over HTTPS protocol."""
+
 SERVER_ROOT_URI = "root://eospublic.cern.ch/"
 """Default CERN Open Data server to query over XRootD protocol."""
 

@@ -111,6 +111,25 @@ the **get-file-locations** command:
 
 This command will output URIs for all the files associated with the record ID 5500, using the HTTP protocol.
 
+**HTTPS protocol**
+
+.. code-block:: console
+
+    $ cernopendata-client get-file-locations --recid 5500 --protocol https
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/List_indexfile.txt
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/M4Lnormdatall.cc
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/M4Lnormdatall_lvl3.cc
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level3MC.py
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level3data.py
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level4MC.py
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/demoanalyzer_cfg_level4data.py
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.pdf
+    https://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png
+
+This command will output URIs for all the files associated with the record ID 5500, using the HTTPS protocol.
+
 **XRootD protocol**
 
 Note that you can use ``--protocol xrootd`` command-line option if you
@@ -144,6 +163,51 @@ In order to download data files belonging to a record, please use the
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500
+    ==> Downloading file 1 of 11
+      -> File: ./5500/BuildFile.xml
+      -> Progress: 0/0 kiB (100%)
+    ==> Downloading file 2 of 11
+      -> File: ./5500/HiggsDemoAnalyzer.cc
+      -> Progress: 81/81 kiB (100%)
+    ==> Downloading file 3 of 11
+      -> File: ./5500/List_indexfile.txt
+      -> Progress: 1/1 kiB (100%)
+    ==> Downloading file 4 of 11
+      -> File: ./5500/M4Lnormdatall.cc
+      -> Progress: 14/14 kiB (100%)
+    ==> Downloading file 5 of 11
+      -> File: ./5500/M4Lnormdatall_lvl3.cc
+      -> Progress: 15/15 kiB (100%)
+    ==> Downloading file 6 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3MC.py
+      -> Progress: 3/3 kiB (100%)
+    ==> Downloading file 7 of 11
+      -> File: ./5500/demoanalyzer_cfg_level3data.py
+      -> Progress: 3/3 kiB (100%)
+    ==> Downloading file 8 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4MC.py
+      -> Progress: 3/3 kiB (100%)
+    ==> Downloading file 9 of 11
+      -> File: ./5500/demoanalyzer_cfg_level4data.py
+      -> Progress: 3/3 kiB (100%)
+    ==> Downloading file 10 of 11
+      -> File: ./5500/mass4l_combine.pdf
+      -> Progress: 17/17 kiB (100%)
+    ==> Downloading file 11 of 11
+      -> File: ./5500/mass4l_combine.png
+      -> Progress: 90/90 kiB (100%)
+    ==> Success!
+
+The command will download files into a `5500` directory.
+
+**HTTPS protocol**
+
+Note that you can use ``--protocol https`` command-line option if you
+would rather want to download files with https protocol:
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --protocol https
     ==> Downloading file 1 of 11
       -> File: ./5500/BuildFile.xml
       -> Progress: 0/0 kiB (100%)

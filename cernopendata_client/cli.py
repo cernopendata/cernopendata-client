@@ -113,7 +113,7 @@ def get_metadata(server, recid, doi, title, output_value):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "xrootd"]),
+    type=click.Choice(["http", "https", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(
@@ -152,7 +152,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "xrootd"]),
+    type=click.Choice(["http", "https", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(

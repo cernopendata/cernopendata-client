@@ -48,7 +48,7 @@ def show_download_progress(
 
 def download_single_file(path=None, file_location=None, protocol=None):
     """Download single file."""
-    if protocol == "http":
+    if protocol in ["http", "https"]:
         file_name = file_location.split("/")[-1]
         file_dest = path + "/" + file_name
         with open(file_dest, "wb") as f:
@@ -87,7 +87,7 @@ def download_single_file(path=None, file_location=None, protocol=None):
         if not xrootd_available:
             display_message(
                 msg_type="error",
-                msg="xrootd is not installed on system. Please use the 'http' protocol instead.",
+                msg="xrootd is not installed on system. Please use the 'http' or 'https' protocol instead.",
             )
             sys.exit(1)
         file_src = file_location.split("root://eospublic.cern.ch/")[-1]

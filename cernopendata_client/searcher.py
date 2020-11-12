@@ -16,7 +16,7 @@ import sys
 
 import requests
 
-from .config import SERVER_HTTP_URI, SERVER_ROOT_URI
+from .config import SERVER_HTTP_URI, SERVER_ROOT_URI, SERVER_HTTPS_URI
 from .printer import display_message
 
 try:
@@ -171,7 +171,7 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
 
     :param server: CERN Open Data server to query
     :param record_json: Record content in JSON
-    :protocol: Protocol to be used in links(http/xrootd)
+    :protocol: Protocol to be used in links(http | https | xrootd)
     :expand: Flag for expanding file indexes
     :type server: str
     :type record_json: json(dict)
@@ -200,6 +200,10 @@ def get_files_list(server=None, record_json=None, protocol=None, expand=None):
 
     if protocol == "http":
         files_list = [file_.replace(SERVER_ROOT_URI, server) for file_ in files_list]
+    elif protocol == "https":
+        files_list = [
+            file_.replace(SERVER_ROOT_URI, SERVER_HTTPS_URI) for file_ in files_list
+        ]
 
     return files_list
 
@@ -229,6 +233,8 @@ def get_file_info_remote(server, recid, protocol=None, filtered_files=None):
         file_name = file_info["uri"].rsplit("/", 1)[1]
         if protocol == "http":
             file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
+        elif protocol == "https":
+            file_uri = file_info["uri"].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI)
         if not filtered_files or file_uri in filtered_files:
             file_info_remote.append(
                 {

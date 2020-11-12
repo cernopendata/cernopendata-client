@@ -71,13 +71,49 @@ def test_download_files_http_pycurl():
 
 
 def test_download_files_http_requests(mocker):
-    """Test download_files() command with http protocol using requets."""
+    """Test download_files() command with http protocol using requests."""
     mocker.patch("cernopendata_client.downloader.pycurl_available", False)
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
     if os.path.isfile(test_file):
         os.remove(test_file)
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_https_pycurl():
+    """Test download_files() command with https protocol using pycurl."""
+    pycurl = pytest.importorskip("pycurl")  # noqa: F841
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--protocol", "https"]
+    )
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_https_requests(mocker):
+    """Test download_files() command with https protocol using requests."""
+    mocker.patch("cernopendata_client.downloader.pycurl_available", False)
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--protocol", "https"]
+    )
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
