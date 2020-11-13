@@ -42,6 +42,16 @@ check_pytest () {
     python setup.py test
 }
 
+if [ $# -eq 0 ]; then
+    check_script
+    check_black
+    check_pydocstyle
+    check_flake8
+    check_manifest
+    check_sphinx
+    check_pytest
+fi
+
 for arg in "$@"
 do
     case $arg in
@@ -52,15 +62,6 @@ do
         --check-manifest) check_manifest;;
         --check-sphinx) check_sphinx;;
         --check-pytest) check_pytest;;
-        --check-all)
-            check_script
-            check_black
-            check_pydocstyle
-            check_flake8
-            check_manifest
-            check_sphinx
-            check_pytest
-            ;;
         *)
     esac
 done
