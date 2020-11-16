@@ -14,6 +14,7 @@ import pytest
 
 from click.testing import CliRunner
 from cernopendata_client.cli import download_files
+from cernopendata_client.config import SERVER_HTTPS_URI
 
 
 def test_dry_run_from_recid():
@@ -94,7 +95,7 @@ def test_download_files_https_pycurl():
         os.remove(test_file)
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
-        download_files, ["--recid", 3005, "--protocol", "https"]
+        download_files, ["--recid", 3005, "--server", SERVER_HTTPS_URI]
     )
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
@@ -112,7 +113,7 @@ def test_download_files_https_requests(mocker):
         os.remove(test_file)
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
-        download_files, ["--recid", 3005, "--protocol", "https"]
+        download_files, ["--recid", 3005, "--server", SERVER_HTTPS_URI]
     )
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True

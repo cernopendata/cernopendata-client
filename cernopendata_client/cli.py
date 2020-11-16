@@ -115,7 +115,7 @@ def get_metadata(server, recid, doi, title, output_value):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "https", "xrootd"]),
+    type=click.Choice(["http", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(
@@ -147,6 +147,8 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
       $ cernopendata-client get-file-locations --recid 5500 --verbose
     """
     validate_server(server)
+    if server != SERVER_HTTP_URI:
+        protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
@@ -165,7 +167,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
 @click.option(
     "--protocol",
     default="http",
-    type=click.Choice(["http", "https", "xrootd"]),
+    type=click.Choice(["http", "xrootd"]),
     help="Protocol to be used in links.",
 )
 @click.option(
@@ -229,6 +231,8 @@ def download_files(
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     """
     validate_server(server)
+    if server != SERVER_HTTP_URI:
+        protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)

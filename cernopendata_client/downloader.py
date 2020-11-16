@@ -87,7 +87,7 @@ def download_single_file(path=None, file_location=None, protocol=None):
         if not xrootd_available:
             display_message(
                 msg_type="error",
-                msg="xrootd is not installed on system. Please use the 'http' or 'https' protocol instead.",
+                msg="xrootd is not installed on system. Please use the 'http' protocol instead.",
             )
             sys.exit(1)
         file_src = file_location.split("root://eospublic.cern.ch/")[-1]

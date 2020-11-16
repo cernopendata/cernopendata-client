@@ -180,7 +180,7 @@ def get_files_list(
 
     :param server: CERN Open Data server to query
     :param record_json: Record content in JSON
-    :protocol: Protocol to be used in links(http | https | xrootd)
+    :protocol: Protocol to be used in links(http | xrootd)
     :expand: Flag for expanding file indexes
     :verbose: Flag for showing size and checksum of file
     :type server: str
