@@ -9,7 +9,9 @@
 """cernopendata-client file downloading related utilities."""
 
 import sys
+import os
 import re
+import time
 import requests
 
 try:
@@ -28,6 +30,45 @@ except ImportError:
 
 from .validator import validate_range
 from .printer import display_message
+from .verifier import get_file_checksum
+from .config import DOWNLOAD_ERROR_PAGE
+
+
+def check_error(
+    path=None, file_location=None, protocol=None, retry_limit=None, retry_sleep=None
+):
+    """Check downloaded file for error page."""
+    file_name = file_location.split("/")[-1]
+    file_path = path + "/" + file_name
+    downloaded_file = {
+        "size": os.path.getsize(file_path),
+        "checksum": get_file_checksum(file_path),
+    }
+    if (
+        DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
+        and DOWNLOAD_ERROR_PAGE["checksum"] == downloaded_file["checksum"]
+    ):
+        for _retry in range(0, retry_limit + 1):
+            if _retry == retry_limit:
+                display_message(msg_type="error", msg="Number of retries exceeded.")
+                sys.exit(1)
+            display_message(
+                msg_type="note", msg="Retrying {}/{}".format(_retry + 1, retry_limit)
+            )
+            time.sleep(retry_sleep)
+            download_single_file(
+                path=path, file_location=file_location, protocol=protocol
+            )
+            downloaded_file = {
+                "size": os.path.getsize(file_path),
+                "checksum": get_file_checksum(file_path),
+            }
+            error = (
+                DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
+                and DOWNLOAD_ERROR_PAGE["checksum"] == downloaded_file["checksum"]
+            )
+            if not error:
+                return True
 
 
 def show_download_progress(
@@ -48,9 +89,9 @@ def show_download_progress(
 
 def download_single_file(path=None, file_location=None, protocol=None):
     """Download single file."""
+    file_name = file_location.split("/")[-1]
+    file_dest = path + "/" + file_name
     if protocol in ["http", "https"]:
-        file_name = file_location.split("/")[-1]
-        file_dest = path + "/" + file_name
         with open(file_dest, "wb") as f:
             display_message(
                 msg_type="note",
@@ -91,8 +132,6 @@ def download_single_file(path=None, file_location=None, protocol=None):
             )
             sys.exit(1)
         file_src = file_location.split("root://eospublic.cern.ch/")[-1]
-        file_name = file_location.split("/")[-1]
-        file_dest = path + "/" + file_name
         fs = XRootDPyFS("root://eospublic.cern.ch//")
         with open(file_dest, "wb") as dest, fs.open(file_src, "rb") as src:
             display_message(

@@ -136,3 +136,53 @@ def validate_directory(directory=None):
         )
         sys.exit(2)
     return True
+
+
+def validate_retry_limit(retry_limit=None):
+    """Return True if retry_limit is valid, exit otherwise.
+
+    :param retry_limit: Number of retries when downloading a file.
+
+    :return: Bool after verifying retry_limit
+    :rtype: bool
+    """
+    if retry_limit is None:
+        display_message(
+            msg_type="error",
+            msg="You must supply a number input using --retry-limit flag.",
+        )
+        sys.exit(1)
+    if retry_limit <= 0:
+        display_message(
+            msg_type="error",
+            msg="Invalid value for {}: {} - Retry limit should be a positive integer".format(
+                "--retry-limit", retry_limit
+            ),
+        )
+        sys.exit(2)
+    return True
+
+
+def validate_retry_sleep(retry_sleep=None):
+    """Return True if retry_sleep is valid, exit otherwise.
+
+    :param retry_sleep: Sleep time in seconds before retrying downloads.
+
+    :return: Bool after verifying retry_sleep
+    :rtype: bool
+    """
+    if retry_sleep is None:
+        display_message(
+            msg_type="error",
+            msg="You must supply a number input using --retry-sleep flag.",
+        )
+        sys.exit(1)
+    if retry_sleep <= 0:
+        display_message(
+            msg_type="error",
+            msg="Invalid value for {}: {} - Retry sleep should be a positive integer".format(
+                "--retry-sleep", retry_sleep
+            ),
+        )
+        sys.exit(2)
+    return True

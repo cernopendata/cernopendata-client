@@ -29,3 +29,12 @@ PRINTER_COLOUR_ERROR = "red"
 
 LIST_DIRECTORY_TIMEOUT = 60
 """Default timeout for list-directory command."""
+
+DOWNLOAD_RETRY_LIMIT = 10
+"""Default retries for getting a file from the server."""
+
+DOWNLOAD_RETRY_SLEEP = 5
+"""Sleep time in seconds before retrying downloads."""
+
+DOWNLOAD_ERROR_PAGE = {"size": 3846, "checksum": "adler32:a82d5324"}
+"""Error page info from the server."""

@@ -17,6 +17,8 @@ from cernopendata_client.validator import (
     validate_server,
     validate_range,
     validate_directory,
+    validate_retry_limit,
+    validate_retry_sleep,
 )
 
 
@@ -58,3 +60,19 @@ def test_validate_directory():
         "root://eospublic.cern.ch//eos/opendata/cms/validated-runs",
     )
     pytest.raises(SystemExit, validate_directory, 90)
+
+
+def test_validate_retry_limit():
+    """Test validate_retry_limit()."""
+    pytest.raises(SystemExit, validate_retry_limit, -1)
+    pytest.raises(SystemExit, validate_retry_limit, 0)
+    pytest.raises(SystemExit, validate_retry_limit, None)
+    assert validate_recid(1) is True
+
+
+def test_validate_retry_sleep():
+    """Test validate_retry_sleep()."""
+    pytest.raises(SystemExit, validate_retry_sleep, -1)
+    pytest.raises(SystemExit, validate_retry_sleep, 0)
+    pytest.raises(SystemExit, validate_retry_sleep, None)
+    assert validate_recid(1) is True

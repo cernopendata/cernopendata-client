@@ -25,6 +25,7 @@ from .searcher import (
     get_list_directory,
 )
 from .downloader import (
+    check_error,
     download_single_file,
     get_download_files_by_name,
     get_download_files_by_range,
@@ -35,9 +36,16 @@ from .validator import (
     validate_recid,
     validate_server,
     validate_directory,
+    validate_retry_limit,
+    validate_retry_sleep,
 )
 from .verifier import get_file_info_local, verify_file_info
-from .config import SERVER_HTTP_URI, LIST_DIRECTORY_TIMEOUT
+from .config import (
+    SERVER_HTTP_URI,
+    LIST_DIRECTORY_TIMEOUT,
+    DOWNLOAD_RETRY_LIMIT,
+    DOWNLOAD_RETRY_SLEEP,
+)
 from .utils import parse_parameters
 from .printer import display_message
 
@@ -213,8 +221,38 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     default=False,
     help="Verify downloaded data file integrity.",
 )
+@click.option(
+    "--retry-limit",
+    "retry_limit",
+    default=DOWNLOAD_RETRY_LIMIT,
+    type=click.INT,
+    help="Number of retries when downloading a file. [default={}]".format(
+        DOWNLOAD_RETRY_LIMIT
+    ),
+)
+@click.option(
+    "--retry-sleep",
+    "retry_sleep",
+    default=DOWNLOAD_RETRY_SLEEP,
+    type=click.INT,
+    help="Sleep time in seconds before retrying downloads. [default={}]".format(
+        DOWNLOAD_RETRY_SLEEP
+    ),
+)
 def download_files(
-    server, recid, doi, title, protocol, expand, names, regexp, ranges, dryrun, verify
+    server,
+    recid,
+    doi,
+    title,
+    protocol,
+    expand,
+    names,
+    regexp,
+    ranges,
+    dryrun,
+    verify,
+    retry_limit,
+    retry_sleep,
 ):
     """Download data files belonging to a record.
 
@@ -235,6 +273,10 @@ def download_files(
         protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
+    if retry_limit:
+        validate_retry_limit(retry_limit=retry_limit)
+    if retry_sleep:
+        validate_retry_sleep(retry_sleep=retry_sleep)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand)
     download_file_locations = []
@@ -293,6 +335,13 @@ def download_files(
             ),
         )
         download_single_file(path=path, file_location=file_location, protocol=protocol)
+        check_error(
+            path=path,
+            file_location=file_location,
+            protocol=protocol,
+            retry_limit=retry_limit,
+            retry_sleep=retry_sleep,
+        )
         if verify:
             file_info_remote = get_file_info_remote(
                 server,
@@ -329,11 +378,12 @@ def verify_files(server, recid):
     """
     # Validate parameters
     validate_server(server)
+    protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
 
     # Get remote file information
-    file_info_remote = get_file_info_remote(server, recid)
+    file_info_remote = get_file_info_remote(server, recid, protocol)
 
     # Get local file information
     file_info_local = get_file_info_local(recid)
@@ -385,7 +435,7 @@ def verify_files(server, recid):
     "--timeout",
     default=LIST_DIRECTORY_TIMEOUT,
     type=click.INT,
-    help="Timeout for list-directory command. [Deafult={}]".format(
+    help="Timeout for list-directory command. [default={}]".format(
         LIST_DIRECTORY_TIMEOUT
     ),
 )

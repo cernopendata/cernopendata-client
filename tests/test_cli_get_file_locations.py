@@ -11,6 +11,7 @@
 
 from click.testing import CliRunner
 from cernopendata_client.cli import get_file_locations
+from cernopendata_client.config import SERVER_HTTPS_URI
 
 
 def test_get_file_locations_from_recid():
@@ -19,6 +20,13 @@ def test_get_file_locations_from_recid():
     test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert "0d0714743f0204ed3c0144941e6ce248.configFile.py" in test_result.output
+
+
+def test_get_file_locations_from_recid_expand():
+    """Test `get-file-locations --recid` command with expand."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 282])
+    assert test_result.exit_code == 0
 
 
 def test_get_file_locations_from_recid_wrong():
@@ -58,3 +66,13 @@ def test_get_file_locations_with_verbose():
     )
     assert test_result.exit_code == 0
     assert "\t93152\tadler32:62e0c299\n" in test_result.output
+
+
+def test_get_file_locations_with_https_server():
+    """Test `get-file-locations --server` command for https server."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations, ["--recid", 3005, "--server", SERVER_HTTPS_URI]
+    )
+    assert test_result.exit_code == 0
+    assert "configFile.py" in test_result.output
