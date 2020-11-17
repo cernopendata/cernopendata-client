@@ -33,6 +33,15 @@ check_manifest () {
     check-manifest
 }
 
+check_dockerfile () {
+    docker run -i --rm hadolint/hadolint < Dockerfile
+}
+
+check_docker_build () {
+    docker build -t cernopendata/cernopendata-client .
+    docker run --rm cernopendata/cernopendata-client version
+}
+
 check_sphinx () {
     sphinx-build -qnNW docs docs/_build/html
     sphinx-build -qnNW -b doctest docs docs/_build/doctest
@@ -48,6 +57,8 @@ if [ $# -eq 0 ]; then
     check_pydocstyle
     check_flake8
     check_manifest
+    check_dockerfile
+    check_docker_build
     check_sphinx
     check_pytest
 fi
@@ -60,6 +71,8 @@ do
         --check-pydocstyle) check_pydocstyle;;
         --check-flake8) check_flake8;;
         --check-manifest) check_manifest;;
+        --check-dockerfile) check_dockerfile;;
+        --check-docker-build) check_docker_build;;
         --check-sphinx) check_sphinx;;
         --check-pytest) check_pytest;;
         *)

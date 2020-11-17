@@ -7,8 +7,8 @@ on:
         branches: master
 
 jobs:
-    lint-Shellcheck:
-        runs-on: ubuntu-latest
+    lint-shellcheck:
+        runs-on: ubuntu-18.04
         steps:
           - uses: actions/checkout@v2
 
@@ -18,7 +18,7 @@ jobs:
               ./run-tests.sh --check-shellscript
 
     lint-black:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         steps:
           - uses: actions/checkout@v2
 
@@ -33,7 +33,7 @@ jobs:
               ./run-tests.sh --check-black
 
     lint-pydocstyle:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-18.04
       steps:
         - uses: actions/checkout@v2
 
@@ -48,7 +48,7 @@ jobs:
             ./run-tests.sh --check-pydocstyle
 
     lint-flake8:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-18.04
       steps:
         - uses: actions/checkout@v2
 
@@ -63,7 +63,7 @@ jobs:
             ./run-tests.sh --check-flake8
 
     lint-check-manifest:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-18.04
       steps:
         - uses: actions/checkout@v2
 
@@ -77,8 +77,16 @@ jobs:
             pip install check-manifest
             ./run-tests.sh --check-manifest
 
+    lint-dockerfile:
+      runs-on: ubuntu-18.04
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Check Dockerfile compliance
+          run: ./run-tests.sh --check-dockerfile
+
     docs-sphinx:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-18.04
       steps:
         - uses: actions/checkout@v2
 
@@ -102,7 +110,7 @@ jobs:
           run: ./run-tests.sh --check-sphinx
 
     python-tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         strategy:
           matrix:
               python-version: [2.7, 3.6, 3.7, 3.8]
@@ -138,11 +146,9 @@ jobs:
               files: coverage.xml
 
     docker-build:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-18.04
         steps:
           - uses: actions/checkout@v2
 
-          - name: Build and Run
-            run: |
-              docker build -t cernopendata/cernopendata-client .
-              docker run --rm cernopendata/cernopendata-client version
+          - name: Build Docker image
+            run: ./run-tests.sh --check-docker-build

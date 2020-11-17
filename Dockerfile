@@ -5,41 +5,38 @@
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
-# Use CentOS8
-FROM centos:8
+# Use CentOS 8.2.2004
+FROM centos:8.2.2004
 
 # Install system prerequisites
-RUN yum update -y && \
-    yum install -y \
+# hadolint ignore=DL3033
+RUN yum install -y \
         ca-certificates \
         epel-release && \
-    yum groupinstall -y "Development Tools" && \
     yum install -y \
         cmake \
         curl \
         gcc \
         gcc-c++ \
-        python3 \
-        python3-pip \
-        python3-devel \
         libcurl-devel \
-        zlib-devel \
         libuuid-devel \
-        openssl-devel && \
+        make \
+        openssl-devel \
+        python3-devel \
+        python3-pip \
+        python3-wheel \
+        xrootd-client \
+        zlib-devel && \
     yum autoremove && \
     yum clean all
 
-# Install some prerequisites ahead of `setup.py` in order to take advantage of
-# the docker build cache:
-RUN pip3 install --upgrade pip setuptools
-RUN pip3 install wheel
-
 # Add sources to `/code` and work there
 WORKDIR /code
-ADD . /code
+COPY . /code
 
 # Install cernopendata-client
-RUN pip3 install .[all]
+# hadolint ignore=DL3013
+RUN pip3 install '.[all]'
 
 # Remove /code to make image slimmer
 RUN rm -rf /code
