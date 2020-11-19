@@ -22,7 +22,6 @@ from .searcher import (
     get_recid_api,
     get_record_as_json,
     verify_recid,
-    get_list_directory,
 )
 from .downloader import (
     check_error,
@@ -39,6 +38,7 @@ from .validator import (
     validate_retry_limit,
     validate_retry_sleep,
 )
+from .walker import get_list_directory
 from .verifier import get_file_info_local, verify_file_info
 from .config import (
     SERVER_HTTP_URI,
