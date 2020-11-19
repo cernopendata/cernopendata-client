@@ -1,3 +1,5 @@
+.. _cliapi:
+
 CLI API
 =======
 
@@ -22,8 +24,6 @@ In order to get help for any ``cernopendata-client`` command, use the
     list-directory      List contents of a EOSPUBLIC Open Data directory.
     verify-files        Verify downloaded data file integrity.
     version             Return cernopendata-client version.
-
-.. _cliapi:
 
 .. click:: cernopendata_client.cli:cernopendata_client
    :prog: cernopendata-client

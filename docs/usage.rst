@@ -1,4 +1,4 @@
-.. _gettingstarted:
+.. _usage:
 
 Usage
 =====
@@ -110,8 +110,9 @@ the **get-file-locations** command:
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.pdf
     http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png
 
-This command will output URIs for all the files associated with the record ID 5500, using the HTTP protocol.
-Note that you can specify `--server https://opendata.cern.ch` if you would like to use the HTTPS protocol instead.
+This command will output URIs for all the files associated with the record ID
+5500, using the HTTP protocol. Note that you can specify ``--server
+https://opendata.cern.ch`` if you would like to use the HTTPS protocol instead.
 
 **XRootD protocol**
 
@@ -135,61 +136,10 @@ would rather see the equivalent XRootD endpoints for the files:
 
 The data files can be downloaded via XRootD protocol using the **xrdcp** command.
 
-List directory
---------------
-
-The CERN Open Data files are hosted on the EOSPUBLIC data storage service.
-In order to get a list of files belonging to a certain EOSPUBLIC directory, please use
-the **list-directory** command:
-
-It uses XRootD protocol to list the data files.
-
-.. code-block:: console
-
-    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
-    Commissioning10-May19ReReco_7TeV.json
-    Commissioning10-May19ReReco_900GeV.json
-
-**Iterate recursively**
-
-Note that you can use ``--recursive`` command-line option if you would
-like to iterate also through all the subdirectories:
-
-.. code-block:: console
-
-    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs --recursive
-    Commissioning10-May19ReReco_7TeV.json
-    Commissioning10-May19ReReco_900GeV.json
-    Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt
-    Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt
-    Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt
-
-**Iterate recursively with timeout**
-
-If you would like to list a directory that contains a large amount of files, you
-can specify ``--timeout`` option in order to exit after a certain amount of time.
-The default timeout is 60 seconds.
-
-.. code-block:: console
-
-    $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive --timeout 30
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.txt
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.txt
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.txt
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.txt
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.txt
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.json
-    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.txt
-    ..
-
 **File sizes and checksums**
 
-If you would like to know in advance the file sizes and checksums, you can use --verbose option:
+If you would like to know in advance the file sizes and checksums, you can use
+``--verbose`` option:
 
 .. code-block:: console
 
@@ -210,55 +160,65 @@ Downloading data files
 ----------------------
 
 In order to download data files belonging to a record, please use the
-**download-files** command:
+**download-files** command. The command can download files over HTTP, HTTPS or
+XRootD protocols and verify the file checksums.
 
 **HTTP protocol**
+
+By default the **download-files** command uses HTTP protocol:
 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500
     ==> Downloading file 1 of 11
       -> File: ./5500/BuildFile.xml
-      -> Progress: 0/0 kiB (100%)
+      -> Progress: 0/0 KiB (100%)
     ==> Downloading file 2 of 11
       -> File: ./5500/HiggsDemoAnalyzer.cc
-      -> Progress: 81/81 kiB (100%)
+      -> Progress: 81/81 KiB (100%)
     ==> Downloading file 3 of 11
       -> File: ./5500/List_indexfile.txt
-      -> Progress: 1/1 kiB (100%)
+      -> Progress: 1/1 KiB (100%)
     ==> Downloading file 4 of 11
       -> File: ./5500/M4Lnormdatall.cc
-      -> Progress: 14/14 kiB (100%)
+      -> Progress: 14/14 KiB (100%)
     ==> Downloading file 5 of 11
       -> File: ./5500/M4Lnormdatall_lvl3.cc
-      -> Progress: 15/15 kiB (100%)
+      -> Progress: 15/15 KiB (100%)
     ==> Downloading file 6 of 11
       -> File: ./5500/demoanalyzer_cfg_level3MC.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 7 of 11
       -> File: ./5500/demoanalyzer_cfg_level3data.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 8 of 11
       -> File: ./5500/demoanalyzer_cfg_level4MC.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 9 of 11
       -> File: ./5500/demoanalyzer_cfg_level4data.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 10 of 11
       -> File: ./5500/mass4l_combine.pdf
-      -> Progress: 17/17 kiB (100%)
+      -> Progress: 17/17 KiB (100%)
     ==> Downloading file 11 of 11
       -> File: ./5500/mass4l_combine.png
-      -> Progress: 90/90 kiB (100%)
+      -> Progress: 90/90 KiB (100%)
     ==> Success!
 
-The command will download files into a `5500` directory.
-Note that you can specify `--server https://opendata.cern.ch` if you would like to use the HTTPS protocol instead.
+The command will download files into a local directory called ``5500`` after
+the record ID input parameter.
+
+By default the download will be carried out over HTTP protocol. If you would
+like to use the HTTPS protocol instead , please specify ``--server
+https://opendata.cern.ch``.
+
+Note that you can also download files from another server, for example from our
+Quality Assurance server, by using ``--server http://opendata-qa.cern.ch``.
 
 **XRootD protocol**
 
-Note that you can use ``--protocol xrootd`` command-line option if you
-would rather want to download files with xrootd protocol:
+If you have installed client with XRootD support, you can use ``--protocol
+xrootd`` command-line option to use that protocol instead of HTTP/HTTPS:
 
 .. code-block:: console
 
@@ -289,14 +249,17 @@ would rather want to download files with xrootd protocol:
 
 **Filter by name**
 
-We can download a file matching exactly the file name by the **filter-name** option.
+A dataset may consist of thousands of files. You can use powerful filtering
+options to download only certain files matching your criteria.
+
+For example, you can download only files matching exactly a given file name using the ``--filter-name`` option:
 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
     ==> Downloading file 1 of 1
       -> File: ./5500/BuildFile.xml
-      -> Progress: 0/0 kiB (100%)
+      -> Progress: 0/0 KiB (100%)
     ==> Success!
 
 .. code-block:: console
@@ -304,52 +267,52 @@ We can download a file matching exactly the file name by the **filter-name** opt
     $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml,List_indexfile.txt
     ==> Downloading file 1 of 2
       -> File: ./5500/BuildFile.xml
-      -> Progress: 0/0 kiB (100%)
+      -> Progress: 0/0 KiB (100%)
     ==> Downloading file 2 of 2
       -> File: ./5500/List_indexfile.txt
-      -> Progress: 1/1 kiB (100%)
+      -> Progress: 1/1 KiB (100%)
     ==> Success!
 
 **Filter by regular expression**
 
-We can download files matching a regular expression by the **filter-regexp** option.
+You can download all files matching a certain regular expression using the ``--filter-regexp`` option:
 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-regexp py$
     ==> Downloading file 1 of 4
       -> File: ./5500/demoanalyzer_cfg_level3MC.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 2 of 4
       -> File: ./5500/demoanalyzer_cfg_level3data.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 3 of 4
       -> File: ./5500/demoanalyzer_cfg_level4MC.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 4 of 4
       -> File: ./5500/demoanalyzer_cfg_level4data.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Success!
 
 **Filter by range**
 
-We can download files from a specified list range (i-j) by the **filter-range** option.
+You can also download files from a specified range (i-j) using the ``--filter-range`` option:
 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-range 1-4
     ==> Downloading file 1 of 4
       -> File: ./5500/BuildFile.xml
-      -> Progress: 0/0 kiB (100%)
+      -> Progress: 0/0 KiB (100%)
     ==> Downloading file 2 of 4
       -> File: ./5500/HiggsDemoAnalyzer.cc
-      -> Progress: 81/81 kiB (100%)
+      -> Progress: 81/81 KiB (100%)
     ==> Downloading file 3 of 4
       -> File: ./5500/List_indexfile.txt
-      -> Progress: 1/1 kiB (100%)
+      -> Progress: 1/1 KiB (100%)
     ==> Downloading file 4 of 4
       -> File: ./5500/M4Lnormdatall.cc
-      -> Progress: 14/14 kiB (100%)
+      -> Progress: 14/14 KiB (100%)
     ==> Success!
 
 .. code-block:: console
@@ -367,19 +330,20 @@ We can download files from a specified list range (i-j) by the **filter-range** 
       -> File: ./5500/demoanalyzer_cfg_level3data.py
     ==> Success!
 
-**Filter by multiple options with multiple filters**
+**Filter by combining multiple selectors**
 
-We can download files by filtering out with multiple filters.
+You can combine multiple filters in the same download command. Here are several
+examples:
 
 .. code-block:: console
 
     $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     ==> Downloading file 1 of 2
       -> File: ./5500/demoanalyzer_cfg_level3MC.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Downloading file 2 of 2
       -> File: ./5500/demoanalyzer_cfg_level3data.py
-      -> Progress: 3/3 kiB (100%)
+      -> Progress: 3/3 KiB (100%)
     ==> Success!
 
 .. code-block:: console
@@ -396,10 +360,10 @@ We can download files by filtering out with multiple filters.
 Verifying files
 ---------------
 
-If you have downloaded the data files for a record before, and you
-would like to verify their integrity and check whether there haven't
-been some critical updates on the CERN Open Data portal side, you can
-use the **verify-files** command:
+If you have downloaded the data files for a certain record, and you would like
+to verify their integrity and check whether there haven't been some critical
+updates on the CERN Open Data portal side, you can use the **verify-files**
+command:
 
 .. code-block:: console
 
@@ -441,7 +405,7 @@ use the **verify-files** command:
       -> Expected checksum adler32:62e0c299, found adler32:62e0c299
     ==> Success!
 
-We can verify each file just after downloading with help of **download-files --verify** command.
+Note that you can verify each file "just in time" as it is being downloaded as well:
 
 .. code-block:: console
 
@@ -468,8 +432,62 @@ We can verify each file just after downloading with help of **download-files --v
       -> Expected checksum adler32:af301992, found adler32:af301992
     ==> Success!
 
+Listing directories
+-------------------
+
+The CERN Open Data files are hosted on the EOSPUBLIC data storage service.
+In order to get a list of files belonging to a certain EOSPUBLIC directory, please use
+the **list-directory** command:
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
+    Commissioning10-May19ReReco_7TeV.json
+    Commissioning10-May19ReReco_900GeV.json
+
+The **list-directory** command uses XRootD protocol to list data files and
+hence it is available only when you install the XRootD flavour. Please see the
+:ref:`installation` documentation for more details.
+
+**Iterate recursively**
+
+Note that you can use ``--recursive`` command-line option if you would like to
+iterate also through all the subdirectories of the given directory:
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/validated-runs --recursive
+    Commissioning10-May19ReReco_7TeV.json
+    Commissioning10-May19ReReco_900GeV.json
+    Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt
+    Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt
+    Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt
+
+**Iterate recursively with timeout**
+
+If you would like to list a directory that contains a large amount of files,
+you can specify ``--timeout`` option in order to exit after a certain amount of
+time. The default timeout is 60 seconds.
+
+.. code-block:: console
+
+    $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive --timeout 30
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0001_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0002_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0003_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0004_file_index.txt
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.json
+    CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.txt
+    ..
+
 More information
 ----------------
 
-For more information about all the available ``cernopendata-client``
-commands and options, please see :ref:`cliapi`.
+For more information about all the available ``cernopendata-client`` commands
+and options, please see :ref:`cliapi`.

@@ -60,7 +60,12 @@ def cernopendata_client():
 
 @cernopendata_client.command()
 def version():
-    """Return cernopendata-client version."""
+    """Return cernopendata-client version.
+
+    \b
+    Examples:
+      $ cernopendata-client version
+    """
     display_message(msg=__version__)
 
 
@@ -72,7 +77,7 @@ def version():
     "--output-value",
     is_flag=False,
     type=click.STRING,
-    help="Output only value of a desired metadata field.",
+    help="Output value of only desired metadata field [example=title]",
 )
 @click.option(
     "--server",
@@ -118,13 +123,13 @@ def get_metadata(server, recid, doi, title, output_value):
 
 @cernopendata_client.command()
 @click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier.")
+@click.option("--doi", help="Digital Object Identifier")
 @click.option("--title", help="Record title")
 @click.option(
     "--protocol",
     default="http",
     type=click.Choice(["http", "xrootd"]),
-    help="Protocol to be used in links.",
+    help="Protocol to be used in links [http,xrootd]",
 )
 @click.option(
     "--expand/--no-expand", default=True, help="Expand file indexes? [default=yes]"
@@ -170,13 +175,13 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
 
 @cernopendata_client.command()
 @click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier.")
+@click.option("--doi", help="Digital Object Identifier")
 @click.option("--title", help="Record title")
 @click.option(
     "--protocol",
     default="http",
     type=click.Choice(["http", "xrootd"]),
-    help="Protocol to be used in links.",
+    help="Protocol to be used in links [http,xrootd]",
 )
 @click.option(
     "--expand/--no-expand", default=True, help="Expand file indexes? [default=yes]"
@@ -192,7 +197,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     "dryrun",
     is_flag=True,
     default=False,
-    help="Get the list of data file locations to be downloaded.",
+    help="Do not download anything, only print out data file locations to be downloaded",
 )
 @click.option(
     "--filter-name",
@@ -219,14 +224,14 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     "verify",
     is_flag=True,
     default=False,
-    help="Verify downloaded data file integrity.",
+    help="Verify downloaded data file integrity",
 )
 @click.option(
     "--retry-limit",
     "retry_limit",
     default=DOWNLOAD_RETRY_LIMIT,
     type=click.INT,
-    help="Number of retries when downloading a file. [default={}]".format(
+    help="Number of retries when downloading a file [default={}]".format(
         DOWNLOAD_RETRY_LIMIT
     ),
 )
@@ -235,7 +240,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     "retry_sleep",
     default=DOWNLOAD_RETRY_SLEEP,
     type=click.INT,
-    help="Sleep time in seconds before retrying downloads. [default={}]".format(
+    help="Sleep time in seconds before retrying downloads [default={}]".format(
         DOWNLOAD_RETRY_SLEEP
     ),
 )
@@ -429,13 +434,13 @@ def verify_files(server, recid):
     "recursive",
     is_flag=True,
     default=False,
-    help="Iterate recursively in the given directory path.",
+    help="Iterate recursively in the given directory path",
 )
 @click.option(
     "--timeout",
     default=LIST_DIRECTORY_TIMEOUT,
     type=click.INT,
-    help="Timeout for list-directory command. [default={}]".format(
+    help="Timeout after which to exit running the command [default={}]".format(
         LIST_DIRECTORY_TIMEOUT
     ),
 )

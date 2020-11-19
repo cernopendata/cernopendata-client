@@ -78,7 +78,7 @@ def show_download_progress(
     kb = 1024
     display_message(
         msg_type="progress",
-        msg="Progress: {}/{} kiB ({}%)\r".format(
+        msg="Progress: {}/{} KiB ({}%)\r".format(
             str(int(download_d / kb)),
             str(int(download_t / kb)),
             str(int(download_d / download_t * 100) if download_t > 0 else 0),
