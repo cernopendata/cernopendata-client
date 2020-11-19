@@ -27,6 +27,17 @@ def test_get_file_locations_from_recid_expand():
     test_get_file_locations = CliRunner()
     test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 282])
     assert test_result.exit_code == 0
+    assert "2A227E10-C949-E311-B033-003048FEAF50.root" in test_result.output
+
+
+def test_get_file_locations_from_recid_expand_verbose():
+    """Test `get-file-locations --recid` command with expand and verbose."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations, ["--recid", 282, "--verbose"]
+    )
+    assert test_result.exit_code == 0
+    assert "2A227E10-C949-E311-B033-003048FEAF50.root" in test_result.output
 
 
 def test_get_file_locations_from_recid_wrong():

@@ -170,7 +170,8 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
         for file_ in file_locations:
             display_message(msg="{}\t{}\t{}".format(file_[0], file_[1], file_[2]))
     else:
-        display_message(msg="\n".join(file_locations))
+        for file_ in file_locations:
+            display_message(msg="{}".format(file_[0]))
 
 
 @cernopendata_client.command()
@@ -283,7 +284,8 @@ def download_files(
     if retry_sleep:
         validate_retry_sleep(retry_sleep=retry_sleep)
     record_json = get_record_as_json(server, recid, doi, title)
-    file_locations = get_files_list(server, record_json, protocol, expand)
+    file_locations_info = get_files_list(server, record_json, protocol, expand)
+    file_locations = [file_[0] for file_ in file_locations_info]
     download_file_locations = []
 
     if names:

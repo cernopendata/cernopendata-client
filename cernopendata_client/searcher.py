@@ -182,41 +182,43 @@ def get_files_list(
     :return: List of files list
     :rtype: list
     """
-    if verbose:
+    files_list = []
+    for file_ in record_json["metadata"]["files"]:
+        files_list.append((file_["uri"], file_["size"], file_["checksum"]))
+    if expand:
+        # let's unwind file indexes
+        files_list_expanded = []
+        for file_ in files_list:
+            if file_[0].endswith("_file_index.json"):
+                url_file = file_[0].replace(SERVER_ROOT_URI, server)
+                json_files = requests.get(url_file).json()
+                for file_ in json_files:
+                    files_list_expanded.append(
+                        (
+                            file_["uri"],
+                            file_["size"],
+                            file_["checksum"],
+                        )
+                    )
+            elif file_[0].endswith("_file_index.txt"):
+                pass
+            else:
+                files_list_expanded.append(file_)
+        files_list = files_list_expanded
+    if protocol == "http":
         files_list = [
-            (file["uri"], file["size"], file["checksum"])
-            for file in record_json["metadata"]["files"]
+            (file_[0].replace(SERVER_ROOT_URI, server), file_[1], file_[2])
+            for file_ in files_list
         ]
-        if protocol == "http":
-            files_list = [
-                (file_[0].replace(SERVER_ROOT_URI, server), file_[1], file_[2])
-                for file_ in files_list
-            ]
-    else:
-        files_list = [file["uri"] for file in record_json["metadata"]["files"]]
-        if expand:
-            # let's unwind file indexes
-            files_list_expanded = []
-            for file_ in files_list:
-                if file_.endswith("_file_index.txt"):
-                    url_file = file_.replace(SERVER_ROOT_URI, server)
-                    req = requests.get(url_file)
-                    for url_individual_file in req.text.split("\n"):
-                        if url_individual_file:
-                            files_list_expanded.append(url_individual_file)
-                elif file_.endswith("_file_index.json"):
-                    pass
-                else:
-                    files_list_expanded.append(file_)
-            files_list = files_list_expanded
-        if protocol == "http":
-            files_list = [
-                file_.replace(SERVER_ROOT_URI, server) for file_ in files_list
-            ]
-        elif protocol == "https":
-            files_list = [
-                file_.replace(SERVER_ROOT_URI, SERVER_HTTPS_URI) for file_ in files_list
-            ]
+    elif protocol == "https":
+        files_list = [
+            (
+                file_[0].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI),
+                file_[1],
+                file_[2],
+            )
+            for file_ in files_list
+        ]
     return files_list
 
 
