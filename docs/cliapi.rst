@@ -3,12 +3,6 @@
 CLI API
 =======
 
-General help
-------------
-
-In order to get help for any ``cernopendata-client`` command, use the
-``--help`` option:
-
 .. code-block:: console
 
     $ cernopendata-client --help
