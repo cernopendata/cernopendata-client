@@ -160,8 +160,6 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
       $ cernopendata-client get-file-locations --recid 5500 --verbose
     """
     validate_server(server)
-    if server != SERVER_HTTP_URI:
-        protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
@@ -275,8 +273,6 @@ def download_files(
       $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     """
     validate_server(server)
-    if server != SERVER_HTTP_URI:
-        protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
     if retry_limit:
@@ -385,12 +381,11 @@ def verify_files(server, recid):
     """
     # Validate parameters
     validate_server(server)
-    protocol = server.split(":")[0]
     if recid is not None:
         validate_recid(recid)
 
     # Get remote file information
-    file_info_remote = get_file_info_remote(server, recid, protocol)
+    file_info_remote = get_file_info_remote(server, recid)
 
     # Get local file information
     file_info_local = get_file_info_local(recid)

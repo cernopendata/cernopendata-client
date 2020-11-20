@@ -87,3 +87,14 @@ def test_get_file_locations_with_https_server():
     )
     assert test_result.exit_code == 0
     assert "configFile.py" in test_result.output
+
+
+def test_get_file_locations_with_https_server_xrootd_protocol():
+    """Test `get-file-locations --server --protocol xrootd` command for https server."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations,
+        ["--recid", 3005, "--server", SERVER_HTTPS_URI, "--protocol", "xrootd"],
+    )
+    assert test_result.exit_code == 0
+    assert "root://eospublic.cern.ch//eos/" in test_result.output

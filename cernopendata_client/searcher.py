@@ -13,7 +13,7 @@ from __future__ import print_function
 import sys
 import requests
 
-from .config import SERVER_ROOT_URI, SERVER_HTTPS_URI
+from .config import SERVER_HTTP_URI, SERVER_ROOT_URI, SERVER_HTTPS_URI
 from .printer import display_message
 
 try:
@@ -182,6 +182,9 @@ def get_files_list(
     :return: List of files list
     :rtype: list
     """
+    searcher_protocol = protocol
+    if server != SERVER_HTTP_URI and searcher_protocol != "xrootd":
+        searcher_protocol = server.split(":")[0]
     files_list = []
     for file_ in record_json["metadata"]["files"]:
         files_list.append((file_["uri"], file_["size"], file_["checksum"]))
@@ -205,12 +208,12 @@ def get_files_list(
             else:
                 files_list_expanded.append(file_)
         files_list = files_list_expanded
-    if protocol == "http":
+    if searcher_protocol == "http":
         files_list = [
             (file_[0].replace(SERVER_ROOT_URI, server), file_[1], file_[2])
             for file_ in files_list
         ]
-    elif protocol == "https":
+    elif searcher_protocol == "https":
         files_list = [
             (
                 file_[0].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI),
@@ -238,16 +241,19 @@ def get_file_info_remote(server, recid, protocol=None, filtered_files=None):
     convenience.
     :rtype: list
     """
+    searcher_protocol = protocol
     file_info_remote = []
+    if server != SERVER_HTTP_URI and searcher_protocol != "xrootd":
+        searcher_protocol = server.split(":")[0]
     record_json = get_record_as_json(server=server, recid=recid)
     for file_info in record_json["metadata"]["files"]:
         file_checksum = file_info["checksum"]
         file_size = file_info["size"]
         file_uri = file_info["uri"]
         file_name = file_info["uri"].rsplit("/", 1)[1]
-        if protocol == "http":
+        if searcher_protocol == "http":
             file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
-        elif protocol == "https":
+        elif searcher_protocol == "https":
             file_uri = file_info["uri"].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI)
         if not filtered_files or file_uri in filtered_files:
             file_info_remote.append(
