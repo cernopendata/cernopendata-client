@@ -46,7 +46,7 @@ def get_list_directory_recursive(path, timeout):
                 break
             else:
                 for _file in files:
-                    files_list.append(_file)
+                    files_list.append(dirs + "/" + _file)
         return files_list, timeout_flag
     except Exception:
         display_message(
@@ -80,6 +80,7 @@ def get_list_directory(path, recursive, timeout):
         fs = XRootDPyFS(directory)
         try:
             files_list = fs.listdir()
+            files_list = [path + file_ for file_ in files_list]
             return files_list
         except Exception:
             display_message(
