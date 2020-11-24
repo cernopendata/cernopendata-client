@@ -43,7 +43,7 @@ def verify_recid(server=None, recid=None):
     else:
         try:
             input_record_url_check.raise_for_status()
-        except requests.HTTPError:
+        except Exception:
             display_message(
                 msg_type="error",
                 msg="The record id number you supplied is not valid.",
@@ -65,7 +65,14 @@ def get_recid_api(server=None, base_record_id=None):
     """
     record_api_url = server + "/api/records/" + base_record_id
     record_api = requests.get(record_api_url)
-    record_api.raise_for_status()
+    try:
+        record_api.raise_for_status()
+    except Exception:
+        display_message(
+            msg_type="error",
+            msg="The record id number you supplied is not valid.",
+        )
+        sys.exit(1)
     return record_api
 
 
@@ -96,7 +103,7 @@ def get_recid(server=None, title=None, doi=None):
     response_json = response.json()
     try:
         response.raise_for_status()
-    except requests.HTTPError as e:
+    except Exception as e:
         display_message(
             msg_type="error",
             msg="Connection to server failed: \n reason: {}.".format(e),
