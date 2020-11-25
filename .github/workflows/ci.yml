@@ -102,9 +102,7 @@ jobs:
             sudo apt-get install libgnutls28-dev
 
         - name: Install Python dependencies
-          run: |
-            pip install --upgrade pip setuptools py
-            pip install -e .[docs]
+          run: pip install -e .[docs]
 
         - name: Run Sphinx documentation with doctests
           run: ./run-tests.sh --check-sphinx
@@ -131,7 +129,6 @@ jobs:
 
           - name: Install Python dependencies
             run: |
-              pip install --upgrade pip setuptools py
               pip install wheel
               pip install -e .[all]
 

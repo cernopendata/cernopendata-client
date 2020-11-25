@@ -22,6 +22,14 @@ def test_get_file_locations_from_recid():
     assert "0d0714743f0204ed3c0144941e6ce248.configFile.py" in test_result.output
 
 
+def test_get_file_locations_from_recid_without_files():
+    """Test `get-file-locations --recid` command for recid without files."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 550])
+    assert test_result.exit_code == 0
+    assert "" in test_result.output
+
+
 def test_get_file_locations_from_recid_expand():
     """Test `get-file-locations --recid` command with expand."""
     test_get_file_locations = CliRunner()

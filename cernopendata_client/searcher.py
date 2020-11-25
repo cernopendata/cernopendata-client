@@ -154,12 +154,15 @@ def get_record_as_json(server=None, recid=None, doi=None, title=None):
     record_json = record_api.json()
     if "_files" in record_json["metadata"]:
         del record_json["metadata"]["_files"]
-    if record_json["metadata"]["files"]:
-        for field in record_json["metadata"]["files"]:
-            if "bucket" in field:
-                del field["bucket"]
-            if "version_id" in field:
-                del field["version_id"]
+    try:
+        if record_json["metadata"]["files"]:
+            for field in record_json["metadata"]["files"]:
+                if "bucket" in field:
+                    del field["bucket"]
+                if "version_id" in field:
+                    del field["version_id"]
+    except KeyError:
+        record_json["metadata"]["files"] = []
     return record_json
 
 
