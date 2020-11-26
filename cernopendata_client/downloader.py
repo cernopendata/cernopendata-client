@@ -87,42 +87,82 @@ def show_download_progress(
     sys.stdout.flush()
 
 
+def downloader_requests(file_location, path, file_size_offline=None):
+    """Download single file with requests."""
+    file_name = file_location.split("/")[-1]
+    file_dest = path + "/" + file_name
+    headers = {}
+    if file_size_offline:
+        headers["Range"] = "bytes={}-".format(file_size_offline)
+    response = requests.get(file_location, headers=headers, stream=True)
+    total_size = response.headers.get("content-length", 0)
+    initial_pos = file_size_offline if file_size_offline else 0
+
+    with open(file_dest, "ab") as f:
+        display_message(
+            msg_type="note",
+            msg="File: ./{}/{}".format(
+                path,
+                file_name,
+            ),
+        )
+        if total_size is None:
+            f.write(response.content)
+        else:
+            downloaded = initial_pos
+            kb = 1024
+            total_size = int(total_size)
+            for data in response.iter_content(chunk_size=kb):
+                downloaded += len(data)
+                f.write(data)
+                show_download_progress(download_t=total_size, download_d=downloaded)
+                headers = {}
+
+
 def download_single_file(path=None, file_location=None, protocol=None):
     """Download single file."""
     file_name = file_location.split("/")[-1]
     file_dest = path + "/" + file_name
     if protocol in ["http", "https"]:
-        with open(file_dest, "wb") as f:
-            display_message(
-                msg_type="note",
-                msg="File: ./{}/{}".format(
-                    path,
-                    file_name,
-                ),
-            )
-            if pycurl_available:
-                c = pycurl.Curl()
-                c.setopt(c.URL, file_location)
-                c.setopt(c.WRITEDATA, f)
-                c.setopt(c.NOPROGRESS, False)
-                c.setopt(c.XFERINFOFUNCTION, show_download_progress)
-                c.perform()
-                c.close()
-            else:
-                response = requests.get(file_location, stream=True)
-                total_size = response.headers.get("content-length", 0)
-                if total_size is None:
-                    f.write(response.content)
+        if pycurl_available:
+            with open(file_dest, "wb") as f:
+                display_message(
+                    msg_type="note",
+                    msg="File: ./{}/{}".format(
+                        path,
+                        file_name,
+                    ),
+                )
+            c = pycurl.Curl()
+            c.setopt(c.URL, file_location)
+            c.setopt(c.WRITEDATA, f)
+            c.setopt(c.NOPROGRESS, False)
+            c.setopt(c.XFERINFOFUNCTION, show_download_progress)
+            c.perform()
+            c.close()
+        else:
+            response = requests.head(file_location)
+            file_size_online = int(response.headers.get("content-length", 0))
+            if os.path.isfile(file_dest):
+                file_size_offline = os.path.getsize(file_dest)
+                if file_size_online != file_size_offline:
+                    display_message(
+                        msg_type="note",
+                        msg="File {} is incomplete. Resuming download.".format(
+                            file_name,
+                        ),
+                    )
+                    downloader_requests(
+                        file_location, path, file_size_offline=file_size_offline
+                    )
                 else:
-                    downloaded = 0
-                    kb = 1024
-                    total_size = int(total_size)
-                    for data in response.iter_content(chunk_size=kb):
-                        downloaded += len(data)
-                        f.write(data)
-                        show_download_progress(
-                            download_t=total_size, download_d=downloaded
-                        )
+                    display_message(
+                        msg_type="note",
+                        msg="File {} is complete. Skip download.",
+                    )
+                    sys.exit(0)
+            else:
+                downloader_requests(file_location, path)
         print()
     elif protocol == "xrootd":
         if not xrootd_available:
