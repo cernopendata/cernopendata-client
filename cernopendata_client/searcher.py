@@ -31,7 +31,7 @@ def verify_recid(server=None, recid=None):
     :type server: str
     :type recid: int
 
-    :return: Boolean after verifying the record id
+    :return: Boolean after verifying the record ID
     :rtype: bool
     """
     input_record_url = server + "/record/" + str(recid)
@@ -46,7 +46,7 @@ def verify_recid(server=None, recid=None):
         except Exception:
             display_message(
                 msg_type="error",
-                msg="The record id number you supplied is not valid.",
+                msg="The record ID number you supplied is not valid.",
             )
             sys.exit(1)
         return False
@@ -70,14 +70,14 @@ def get_recid_api(server=None, base_record_id=None):
     except Exception:
         display_message(
             msg_type="error",
-            msg="The record id number you supplied is not valid.",
+            msg="The record ID number you supplied is not valid.",
         )
         sys.exit(1)
     return record_api
 
 
 def get_recid(server=None, title=None, doi=None):
-    """Return record id by either title or doi.
+    """Return record ID by either title or doi.
 
     :param server: CERN Open Data server to query
     :param title: Record title
@@ -86,7 +86,7 @@ def get_recid(server=None, title=None, doi=None):
     :type title: str
     :type doi: str
 
-    :return: record id
+    :return: record ID
     :rtype: int
     """
     if title:

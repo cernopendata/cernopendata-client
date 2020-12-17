@@ -26,7 +26,7 @@ def validate_recid(recid=None):
     if recid is None:
         display_message(
             msg_type="error",
-            msg="You must supply a record id number as an " "input using -r flag.",
+            msg="You must supply a record ID number as an " "input using -r flag.",
         )
         sys.exit(1)
     if recid <= 0:
