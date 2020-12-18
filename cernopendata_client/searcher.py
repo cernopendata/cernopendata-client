@@ -203,8 +203,17 @@ def get_files_list(
         files_list_expanded = []
         for file_ in files_list:
             if file_[0].endswith("_file_index.json"):
-                url_file = file_[0].replace(SERVER_ROOT_URI, server)
-                json_files = requests.get(url_file).json()
+                try:
+                    url_file = "{}/record/{}/files/{}".format(
+                        server, str(record_json["id"]), file_[0].split("/")[-1]
+                    )
+                    json_files = requests.get(url_file).json()
+                except Exception:
+                    display_message(
+                        msg_type="error",
+                        msg="Error occured while fetching file info. Please try again.",
+                    )
+                    sys.exit(1)
                 for file_ in json_files:
                     files_list_expanded.append(
                         (

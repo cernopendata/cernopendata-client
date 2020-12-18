@@ -129,6 +129,7 @@ jobs:
 
           - name: Install Python dependencies
             run: |
+              pip install "pip<20.3"
               pip install wheel
               pip install -e .[all]
 
