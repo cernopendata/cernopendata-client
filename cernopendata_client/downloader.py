@@ -119,31 +119,48 @@ def downloader_requests(file_location, path, file_size_offline=None, mode=None):
                 headers = {}
 
 
-def downloader_pycurl(file_location, path):
+def downloader_pycurl(file_location, path, file_size_offline=None, mode=None):
     """Download single file with pycurl."""
-    file_name = file_location.split("/")[-1]
-    file_dest = path + "/" + file_name
-    with open(file_dest, "wb") as f:
+
+    def show_download_progress_pycurl(
+        download_t=None, download_d=None, upload_t=None, upload_d=None
+    ):
+        """Show download progress of a file."""
+        download_t = download_t + initial_pos
+        download_d = download_d + initial_pos
+        kb = 1024
         display_message(
-            msg_type="note",
-            msg="File: ./{}/{}".format(
-                path,
-                file_name,
+            msg_type="progress",
+            msg="Progress: {}/{} KiB ({}%)\r".format(
+                str(int(download_d / kb)),
+                str(int(download_t / kb)),
+                str(int(download_d / download_t * 100) if download_t > 0 else 0),
             ),
         )
-        c = pycurl.Curl()
-        c.setopt(c.URL, file_location)
-        c.setopt(c.WRITEDATA, f)
-        c.setopt(c.NOPROGRESS, False)
-        c.setopt(c.XFERINFOFUNCTION, show_download_progress)
-        try:
-            c.perform()
-        except Exception:
-            display_message(
-                msg_type="error",
-                msg="Download error occured. Please try again.",
-            )
-        c.close()
+        sys.stdout.flush()
+
+    file_name = file_location.split("/")[-1]
+    file_dest = path + "/" + file_name
+    initial_pos = file_size_offline if file_size_offline else 0
+    c = pycurl.Curl()
+    c.setopt(c.URL, file_location)
+    if mode == "ab":
+        f = open(file_dest, mode)
+        c.setopt(c.RESUME_FROM, file_size_offline)
+    else:
+        f = open(file_dest, mode)
+    c.setopt(c.WRITEDATA, f)
+    c.setopt(c.NOPROGRESS, False)
+    c.setopt(c.XFERINFOFUNCTION, show_download_progress_pycurl)
+    try:
+        c.perform()
+    except Exception:
+        display_message(
+            msg_type="error",
+            msg="Download error occured. Please try again.",
+        )
+        sys.exit(1)
+    c.close()
 
 
 def downloader_file_checker(file_location, file_dest):
@@ -168,7 +185,20 @@ def download_single_file(path=None, file_location=None, protocol=None):
     file_dest = path + "/" + file_name
     if protocol in ["http", "https"]:
         if pycurl_available:
-            downloader_pycurl(file_location, path)
+            file_status = downloader_file_checker(file_location, file_dest)
+            if file_status:
+                file_size_offline = os.path.getsize(file_dest)
+                display_message(
+                    msg_type="note",
+                    msg="File {} is incomplete. Resuming download.".format(
+                        file_name,
+                    ),
+                )
+                downloader_pycurl(
+                    file_location, path, file_size_offline=file_size_offline, mode="ab"
+                )
+            else:
+                downloader_pycurl(file_location, path, mode="wb")
         else:
             file_status = downloader_file_checker(file_location, file_dest)
             if file_status:
