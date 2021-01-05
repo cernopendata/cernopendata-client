@@ -76,7 +76,7 @@ def test_get_file_info_local_good_input():
 
 
 def test_get_file_info_local_good_input_wrong_count():
-    """Test get_file_info_local() for good inputs simulating wring file count."""
+    """Test get_file_info_local() for good inputs simulating wrong file count."""
 
     # remove test file
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"

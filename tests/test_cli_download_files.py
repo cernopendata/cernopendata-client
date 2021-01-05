@@ -123,6 +123,48 @@ def test_download_files_https_requests(mocker):
         os.remove(test_file)
 
 
+def test_download_files_download_engine(mocker):
+    """Test download_files() command with download-engine option."""
+    mocker.patch("cernopendata_client.downloader.pycurl_available", False)
+    test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files, ["--recid", 3005, "--download-engine", "requests"]
+    )
+    assert test_result.exit_code == 0
+    assert os.path.isfile(test_file) is True
+    assert os.path.getsize(test_file) == 3644
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+
+
+def test_download_files_download_engine_wrong_protocol_combination_one():
+    """Test download_files() command with download-engine option and wrong protocol."""
+    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files,
+        ["--recid", 3005, "--download-engine", "requests", "--protocol", "xrootd"],
+    )
+    assert test_result.exit_code == 1
+    assert "requests is not compatible with xrootd" in test_result.output
+
+
+def test_download_files_download_engine_wrong_protocol_combination_two():
+    """Test download_files() command with download-engine option and wrong protocol."""
+    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files,
+        ["--recid", 3005, "--download-engine", "xrootdpyfs", "--protocol", "http"],
+    )
+    assert test_result.exit_code == 1
+    assert "xrootdpyfs is not compatible with http" in test_result.output
+
+
 def test_download_files_root():
     """Test download_files() command with xrootd protocol."""
     xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
@@ -149,7 +191,7 @@ def test_download_files_root_wrong(mocker):
         download_files, ["--recid", 3005, "--protocol", "xrootd"]
     )
     assert test_result.exit_code == 1
-    assert "xrootd is not installed on system" in test_result.output
+    assert "xrootdpyfs is not installed on system" in test_result.output
 
 
 def test_download_files_with_verify():

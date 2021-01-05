@@ -247,6 +247,21 @@ xrootd`` command-line option to use that protocol instead of HTTP/HTTPS:
       -> File: ./5500/mass4l_combine.png
     ==> Success!
 
+**Select download engine**
+
+You can specify the download engine with ``--download-engine`` option. 
+
+- ``requests`` and ``pycurl`` are two supported download engines for **HTTP** protocol.
+- ``xrootdpyfs`` is the only supported download engine for **XRootD** protocol.
+
+.. code-block:: console
+
+    $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml --download-engine pycurl
+    ==> Downloading file 1 of 1
+      -> File: ./5500/BuildFile.xml
+      -> Progress: 0/0 KiB (100%)
+    ==> Success!
+
 **Filter by name**
 
 A dataset may consist of thousands of files. You can use powerful filtering

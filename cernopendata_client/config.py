@@ -38,3 +38,9 @@ DOWNLOAD_RETRY_SLEEP = 5
 
 DOWNLOAD_ERROR_PAGE = {"size": 3846, "checksum": "adler32:a82d5324"}
 """Error page info from the server."""
+
+DOWNLOAD_ENGINE_PROTOCOL_HTTP_MAP = ["pycurl", "requests"]
+"""Download engine compatible with HTTP protocol."""
+
+DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP = ["xrootdpyfs"]
+"""Download engine compatible with xrootd protocol."""

@@ -243,6 +243,14 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
         DOWNLOAD_RETRY_SLEEP
     ),
 )
+@click.option(
+    "--download-engine",
+    "download_engine",
+    type=click.Choice(["requests", "pycurl", "xrootdpyfs"]),
+    help="Download engine to use when downloading files."
+    "The available values are 'requests', 'pycurl', 'xrootdpyfs'."
+    "[default=requests (for HTTP protocol), xrootdpyfs (for XRootD protocol)]",
+)
 def download_files(
     server,
     recid,
@@ -257,6 +265,7 @@ def download_files(
     verify,
     retry_limit,
     retry_sleep,
+    download_engine,
 ):
     """Download data files belonging to a record.
 
@@ -330,6 +339,11 @@ def download_files(
                 msg_type="error",
                 msg="Creation of the directory {} failed".format(path),
             )
+    if not download_engine:
+        if protocol.startswith("http"):
+            download_engine = "requests"
+        elif protocol == "xrootd":
+            download_engine = "xrootdpyfs"
     for file_location in download_file_locations:
         display_message(
             msg_type="info",
@@ -337,7 +351,12 @@ def download_files(
                 download_file_locations.index(file_location) + 1, total_files
             ),
         )
-        download_single_file(path=path, file_location=file_location, protocol=protocol)
+        download_single_file(
+            path=path,
+            file_location=file_location,
+            protocol=protocol,
+            download_engine=download_engine,
+        )
         check_error(
             path=path,
             file_location=file_location,

@@ -8,11 +8,18 @@
 
 """cernopendata-client file downloading related utilities."""
 
+from __future__ import print_function
 import sys
 import os
 import re
 import time
-import requests
+
+try:
+    import requests
+
+    requests_available = True
+except ImportError:
+    requests_available = False
 
 try:
     import pycurl
@@ -31,18 +38,190 @@ except ImportError:
 from .validator import validate_range
 from .printer import display_message
 from .verifier import get_file_checksum
-from .config import DOWNLOAD_ERROR_PAGE
+from .config import (
+    DOWNLOAD_ERROR_PAGE,
+    DOWNLOAD_ENGINE_PROTOCOL_HTTP_MAP,
+    DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP,
+)
+
+
+class DownloaderHttpRequests:
+    """Downloader class for managing download related utilities with requests downloader engine."""
+
+    def __init__(self, path, file_location, mode, file_size_offline):
+        """Initiate class instance."""
+        self.kb = 1024
+        self.path = path
+        self.mode = mode
+        self.file_location = file_location
+        self.file_name = self.file_location.split("/")[-1]
+        self.file_dest = self.path + "/" + self.file_name
+        self.file_size_offline = file_size_offline if file_size_offline else 0
+
+    def show_download_progress(self, download_t=None, download_d=None):
+        """Show download progress of a file."""
+        display_message(
+            msg_type="progress",
+            msg="Progress: {}/{} KiB ({}%)\r".format(
+                str(int(download_d / self.kb)),
+                str(int(download_t / self.kb)),
+                str(int(download_d / download_t * 100) if download_t > 0 else 0),
+            ),
+        )
+        sys.stdout.flush()
+
+    def file_downloader(self):
+        """Download single file with requests."""
+        headers = {}
+        if self.file_size_offline:
+            headers["Range"] = "bytes={}-".format(self.file_size_offline)
+        response = requests.get(self.file_location, headers=headers, stream=True)
+        total_size = int(response.headers.get("content-length", 0))
+        with open(self.file_dest, self.mode) as f:
+            display_message(
+                msg_type="note",
+                msg="File: ./{}/{}".format(
+                    self.path,
+                    self.file_name,
+                ),
+            )
+            downloaded = self.file_size_offline
+            total_size = total_size + self.file_size_offline
+            for data in response.iter_content(chunk_size=1024):
+                downloaded += len(data)
+                try:
+                    f.write(data)
+                except Exception:
+                    display_message(
+                        msg_type="error",
+                        msg="Download error occured. Please try again.",
+                    )
+                    sys.exit(1)
+                self.show_download_progress(
+                    download_t=total_size, download_d=downloaded
+                )
+                headers = {}
+
+
+class DownloaderHttpPycurl:
+    """Downloader class for managing download related utilities with pycurl downloader engine."""
+
+    def __init__(self, path, file_location, mode, file_size_offline):
+        """Initiate class instance."""
+        self.kb = 1024
+        self.path = path
+        self.mode = mode
+        self.file_location = file_location
+        self.file_name = self.file_location.split("/")[-1]
+        self.file_dest = self.path + "/" + self.file_name
+        self.file_size_offline = file_size_offline if file_size_offline else 0
+
+    def show_download_progress(
+        self, download_t=None, download_d=None, upload_t=None, upload_d=None
+    ):
+        """Show download progress of a file."""
+        download_t = download_t + self.file_size_offline
+        download_d = download_d + self.file_size_offline
+        display_message(
+            msg_type="progress",
+            msg="Progress: {}/{} KiB ({}%)\r".format(
+                str(int(download_d / self.kb)),
+                str(int(download_t / self.kb)),
+                str(int(download_d / download_t * 100) if download_t > 0 else 0),
+            ),
+        )
+        sys.stdout.flush()
+
+    def file_downloader(self):
+        """Download single file with pycurl."""
+        c = pycurl.Curl()
+        c.setopt(c.URL, self.file_location)
+        if self.mode == "ab":
+            c.setopt(c.RESUME_FROM, self.file_size_offline)
+        with open(self.file_dest, self.mode) as f:
+            display_message(
+                msg_type="note",
+                msg="File: ./{}/{}".format(
+                    self.path,
+                    self.file_name,
+                ),
+            )
+            c.setopt(c.WRITEDATA, f)
+            c.setopt(c.NOPROGRESS, False)
+            c.setopt(c.XFERINFOFUNCTION, self.show_download_progress)
+            try:
+                c.perform()
+            except Exception:
+                display_message(
+                    msg_type="error",
+                    msg="Download error occured. Please try again.",
+                )
+                sys.exit(1)
+            c.close()
+
+
+class DownloaderXrootd:
+    """Downloader class for managing download related utilities with xrootd downloader engine."""
+
+    def __init__(self, path, file_location, mode):
+        """Initiate class instance."""
+        self.path = path
+        self.mode = mode
+        self.file_location = file_location
+        self.file_name = self.file_location.split("/")[-1]
+        self.file_dest = self.path + "/" + self.file_name
+        self.file_src = self.file_location.split("root://eospublic.cern.ch/")[-1]
+
+    def show_download_progress(self):
+        """Show download progress of a file."""
+        return
+
+    def file_downloader(self):
+        """Download single file with XrootDPyFS."""
+        try:
+            fs = XRootDPyFS("root://eospublic.cern.ch//")
+            with open(self.file_dest, self.mode) as dest, fs.open(
+                self.file_src, "rb"
+            ) as src:
+                display_message(
+                    msg_type="note",
+                    msg="File: ./{}/{}".format(
+                        self.path,
+                        self.file_name,
+                    ),
+                )
+                src_data = src.read()
+                dest.write(src_data)
+        except Exception:
+            display_message(
+                msg_type="error", msg="Download error occured. Please try again."
+            )
 
 
 def check_error(
     path=None, file_location=None, protocol=None, retry_limit=None, retry_sleep=None
 ):
-    """Check downloaded file for error page."""
+    """Return True if the file size and checksum does not matches with download error page.
+
+    :param path: Directory where file is downloaded
+    :param file_location: Remote location of a file
+    :param protocol: Protocol to be used for downloading a file
+    :param retry_limit: Number of retries to be made for downloading a file.
+    :param retry_sleep: Time of sleep before every retry.
+    :type path: str
+    :type file_location: str
+    :type protocol: str
+    :type retry_limit: int
+    :type retry_sleep: int
+
+    :return: True if the file size and checksum does not matches with download error page.
+    :rtype: Boolean
+    """
     file_name = file_location.split("/")[-1]
-    file_path = path + "/" + file_name
+    file_dest = path + "/" + file_name
     downloaded_file = {
-        "size": os.path.getsize(file_path),
-        "checksum": get_file_checksum(file_path),
+        "size": os.path.getsize(file_dest),
+        "checksum": get_file_checksum(file_dest),
     }
     if (
         DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
@@ -60,8 +239,8 @@ def check_error(
                 path=path, file_location=file_location, protocol=protocol
             )
             downloaded_file = {
-                "size": os.path.getsize(file_path),
-                "checksum": get_file_checksum(file_path),
+                "size": os.path.getsize(file_dest),
+                "checksum": get_file_checksum(file_dest),
             }
             error = (
                 DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
@@ -71,100 +250,17 @@ def check_error(
                 return True
 
 
-def show_download_progress(
-    download_t=None, download_d=None, upload_t=None, upload_d=None
-):
-    """Show download progress of a file."""
-    kb = 1024
-    display_message(
-        msg_type="progress",
-        msg="Progress: {}/{} KiB ({}%)\r".format(
-            str(int(download_d / kb)),
-            str(int(download_t / kb)),
-            str(int(download_d / download_t * 100) if download_t > 0 else 0),
-        ),
-    )
-    sys.stdout.flush()
-
-
-def downloader_requests(file_location, path, file_size_offline=None, mode=None):
-    """Download single file with requests."""
-    file_name = file_location.split("/")[-1]
-    file_dest = path + "/" + file_name
-    headers = {}
-    if file_size_offline:
-        headers["Range"] = "bytes={}-".format(file_size_offline)
-    response = requests.get(file_location, headers=headers, stream=True)
-    total_size = response.headers.get("content-length", 0)
-    initial_pos = file_size_offline if file_size_offline else 0
-
-    with open(file_dest, mode) as f:
-        display_message(
-            msg_type="note",
-            msg="File: ./{}/{}".format(
-                path,
-                file_name,
-            ),
-        )
-        if total_size is None:
-            f.write(response.content)
-        else:
-            downloaded = initial_pos
-            kb = 1024
-            total_size = int(total_size) + int(initial_pos)
-            for data in response.iter_content(chunk_size=kb):
-                downloaded += len(data)
-                f.write(data)
-                show_download_progress(download_t=total_size, download_d=downloaded)
-                headers = {}
-
-
-def downloader_pycurl(file_location, path, file_size_offline=None, mode=None):
-    """Download single file with pycurl."""
-
-    def show_download_progress_pycurl(
-        download_t=None, download_d=None, upload_t=None, upload_d=None
-    ):
-        """Show download progress of a file."""
-        download_t = download_t + initial_pos
-        download_d = download_d + initial_pos
-        kb = 1024
-        display_message(
-            msg_type="progress",
-            msg="Progress: {}/{} KiB ({}%)\r".format(
-                str(int(download_d / kb)),
-                str(int(download_t / kb)),
-                str(int(download_d / download_t * 100) if download_t > 0 else 0),
-            ),
-        )
-        sys.stdout.flush()
-
-    file_name = file_location.split("/")[-1]
-    file_dest = path + "/" + file_name
-    initial_pos = file_size_offline if file_size_offline else 0
-    c = pycurl.Curl()
-    c.setopt(c.URL, file_location)
-    if mode == "ab":
-        f = open(file_dest, mode)
-        c.setopt(c.RESUME_FROM, file_size_offline)
-    else:
-        f = open(file_dest, mode)
-    c.setopt(c.WRITEDATA, f)
-    c.setopt(c.NOPROGRESS, False)
-    c.setopt(c.XFERINFOFUNCTION, show_download_progress_pycurl)
-    try:
-        c.perform()
-    except Exception:
-        display_message(
-            msg_type="error",
-            msg="Download error occured. Please try again.",
-        )
-        sys.exit(1)
-    c.close()
-
-
 def downloader_file_checker(file_location, file_dest):
-    """Compare file size."""
+    """Return False if file is not present in the directory else True.
+
+    :param file_location: Remote location of a file
+    :param file_dest: Expected local destination path of a file
+    :type file_location: str
+    :type file_dest: str
+
+    :return: False if file is not present in the directory else True
+    :rtype: Boolean
+    """
     try:
         response = requests.head(file_location)
         file_size_online = int(response.headers.get("content-length", 0))
@@ -179,66 +275,86 @@ def downloader_file_checker(file_location, file_dest):
     return False
 
 
-def download_single_file(path=None, file_location=None, protocol=None):
-    """Download single file."""
+def download_single_file(
+    path=None, file_location=None, protocol=None, download_engine=None
+):
+    """Download a single file.
+
+    :param path: Directory where file is downloaded
+    :param file_location: Remote location of a file
+    :param protocol: Protocol to be used for downloading a file
+    :param download_engine: Library to be used in downloading files
+    :type path: str
+    :type file_location: str
+    :type protocol: str
+    :type download_engine: str
+
+    :return: None
+    :rtype: None
+    """
     file_name = file_location.split("/")[-1]
     file_dest = path + "/" + file_name
-    if protocol in ["http", "https"]:
-        if pycurl_available:
-            file_status = downloader_file_checker(file_location, file_dest)
-            if file_status:
-                file_size_offline = os.path.getsize(file_dest)
-                display_message(
-                    msg_type="note",
-                    msg="File {} is incomplete. Resuming download.".format(
-                        file_name,
-                    ),
-                )
-                downloader_pycurl(
-                    file_location, path, file_size_offline=file_size_offline, mode="ab"
-                )
-            else:
-                downloader_pycurl(file_location, path, mode="wb")
-        else:
-            file_status = downloader_file_checker(file_location, file_dest)
-            if file_status:
-                file_size_offline = os.path.getsize(file_dest)
-                display_message(
-                    msg_type="note",
-                    msg="File {} is incomplete. Resuming download.".format(
-                        file_name,
-                    ),
-                )
-                downloader_requests(
-                    file_location, path, file_size_offline=file_size_offline, mode="ab"
-                )
-            else:
-                downloader_requests(file_location, path, mode="wb")
-        print()
-    elif protocol == "xrootd":
-        if not xrootd_available:
+    download_engine_map = {
+        "requests": requests_available,
+        "pycurl": pycurl_available,
+        "xrootdpyfs": xrootd_available,
+    }
+    if download_engine:
+        if not download_engine_map.get(download_engine):
             display_message(
                 msg_type="error",
-                msg="xrootd is not installed on system. Please use the 'http' protocol instead.",
+                msg="{} is not installed on system. Please install it.".format(
+                    download_engine
+                ),
             )
             sys.exit(1)
-        file_src = file_location.split("root://eospublic.cern.ch/")[-1]
-        try:
-            fs = XRootDPyFS("root://eospublic.cern.ch//")
-            with open(file_dest, "wb") as dest, fs.open(file_src, "rb") as src:
-                display_message(
-                    msg_type="note",
-                    msg="File: ./{}/{}".format(
-                        path,
-                        file_name,
-                    ),
-                )
-                src_data = src.read()
-                dest.write(src_data)
-        except Exception:
+    if protocol in ["http", "https"]:
+        if download_engine not in DOWNLOAD_ENGINE_PROTOCOL_HTTP_MAP:
             display_message(
-                msg_type="error", msg="Download error occured. Please try again."
+                msg_type="error",
+                msg="{} is not compatible with {} protocol. Please use requests or pycurl download engine.".format(
+                    download_engine,
+                    protocol,
+                ),
             )
+            sys.exit(1)
+        file_download_incomplete = downloader_file_checker(file_location, file_dest)
+        if file_download_incomplete:
+            file_size_offline = os.path.getsize(file_dest)
+            mode = "ab"
+            display_message(
+                msg_type="note",
+                msg="File {} is incomplete. Resuming download.".format(
+                    file_name,
+                ),
+            )
+        else:
+            file_size_offline = None
+            mode = "wb"
+        if download_engine == "requests":
+            downloader = DownloaderHttpRequests(
+                path, file_location, mode, file_size_offline
+            )
+            downloader.file_downloader()
+        elif download_engine == "pycurl":
+            downloader = DownloaderHttpPycurl(
+                path, file_location, mode, file_size_offline
+            )
+            downloader.file_downloader()
+        print()
+    elif protocol == "xrootd":
+        if download_engine not in DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP:
+            display_message(
+                msg_type="error",
+                msg="{} is not compatible with {} protocol. Please use xrootdpyfs engine.".format(
+                    download_engine,
+                    protocol,
+                ),
+            )
+            sys.exit(1)
+        mode = "wb"
+        downloader = DownloaderXrootd(path, file_location, mode)
+        downloader.file_downloader()
     return
 
 
@@ -246,7 +362,7 @@ def get_download_files_by_name(names=None, file_locations=None):
     """Return the files filtered by file names.
 
     :param names: List of file names to be filtered
-    :param file_locations: List of file locations
+    :param file_locations: List of remote file locations
     :type names: list
     :type file_locations: list
 
@@ -266,7 +382,7 @@ def get_download_files_by_regexp(regexp=None, file_locations=None, filtered_file
     """Return the list of files filtered by a regular expression.
 
     :param regexp: Regexp string for filtering of file locations
-    :param file_locations: List of file locations
+    :param file_locations: List of remote file locations
     :param filtered_files: List of file locations filtered by previous filters(if any).
     :type regexp: str
     :type file_locations: list
@@ -288,7 +404,7 @@ def get_download_files_by_range(ranges=None, file_locations=None, filtered_files
     """Return the list of files filtered by a range of files.
 
     :param ranges: List of ranges for filtering of files
-    :param file_locations: List of file locations
+    :param file_locations: List of remote file locations
     :param filtered_files: List of file locations filtered by previous filters(if any).
     :type ranges: list
     :type file_locations: list
