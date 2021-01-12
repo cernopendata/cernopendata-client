@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020 CERN.
+# Copyright (C) 2019, 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -36,7 +36,10 @@ extras_require = {
         "sphinx-click>=2.5.0",
     ],
     "tests": tests_require,
-    "xrootd": ["xrootdpyfs>=0.2"],
+    "xrootd": [
+        "xrootd<=4.12.2",
+        "xrootdpyfs>=0.2",
+    ],
     "pycurl": ["pycurl>=7"],
 }
 
