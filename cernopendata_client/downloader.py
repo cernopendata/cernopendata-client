@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -29,11 +29,12 @@ except ImportError:
     pycurl_available = False
 
 try:
-    from xrootdpyfs import XRootDPyFS
+    from XRootD import client as xrootdclient
 
     xrootd_available = True
 except ImportError:
     xrootd_available = False
+
 
 from .validator import validate_range
 from .printer import display_message
@@ -42,6 +43,7 @@ from .config import (
     DOWNLOAD_ERROR_PAGE,
     DOWNLOAD_ENGINE_PROTOCOL_HTTP_MAP,
     DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP,
+    SERVER_ROOT_URI,
 )
 
 
@@ -49,7 +51,7 @@ class DownloaderHttpRequests:
     """Downloader class for managing download related utilities with requests downloader engine."""
 
     def __init__(self, path, file_location, mode, file_size_offline):
-        """Initiate class instance."""
+        """Initialise class instance."""
         self.kb = 1024
         self.path = path
         self.mode = mode
@@ -107,7 +109,7 @@ class DownloaderHttpPycurl:
     """Downloader class for managing download related utilities with pycurl downloader engine."""
 
     def __init__(self, path, file_location, mode, file_size_offline):
-        """Initiate class instance."""
+        """Initialise class instance."""
         self.kb = 1024
         self.path = path
         self.mode = mode
@@ -164,7 +166,7 @@ class DownloaderXrootd:
     """Downloader class for managing download related utilities with xrootd downloader engine."""
 
     def __init__(self, path, file_location, mode):
-        """Initiate class instance."""
+        """Initialise class instance."""
         self.path = path
         self.mode = mode
         self.file_location = file_location
@@ -177,21 +179,21 @@ class DownloaderXrootd:
         return
 
     def file_downloader(self):
-        """Download single file with XrootDPyFS."""
+        """Download single file with XRootD."""
         try:
-            fs = XRootDPyFS("root://eospublic.cern.ch//")
-            with open(self.file_dest, self.mode) as dest, fs.open(
-                self.file_src, "rb"
-            ) as src:
-                display_message(
-                    msg_type="note",
-                    msg="File: ./{}/{}".format(
-                        self.path,
-                        self.file_name,
-                    ),
-                )
-                src_data = src.read()
-                dest.write(src_data)
+            display_message(
+                msg_type="note",
+                msg="File: ./{}/{}".format(
+                    self.path,
+                    self.file_name,
+                ),
+            )
+            process = xrootdclient.CopyProcess()
+            process.add_job(
+                SERVER_ROOT_URI + self.file_src, os.getcwd() + os.sep + self.file_dest
+            )
+            process.prepare()
+            process.run()
         except Exception:
             display_message(
                 msg_type="error", msg="Download error occured. Please try again."
@@ -297,7 +299,7 @@ def download_single_file(
     download_engine_map = {
         "requests": requests_available,
         "pycurl": pycurl_available,
-        "xrootdpyfs": xrootd_available,
+        "xrootd": xrootd_available,
     }
     if download_engine:
         if not download_engine_map.get(download_engine):
@@ -346,7 +348,7 @@ def download_single_file(
         if download_engine not in DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP:
             display_message(
                 msg_type="error",
-                msg="{} is not compatible with {} protocol. Please use xrootdpyfs engine.".format(
+                msg="{} is not compatible with {} protocol. Please use xrootd engine.".format(
                     download_engine,
                     protocol,
                 ),

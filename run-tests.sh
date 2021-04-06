@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020 CERN.
+# Copyright (C) 2019, 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -39,7 +39,10 @@ check_dockerfile () {
 
 check_docker_build () {
     docker build -t cernopendata/cernopendata-client .
-    docker run --rm cernopendata/cernopendata-client version
+}
+
+check_docker_run () {
+    docker run --rm -v "$PWD"/tests:/code/tests --entrypoint /bin/bash cernopendata/cernopendata-client -c 'pytest tests'
 }
 
 check_sphinx () {
@@ -59,6 +62,7 @@ if [ $# -eq 0 ]; then
     check_manifest
     check_dockerfile
     check_docker_build
+    check_docker_run
     check_sphinx
     check_pytest
 fi
@@ -73,6 +77,7 @@ do
         --check-manifest) check_manifest;;
         --check-dockerfile) check_dockerfile;;
         --check-docker-build) check_docker_build;;
+        --check-docker-run) check_docker_run;;
         --check-sphinx) check_sphinx;;
         --check-pytest) check_pytest;;
         *)

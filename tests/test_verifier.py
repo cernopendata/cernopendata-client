@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -25,14 +25,14 @@ from cernopendata_client.verifier import (
 
 def test_get_file_size():
     """Test get_file_size()."""
-    afile = "./LICENSE"
-    assert get_file_size(afile) == 35149
+    afile = "./tests/test_version.py"
+    assert get_file_size(afile) == 641
 
 
 def test_get_file_checksum():
     """Test get_file_checksum()."""
-    afile = "./LICENSE"
-    assert get_file_checksum(afile) == "adler32:f70779ec"
+    afile = "./tests/test_version.py"
+    assert get_file_checksum(afile) == "adler32:fa91da1e"
 
 
 def test_get_file_info_local_wrong_input():

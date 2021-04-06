@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -143,7 +143,7 @@ def test_download_files_download_engine(mocker):
 
 def test_download_files_download_engine_wrong_protocol_combination_one():
     """Test download_files() command with download-engine option and wrong protocol."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
         download_files,
@@ -155,19 +155,19 @@ def test_download_files_download_engine_wrong_protocol_combination_one():
 
 def test_download_files_download_engine_wrong_protocol_combination_two():
     """Test download_files() command with download-engine option and wrong protocol."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_download_files = CliRunner()
     test_result = test_download_files.invoke(
         download_files,
-        ["--recid", 3005, "--download-engine", "xrootdpyfs", "--protocol", "http"],
+        ["--recid", 3005, "--download-engine", "xrootd", "--protocol", "http"],
     )
     assert test_result.exit_code == 1
-    assert "xrootdpyfs is not compatible with http" in test_result.output
+    assert "xrootd is not compatible with http" in test_result.output
 
 
 def test_download_files_root():
     """Test download_files() command with xrootd protocol."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
     if os.path.isfile(test_file):
         os.remove(test_file)
@@ -191,7 +191,7 @@ def test_download_files_root_wrong(mocker):
         download_files, ["--recid", 3005, "--protocol", "xrootd"]
     )
     assert test_result.exit_code == 1
-    assert "xrootdpyfs is not installed on system" in test_result.output
+    assert "xrootd is not installed on system" in test_result.output
 
 
 def test_download_files_with_verify():

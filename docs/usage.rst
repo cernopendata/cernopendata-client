@@ -56,20 +56,20 @@ In order to get metadata information about a record, please use the
 
     $ cernopendata-client get-metadata --recid 1
     {
-	"$schema": "http://opendata.cern.ch/schema/records/record-v1.0.0.json",
-	"abstract": {
-	    "description": "<p>BTau primary dataset in AOD format from RunB of 2010</p> <p>This dataset contains all runs from 2010 RunB. The list of validated runs, which must be applied to all analyses, can be found in</p>",
-	    "links": [
-		{
-		    "recid": "1000"
-		}
-	    ]
-	},
-	"accelerator": "CERN-LHC",
-	"collaboration": {
-	    "name": "CMS collaboration",
-	    "recid": "450"
-	},
+        "$schema": "http://opendata.cern.ch/schema/records/record-v1.0.0.json",
+        "abstract": {
+            "description": "<p>BTau primary dataset in AOD format from RunB of 2010</p> <p>This dataset contains all runs from 2010 RunB. The list of validated runs, which must be applied to all analyses, can be found in</p>",
+            "links": [
+                {
+                    "recid": "1000"
+                }
+            ]
+        },
+        "accelerator": "CERN-LHC",
+        "collaboration": {
+            "name": "CMS collaboration",
+            "recid": "450"
+        },
     ...
 
 This will output a JSON containing all the record metadata, such as
@@ -249,10 +249,10 @@ xrootd`` command-line option to use that protocol instead of HTTP/HTTPS:
 
 **Select download engine**
 
-You can specify the download engine with ``--download-engine`` option. 
+You can specify the download engine with ``--download-engine`` option.
 
 - ``requests`` and ``pycurl`` are two supported download engines for **HTTP** protocol.
-- ``xrootdpyfs`` is the only supported download engine for **XRootD** protocol.
+- ``xrootd`` is the only supported download engine for **XRootD** protocol.
 
 .. code-block:: console
 

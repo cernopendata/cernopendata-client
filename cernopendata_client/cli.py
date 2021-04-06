@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020 CERN.
+# Copyright (C) 2019, 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -246,10 +246,10 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
 @click.option(
     "--download-engine",
     "download_engine",
-    type=click.Choice(["requests", "pycurl", "xrootdpyfs"]),
+    type=click.Choice(["requests", "pycurl", "xrootd"]),
     help="Download engine to use when downloading files."
-    "The available values are 'requests', 'pycurl', 'xrootdpyfs'."
-    "[default=requests (for HTTP protocol), xrootdpyfs (for XRootD protocol)]",
+    "The available values are 'requests', 'pycurl', 'xrootd'."
+    "[default=requests (for HTTP protocol), xrootd (for XRootD protocol)]",
 )
 def download_files(
     server,
@@ -343,7 +343,7 @@ def download_files(
         if protocol.startswith("http"):
             download_engine = "requests"
         elif protocol == "xrootd":
-            download_engine = "xrootdpyfs"
+            download_engine = "xrootd"
     for file_location in download_file_locations:
         display_message(
             msg_type="info",

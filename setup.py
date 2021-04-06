@@ -37,8 +37,7 @@ extras_require = {
     ],
     "tests": tests_require,
     "xrootd": [
-        "xrootd<=4.12.2",
-        "xrootdpyfs>=0.2",
+        "xrootd>=4.12.2",
     ],
     "pycurl": ["pycurl>=7"],
 }

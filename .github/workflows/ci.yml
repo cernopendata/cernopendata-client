@@ -8,7 +8,7 @@ on:
 
 jobs:
     lint-shellcheck:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v2
 
@@ -18,7 +18,7 @@ jobs:
               ./run-tests.sh --check-shellscript
 
     lint-black:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v2
 
@@ -33,7 +33,7 @@ jobs:
               ./run-tests.sh --check-black
 
     lint-pydocstyle:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
 
@@ -48,7 +48,7 @@ jobs:
             ./run-tests.sh --check-pydocstyle
 
     lint-flake8:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
 
@@ -63,7 +63,7 @@ jobs:
             ./run-tests.sh --check-flake8
 
     lint-check-manifest:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
 
@@ -78,7 +78,7 @@ jobs:
             ./run-tests.sh --check-manifest
 
     lint-dockerfile:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
 
@@ -86,7 +86,7 @@ jobs:
           run: ./run-tests.sh --check-dockerfile
 
     docs-sphinx:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
 
@@ -98,8 +98,7 @@ jobs:
         - name: Install system dependencies
           run: |
             sudo apt-get update -y
-            sudo apt install libcurl4-openssl-dev libssl-dev
-            sudo apt-get install libgnutls28-dev
+            sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
 
         - name: Install Python dependencies
           run: pip install -e .[docs]
@@ -108,7 +107,7 @@ jobs:
           run: ./run-tests.sh --check-sphinx
 
     python-tests:
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-20.04
         strategy:
           matrix:
               python-version: [2.7, 3.6, 3.7, 3.8, 3.9]
@@ -124,14 +123,12 @@ jobs:
           - name: Install system dependencies
             run: |
               sudo apt-get update -y
-              sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev
-              sudo apt-get install libgnutls28-dev
+              sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
 
           - name: Install Python dependencies
             run: |
-              pip install "pip<20.3"
-              pip install wheel
-              pip install -e .[all]
+              pip install --upgrade pip setuptools wheel
+              pip install -e .[docs,tests,pycurl]
 
           - name: Run pytest
             run: ./run-tests.sh --check-pytest
@@ -143,10 +140,13 @@ jobs:
               token: ${{ secrets.CODECOV_TOKEN }}
               files: coverage.xml
 
-    docker-build:
-        runs-on: ubuntu-18.04
+    docker-tests:
+        runs-on: ubuntu-20.04
         steps:
           - uses: actions/checkout@v2
 
           - name: Build Docker image
             run: ./run-tests.sh --check-docker-build
+
+          - name: Run Docker image tests
+            run: sudo ./run-tests.sh --check-docker-run

@@ -23,8 +23,8 @@ import sphinx.environment
 # -- Project information -----------------------------------------------------
 
 project = "cernopendata_client"
-copyright = "2019, CERN"
-author = "CERN Analysis Preservation"
+copyright = "2019-2021, CERN"
+author = "CERN Open Data"
 
 # Get the version string. Cannot be done with import!
 g = {}
@@ -56,7 +56,7 @@ extensions = [
 ]
 
 # Autodoc mocking to fix ReadTheDocs builds missing system dependencies
-autodoc_mock_imports = ["pycurl", "xrootdpyfs"]
+autodoc_mock_imports = ["pycurl", "xrootd"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

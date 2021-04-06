@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -17,7 +17,7 @@ from cernopendata_client.cli import list_directory
 
 def test_non_recursive_list_directory():
     """Test `list_directory` command."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_non_recursive = CliRunner()
     test_result = test_non_recursive.invoke(
         list_directory, ["/eos/opendata/cms/validated-runs/Commissioning10"]
@@ -28,7 +28,7 @@ def test_non_recursive_list_directory():
 
 def test_recursive_list_directory():
     """Test `list_directory --recursive` command."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_recursive = CliRunner()
     test_result = test_recursive.invoke(
         list_directory, ["/eos/opendata/cms/Run2010B/BTau/AOD", "--recursive"]
@@ -38,7 +38,7 @@ def test_recursive_list_directory():
 
 def test_recursive_list_directory_timeout():
     """Test `list_directory --recursive` command with timeout."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_recursive = CliRunner()
     test_result = test_recursive.invoke(
         list_directory, ["/eos/opendata/cms", "--recursive", "--timeout", 5]
@@ -49,7 +49,7 @@ def test_recursive_list_directory_timeout():
 
 def test_non_recursive_list_directory_wrong():
     """Test `list_directory` command with wrong path"""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_non_recursive = CliRunner()
     test_result = test_non_recursive.invoke(list_directory, ["/eos/opendata/foobar"])
     assert test_result.exit_code == 1
@@ -58,7 +58,7 @@ def test_non_recursive_list_directory_wrong():
 
 def test_recursive_list_directory_wrong():
     """Test `list_directory --recursive` command with wrong path."""
-    xrootdpyfs = pytest.importorskip("xrootdpyfs")  # noqa: F841
+    xrootd = pytest.importorskip("XRootD")  # noqa: F841
     test_recursive = CliRunner()
     test_result = test_recursive.invoke(
         list_directory, ["/eos/opendata/recursiveFoobar", "--recursive"]

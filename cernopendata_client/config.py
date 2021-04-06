@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2021 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -40,7 +40,7 @@ DOWNLOAD_ERROR_PAGE = {"size": 3846, "checksum": "adler32:a82d5324"}
 """Error page info from the server."""
 
 DOWNLOAD_ENGINE_PROTOCOL_HTTP_MAP = ["pycurl", "requests"]
-"""Download engine compatible with HTTP protocol."""
+"""Download engines compatible with HTTP protocol."""
 
-DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP = ["xrootdpyfs"]
-"""Download engine compatible with xrootd protocol."""
+DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP = ["xrootd"]
+"""Download engines compatible with xrootd protocol."""
