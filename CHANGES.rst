@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version 0.2.1 (UNRELEASED)
+--------------------------
+
+- Adds support for Python 3.10.
+- Improves ``download-files`` command to resume interrupted downloads.
+- Improves XRootD downloader by using vanilla XRootD package.
+- Fixes minor issues with file index unwinding and output directory handling.
+
 Version 0.2.0 (2020-11-19)
 --------------------------
 
