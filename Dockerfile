@@ -1,18 +1,17 @@
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2022 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 
-# Use CentOS 8.2.2004
-FROM centos:8.2.2004
+# Use Fedora 35
+FROM fedora:35
 
 # Install system prerequisites
 # hadolint ignore=DL3033
 RUN yum install -y \
-        ca-certificates \
-        epel-release && \
+        ca-certificates && \
     yum install -y \
         cmake \
         curl \
@@ -39,10 +38,12 @@ COPY . /code
 RUN pip3 install --no-cache-dir '.[all]'
 
 # Remove /code to make image slimmer
+# hadolint ignore=DL3059
 RUN rm -rf /code
 
 # Run container as `cernopendata` user with UID `1000`, which should match
 # current host user in most situations
+# hadolint ignore=DL3059
 RUN adduser --uid 1000  cernopendata --gid 0 && \
     chown -R  cernopendata:root /code
 
