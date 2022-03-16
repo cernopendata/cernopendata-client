@@ -1,13 +1,19 @@
 Changes
 =======
 
-Version 0.2.1 (UNRELEASED)
+Version 0.3.0 (2022-03-16)
 --------------------------
 
 - Adds support for Python 3.10.
-- Improves ``download-files`` command to resume interrupted downloads.
-- Improves XRootD downloader by using vanilla XRootD package.
+- Improves ``download-files`` command to resume interrupted downloads when
+  using HTTP downloads with ``pycurl`` engine.
+- Improves XRootD downloader by using vanilla XRootD package. Changes
+  ``xrootdpyfs`` to ``xrootd`` download engine.
+- Improves ``download-files`` command with a new option ``--download-engine``
+  to select ``pycurl`` or ``requests`` engines when downloading files over
+  HTTP.
 - Fixes minor issues with file index unwinding and output directory handling.
+
 
 Version 0.2.0 (2020-11-19)
 --------------------------
