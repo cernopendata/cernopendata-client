@@ -23,7 +23,7 @@ cernopendata-client
 About
 =====
 
-``cernopendata-client`` is a command-like tool to facilitate downloading files
+``cernopendata-client`` is a command-line tool to facilitate downloading files
 from the `CERN Open Data portal <http://opendata.cern.ch/>`_. The tool enables
 to query datasets hosted on the CERN Open Data portal and to download and
 verify the individual data set files.
