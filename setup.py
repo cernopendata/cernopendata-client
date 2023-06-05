@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2022 CERN.
+# Copyright (C) 2019, 2020, 2021, 2022, 2023 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -31,6 +31,7 @@ tests_require = [
 
 extras_require = {
     "docs": [
+        "jinja2<3.1.0",
         "Sphinx>=1.4.4,<2.0",
         "sphinx-rtd-theme>=0.1.9",
         "sphinx-click>=2.5.0",

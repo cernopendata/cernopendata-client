@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -62,9 +62,8 @@ def cernopendata_client():
 def version():
     """Return cernopendata-client version.
 
-    \b
-    Examples:
-      $ cernopendata-client version
+    Examples: \n
+    \t $ cernopendata-client version
     """
     display_message(msg=__version__)
 
@@ -92,10 +91,9 @@ def get_metadata(server, recid, doi, title, output_value):
     Select a CERN Open Data bibliographic record by a record ID, a
     DOI, or a title and return its metadata in the JSON format.
 
-    \b
-    Examples:
-      $ cernopendata-client get-metadata --recid 1
-      $ cernopendata-client get-metadata --recid 1 --output-value title
+    Examples: \n
+    \t $ cernopendata-client get-metadata --recid 1\n
+    \t $ cernopendata-client get-metadata --recid 1 --output-value title
     """
     validate_server(server)
     if recid is not None:
@@ -153,11 +151,10 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     DOI, or a title and return the list of data file locations
     belonging to this record.
 
-    \b
-    Examples:
-      $ cernopendata-client get-file-locations --recid 5500
-      $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd
-      $ cernopendata-client get-file-locations --recid 5500 --verbose
+    Examples: \n
+    \t $ cernopendata-client get-file-locations --recid 5500\n
+    \t $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd\n
+    \t $ cernopendata-client get-file-locations --recid 5500 --verbose
     """
     validate_server(server)
     if recid is not None:
@@ -272,14 +269,13 @@ def download_files(
     Select a CERN Open Data bibliographic record by a record ID, a
     DOI, or a title and download data files belonging to this record.
 
-    \b
-    Examples:
-      $ cernopendata-client download-files --recid 5500
-      $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
-      $ cernopendata-client download-files --recid 5500 --filter-regexp py$
-      $ cernopendata-client download-files --recid 5500 --filter-range 1-4
-      $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7
-      $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
+    Examples: \n
+    \t $ cernopendata-client download-files --recid 5500\n
+    \t $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml\n
+    \t $ cernopendata-client download-files --recid 5500 --filter-regexp py$\n
+    \t $ cernopendata-client download-files --recid 5500 --filter-range 1-4\n
+    \t $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7\n
+    \t $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     """
     validate_server(server)
     if recid is not None:
@@ -394,9 +390,8 @@ def verify_files(server, recid):
     verify integrity of downloaded data files belonging to this
     record.
 
-    \b
-    Examples:
-      $ cernopendata-client verify-files --recid 5500
+    Examples: \n
+    \t $ cernopendata-client verify-files --recid 5500
     """
     # Validate parameters
     validate_server(server)
@@ -466,11 +461,10 @@ def list_directory(path, recursive, timeout):
 
     Returns the list of files and subdirectories of a given EOSPUBLIC directory.
 
-    \b
-    Examples:
-      $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
-      $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive
-      $ cernopendata-client list-directory /eos/opendata/cms/Run2010B --recursive --timeout 10
+    Examples: \n
+    \t $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10\n
+    \t $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive\n
+    \t $ cernopendata-client list-directory /eos/opendata/cms/Run2010B --recursive --timeout 10
     """
     validate_directory(directory=path)
     files = get_list_directory(path, recursive, timeout)
