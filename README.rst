@@ -35,6 +35,31 @@ Installation
 
     $ pip install cernopendata-client
 
+Development
+============
+
+Once you've completed the below setup, you can proceed to code enhancements
+and modifications within the package.
+
+- Clone the github repository.
+
+.. code-block:: console
+
+    $ git clone https://github.com/cernopendata/cernopendata-client.git
+
+- Setup a `virtual environment <https://docs.python.org/3/library/venv.html>`_.
+
+.. code-block:: console
+
+    $ python3 -m venv env
+    $ source env/bin/activate
+
+- Install package in `editable mode <https://setuptools.pypa.io/en/latest/userguide/development_mode.html>`_.
+
+.. code-block:: console
+
+    $ pip install -e .
+
 Usage
 =====
 
