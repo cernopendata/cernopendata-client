@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.4.0 (UNRELEASED)
+--------------------------
+
+- Drops support for Python 2.7.
+
 Version 0.3.0 (2022-03-16)
 --------------------------
 
