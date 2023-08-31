@@ -4,7 +4,7 @@ Changes
 Version 0.4.0 (UNRELEASED)
 --------------------------
 
-- Adds support for Python 3.11.
+- Adds support for Python 3.11 and 3.12.
 - Drops support for Python 2.7.
 - Improves ``get-metadata --output-field`` command by adding a new ``--filter`` option allowing to output only selected field values matching desired criteria.
 
