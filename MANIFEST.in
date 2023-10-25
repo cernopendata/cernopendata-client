@@ -2,6 +2,7 @@ include *.rst
 include *.sh
 include *.yml
 include .flake8
+include .readthedocs.yaml
 include Dockerfile
 include LICENSE
 include docs/requirements.txt
