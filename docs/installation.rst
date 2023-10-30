@@ -55,6 +55,6 @@ image contains both `pycurl` and `xrootd` flavours:
 
 .. code-block:: console
 
-   $ docker pull cernopendata/cernopendata-client
-   $ docker run -i -t --rm cernopendata/cernopendata-client --help
+   $ docker pull docker.io/cernopendata/cernopendata-client
+   $ docker run -i -t --rm docker.io/cernopendata/cernopendata-client --help
 

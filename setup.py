@@ -20,7 +20,7 @@ tests_require = [
     'black>=19.10b0 ; python_version>="3"',
     "check-manifest>=0.25",
     "coverage>=4.0",
-    "mock>=3.0,<4.0",
+    "mock>=3.0",
     "pydocstyle>=1.0.0",
     "pytest-cache>=1.0",
     "pytest-cov>=1.8.0",
@@ -33,15 +33,15 @@ tests_require = [
 extras_require = {
     "docs": [
         "jinja2<3.1.0",
-        "Sphinx>=1.4.4,<2.0",
+        "Sphinx>=1.4.4",
         "sphinx-rtd-theme>=0.1.9",
         "sphinx-click>=2.5.0",
     ],
+    "pycurl": ["pycurl>=7"],
     "tests": tests_require,
     "xrootd": [
         "xrootd>=4.12.2",
     ],
-    "pycurl": ["pycurl>=7"],
 }
 
 extras_require["all"] = []

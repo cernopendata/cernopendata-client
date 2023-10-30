@@ -5,8 +5,9 @@ Version 0.4.0 (UNRELEASED)
 --------------------------
 
 - Adds support for Python 3.11 and 3.12.
-- Drops support for Python 2.7.
 - Improves ``get-metadata --output-field`` command by adding a new ``--filter`` option allowing to output only selected field values matching desired criteria.
+- Changes container image base to Fedora 38 and slightly optimises image size.
+- Drops support for Python 2.7.
 
 Version 0.3.0 (2022-03-16)
 --------------------------

@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -34,15 +34,15 @@ check_manifest () {
 }
 
 check_dockerfile () {
-    docker run -i --rm hadolint/hadolint < Dockerfile
+    docker run -i --rm docker.io/hadolint/hadolint:v2.12.0 < Dockerfile
 }
 
 check_docker_build () {
-    docker build -t cernopendata/cernopendata-client .
+    docker build -t docker.io/cernopendata/cernopendata-client .
 }
 
 check_docker_run () {
-    docker run --rm -v "$PWD"/tests:/code/tests --entrypoint /bin/bash cernopendata/cernopendata-client -c 'pytest tests'
+    docker run --rm -v "$PWD"/tests:/code/tests --entrypoint /bin/bash docker.io/cernopendata/cernopendata-client -c 'pytest tests'
 }
 
 check_sphinx () {
