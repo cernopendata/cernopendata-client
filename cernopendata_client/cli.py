@@ -68,6 +68,60 @@ def version():
     display_message(msg=__version__)
 
 
+def filter_metadata(output_field, filters, output_json):
+    # noqa: D301
+    """Filter metadata objects based on specified criteria.
+
+    :param output_field: Name of the array containing objects to access
+    :param filters: Argument of the --filter option in the format some_field_name=some_value
+    :param output_json: JSON containing metadata objects
+
+    :type field: str
+    :type filters: str
+    :type output_json: list or dict
+
+    :return: None
+    """
+    filter_fields = filters.split("=")
+    if len(filter_fields) != 2:
+        display_message(
+            msg_type="error",
+            msg="Invalid filter format. Use --filter some_field_name=some_value",
+        )
+        sys.exit(1)
+    filterField_name, filterField_value = filter_fields
+    filterField_names = filterField_name.split(".")
+    for object in output_json:
+        if object == "$schema":
+            display_message(
+                msg_type="error",
+                msg="Field '{}' is not present in metadata".format(output_field),
+            )
+            sys.exit(1)
+        try:
+            if filterField_value == object[filterField_names[-1]]:
+                if output_field in object:
+                    display_message(msg=object[output_field])
+                else:
+                    display_message(msg=json.dumps(object, indent=4))
+                return
+        except (KeyError, TypeError):
+            display_message(
+                msg_type="error",
+                msg="Field '{}' is not present in metadata".format(
+                    filterField_names[-1]
+                ),
+            )
+            sys.exit(1)
+    display_message(
+        msg_type="error",
+        msg="No objects found with {}={}".format(
+            filterField_names[-1], filterField_value
+        ),
+    )
+    sys.exit(1)
+
+
 @cernopendata_client.command()
 @click.option("--recid", type=click.INT, help="Record ID")
 @click.option("--doi", help="Digital Object Identifier")
@@ -84,7 +138,13 @@ def version():
     type=click.STRING,
     help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
-def get_metadata(server, recid, doi, title, output_value):
+@click.option(
+    "--filter",
+    "filters",
+    multiple=False,
+    help="Filter only certain output values matching filtering criteria. [Use --filter some_field_name=some_value]",
+)
+def get_metadata(server, recid, doi, title, output_value, filters):
     # noqa: D301
     """Get metadata content of a record.
 
@@ -93,30 +153,47 @@ def get_metadata(server, recid, doi, title, output_value):
 
     Examples: \n
     \t $ cernopendata-client get-metadata --recid 1\n
-    \t $ cernopendata-client get-metadata --recid 1 --output-value title
+    \t $ cernopendata-client get-metadata --recid 1 --output-value title\n
+    \t $ cernopendata-client get-metadata --recid 329 --output-value authors.orcid --filter name="Rousseau, David"
     """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
     output_json = record_json["metadata"]
-    if not output_value:
-        display_message(msg=json.dumps(output_json, indent=4))
-    else:
+    if output_value:
         fields = output_value.split(".")
-        for field in fields:
-            try:
+        try:
+            for field in fields:
                 output_json = output_json[field]
+            if filters:
+                filter_metadata(field, filters, output_json)
+                return
+        except (KeyError, TypeError):
+            try:
+                if filters:
+                    filter_metadata(field, filters, output_json)
+                else:
+                    for object in output_json:
+                        display_message(msg=object[field])
+                return
             except (KeyError, TypeError):
                 display_message(
                     msg_type="error",
                     msg="Field '{}' is not present in metadata".format(field),
                 )
                 sys.exit(1)
-        if type(output_json) is dict or type(output_json) is list:
+        if isinstance(output_json, (dict, list)):
             display_message(msg=json.dumps(output_json, indent=4))
         else:  # print strings or numbers more simply
             display_message(msg=output_json)
+    elif filters:
+        display_message(
+            msg_type="error",
+            msg="--filter can only be used with --output-value",
+        )
+    else:
+        display_message(msg=json.dumps(output_json, indent=4))
 
 
 @cernopendata_client.command()

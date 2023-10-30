@@ -87,6 +87,25 @@ datasets, you can use **--output-value** command-line option:
     $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
     FT_R_42_V10A::All
 
+If the output field produces a list of values, you may want to filter
+only certain field values of interest. For example, you may want to ask
+not to output all authors of a dataset record, but only the authors
+matching certain particular author name. 
+You can use the **--filter** command-line option to achieve this:
+
+.. code-block:: console
+
+    $ cernopendata-client get-metadata --recid 329 --output-value authors.orcid
+    0000-0002-2634-4958
+    0000-0001-8363-9827
+    0000-0002-9764-9783
+    0000-0002-9266-1783
+    0000-0001-5610-1060
+    0000-0001-7613-8063
+    $ cernopendata-client get-metadata --recid 329 --output-value authors.orcid --filter name='Rousseau, David'
+    0000-0001-7613-8063
+
+
 Listing available data files
 ----------------------------
 

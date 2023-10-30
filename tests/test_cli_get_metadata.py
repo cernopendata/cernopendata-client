@@ -69,11 +69,38 @@ def test_get_metadata_from_output_fields():
     assert "FT_R_42_V10A::All" in test_result.output
 
 
+def test_get_metadata_from_filter_fields():
+    """Test `get-metadata --recid --output-value --filter` command."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata,
+        [
+            "--recid",
+            1,
+            "--output-value",
+            "usage.links.description",
+            "--filter",
+            "url=/docs/cms-getting-started-2010",
+        ],
+    )
+    assert test_result.exit_code == 0
+    assert "Getting started with CMS open data" in test_result.output
+
+
 def test_get_metadata_from_output_fields_one():
     """Test `get-metadata --recid --output-value` command."""
     test_get_metadata = CliRunner()
     test_result = test_get_metadata.invoke(
         get_metadata, ["--recid", 1, "--output-value", "usage.links"]
+    )
+    assert test_result.exit_code == 0
+
+
+def test_get_metadata_from_output_fields_two():
+    """Test `get-metadata --recid --output-value` command."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata, ["--recid", 1, "--output-value", "usage.links.url"]
     )
     assert test_result.exit_code == 0
 
@@ -86,6 +113,38 @@ def test_get_metadata_from_output_fields_wrong():
     )
     assert test_result.exit_code == 1
     assert "Field 'global_tag' is not present in metadata\n" in test_result.output
+
+
+def test_get_metadata_from_filter_fields_wrong():
+    """Test `get-metadata --recid --output-value --filter` command for wrong values."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata,
+        [
+            "--recid",
+            1,
+            "--output-value",
+            "usage.links.description",
+            "--filter",
+            "link=/docs/cms-getting-started-2010",
+        ],
+    )
+    assert test_result.exit_code == 1
+    assert "Field 'link' is not present in metadata\n" in test_result.output
+
+
+def test_get_metadata_from_filter_fields_emptyg():
+    """Test `get-metadata --recid --output-value --filter` command with empty values."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata,
+        ["--recid", 1, "--output-value", "usage.links.description", "--filter", "url"],
+    )
+    assert test_result.exit_code == 1
+    assert (
+        "Invalid filter format. Use --filter some_field_name=some_value"
+        in test_result.output
+    )
 
 
 def test_get_metadata_empty_value():

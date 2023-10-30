@@ -8,5 +8,6 @@ The list of contributors in alphabetical order:
 - `Daniel Prelipcean <https://orcid.org/0000-0002-4855-194X>`_ (`@dprelipcean <https://github.com/dprelipcean>`_)
 - `Jan Okraska <https://orcid.org/0000-0002-1416-3244>`_ (`@okraskaj <https://github.com/okraskaj>`_)
 - Jiri Kuncar (`@jirikuncar <https://github.com/jirikuncar>`_)
+- Joud Masoud (`@joudmas <https://github.com/joudmas>`_)
 - Parth Shandilya (`@ParthS007 <https://github.com/ParthS007>`_)
 - `Tibor Simko <https://orcid.org/0000-0001-7202-5803>`_ (`@tiborsimko <https://github.com/tiborsimko>`_)
