@@ -40,6 +40,7 @@ from .validator import (
 )
 from .walker import get_list_directory
 from .verifier import get_file_info_local, verify_file_info
+from .metadater import filter_metadata, handle_error_message
 from .config import (
     SERVER_HTTP_URI,
     LIST_DIRECTORY_TIMEOUT,
@@ -68,60 +69,6 @@ def version():
     display_message(msg=__version__)
 
 
-def filter_metadata(output_field, filters, output_json):
-    # noqa: D301
-    """Filter metadata objects based on specified criteria.
-
-    :param output_field: Name of the array containing objects to access
-    :param filters: Argument of the --filter option in the format some_field_name=some_value
-    :param output_json: JSON containing metadata objects
-
-    :type field: str
-    :type filters: str
-    :type output_json: list or dict
-
-    :return: None
-    """
-    filter_fields = filters.split("=")
-    if len(filter_fields) != 2:
-        display_message(
-            msg_type="error",
-            msg="Invalid filter format. Use --filter some_field_name=some_value",
-        )
-        sys.exit(1)
-    filterField_name, filterField_value = filter_fields
-    filterField_names = filterField_name.split(".")
-    for object in output_json:
-        if object == "$schema":
-            display_message(
-                msg_type="error",
-                msg="Field '{}' is not present in metadata".format(output_field),
-            )
-            sys.exit(1)
-        try:
-            if filterField_value == object[filterField_names[-1]]:
-                if output_field in object:
-                    display_message(msg=object[output_field])
-                else:
-                    display_message(msg=json.dumps(object, indent=4))
-                return
-        except (KeyError, TypeError):
-            display_message(
-                msg_type="error",
-                msg="Field '{}' is not present in metadata".format(
-                    filterField_names[-1]
-                ),
-            )
-            sys.exit(1)
-    display_message(
-        msg_type="error",
-        msg="No objects found with {}={}".format(
-            filterField_names[-1], filterField_value
-        ),
-    )
-    sys.exit(1)
-
-
 @cernopendata_client.command()
 @click.option("--recid", type=click.INT, help="Record ID")
 @click.option("--doi", help="Digital Object Identifier")
@@ -141,7 +88,7 @@ def filter_metadata(output_field, filters, output_json):
 @click.option(
     "--filter",
     "filters",
-    multiple=False,
+    multiple=True,
     help="Filter only certain output values matching filtering criteria. [Use --filter some_field_name=some_value]",
 )
 def get_metadata(server, recid, doi, title, output_value, filters):
@@ -163,6 +110,7 @@ def get_metadata(server, recid, doi, title, output_value, filters):
     output_json = record_json["metadata"]
     if output_value:
         fields = output_value.split(".")
+        wrong_field = True
         try:
             for field in fields:
                 output_json = output_json[field]
@@ -173,16 +121,18 @@ def get_metadata(server, recid, doi, title, output_value, filters):
             try:
                 if filters:
                     filter_metadata(field, filters, output_json)
+                    wrong_field = False
                 else:
                     for object in output_json:
-                        display_message(msg=object[field])
-                return
+                        if field in object:
+                            wrong_field = False
+                            display_message(msg=object[field])
             except (KeyError, TypeError):
-                display_message(
-                    msg_type="error",
-                    msg="Field '{}' is not present in metadata".format(field),
-                )
-                sys.exit(1)
+                handle_error_message(field)
+            if wrong_field:
+                handle_error_message(field)
+            return
+
         if isinstance(output_json, (dict, list)):
             display_message(msg=json.dumps(output_json, indent=4))
         else:  # print strings or numbers more simply

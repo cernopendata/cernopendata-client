@@ -95,15 +95,15 @@ You can use the **--filter** command-line option to achieve this:
 
 .. code-block:: console
 
-    $ cernopendata-client get-metadata --recid 329 --output-value authors.orcid
-    0000-0002-2634-4958
-    0000-0001-8363-9827
-    0000-0002-9764-9783
-    0000-0002-9266-1783
-    0000-0001-5610-1060
-    0000-0001-7613-8063
-    $ cernopendata-client get-metadata --recid 329 --output-value authors.orcid --filter name='Rousseau, David'
-    0000-0001-7613-8063
+    $ cernopendata-client get-metadata --recid 329 --output-value authors.name
+    Adam-Bourdarios, Claire
+    Cowan, Glen
+    Germain, Cecile
+    Guyon, Isabelle
+    Kégl, Balázs
+    Rousseau, David
+    $ cernopendata-client get-metadata --recid 329 --output-value authors.name --filter affiliation='Orsay, LAL; Paris, IN2P3; Orsay' --filter orcid='0000-0001-7613-8063'
+    Rousseau, David
 
 
 Listing available data files
