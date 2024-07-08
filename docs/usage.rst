@@ -109,23 +109,6 @@ Another example of using **--filter** would be retrieving the container image de
 
 .. code-block:: console
 
-    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images
-    [
-        {
-            "name": "docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
-            "registry": "dockerhub"
-        },
-        {
-            "name": "gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
-            "registry": "gitlab"
-        }
-    ]
-    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images --filter registry=dockerhub
-    {
-    "name": "docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
-    "registry": "dockerhub"
-    }
-
     $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name
     docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
     gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
