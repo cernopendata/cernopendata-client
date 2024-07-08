@@ -105,6 +105,32 @@ You can use the **--filter** command-line option to achieve this:
     $ cernopendata-client get-metadata --recid 329 --output-value authors.name --filter affiliation='Orsay, LAL; Paris, IN2P3; Orsay' --filter orcid='0000-0001-7613-8063'
     Rousseau, David
 
+Another example of using **--filter** would be retrieving the container image details. For instance, to get the container images registered in Docker Hub for a specific record, you can use:
+
+.. code-block:: console
+
+    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images
+    [
+        {
+            "name": "docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
+            "registry": "dockerhub"
+        },
+        {
+            "name": "gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
+            "registry": "gitlab"
+        }
+    ]
+    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images --filter registry=dockerhub
+    {
+    "name": "docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest",
+    "registry": "dockerhub"
+    }
+
+    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name
+    docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
+    gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
+    $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name --filter registry=dockerhub
+    docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
 
 Listing available data files
 ----------------------------
