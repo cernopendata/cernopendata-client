@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2022, 2023 CERN.
+# Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -16,19 +16,6 @@ from setuptools import setup
 readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
-tests_require = [
-    'black>=19.10b0 ; python_version>="3"',
-    "check-manifest>=0.25",
-    "coverage>=4.0",
-    "mock>=3.0",
-    "pydocstyle>=1.0.0",
-    "pytest-cache>=1.0",
-    "pytest-cov>=1.8.0",
-    "pytest>=2.8.0",
-    'platformdirs<2.1 ; python_version=="3.6"',
-    'pytest-mock>=2.0,<3.0 ; python_version=="2.7"',
-    'pytest-mock>=3.0 ; python_version>="3"',
-]
 
 extras_require = {
     "docs": [
@@ -38,7 +25,19 @@ extras_require = {
         "sphinx-click>=2.5.0",
     ],
     "pycurl": ["pycurl>=7"],
-    "tests": tests_require,
+    "tests": [
+        'black>=19.10b0 ; python_version>="3"',
+        "check-manifest>=0.25",
+        "coverage>=4.0",
+        "mock>=3.0",
+        "pydocstyle>=1.0.0",
+        "pytest-cache>=1.0",
+        "pytest-cov>=1.8.0",
+        "pytest>=2.8.0",
+        'platformdirs<2.1 ; python_version=="3.6"',
+        'pytest-mock>=2.0,<3.0 ; python_version=="2.7"',
+        'pytest-mock>=3.0 ; python_version>="3"',
+    ],
     "xrootd": [
         "xrootd>=4.12.2",
     ],
@@ -49,10 +48,6 @@ for key, reqs in extras_require.items():
     if ":" == key[0]:
         continue
     extras_require["all"].extend(reqs)
-
-setup_requires = [
-    "pytest-runner>=2.7",
-]
 
 install_requires = ["click>=7", "requests>=2"]
 
@@ -74,8 +69,6 @@ setup(
     ],
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
-    tests_require=tests_require,
     entry_points={
         "console_scripts": [
             "cernopendata-client = cernopendata_client.cli:cernopendata_client"

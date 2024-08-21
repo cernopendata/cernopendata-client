@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2023 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023, 2024 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -51,7 +51,7 @@ check_sphinx () {
 }
 
 check_pytest () {
-    python setup.py test
+    pytest
 }
 
 if [ $# -eq 0 ]; then
