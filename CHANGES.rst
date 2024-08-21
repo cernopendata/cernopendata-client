@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 0.4.0 (UNRELEASED)
+Version 0.4.0 (2024-08-22)
 --------------------------
 
 - Adds support for Python 3.11 and 3.12.
