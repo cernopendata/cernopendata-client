@@ -1,6 +1,8 @@
+include *.json
+include *.md
 include *.rst
 include *.sh
-include *.yml
+include *.yaml
 include .flake8
 include .readthedocs.yaml
 include Dockerfile
