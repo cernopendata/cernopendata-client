@@ -26,7 +26,7 @@ extras_require = {
     ],
     "pycurl": ["pycurl>=7"],
     "tests": [
-        'black>=19.10b0 ; python_version>="3"',
+        "black>=19.10b0",
         "check-manifest>=0.25",
         "coverage>=4.0",
         "mock>=3.0",
@@ -34,9 +34,7 @@ extras_require = {
         "pytest-cache>=1.0",
         "pytest-cov>=1.8.0",
         "pytest>=2.8.0",
-        'platformdirs<2.1 ; python_version=="3.6"',
-        'pytest-mock>=2.0,<3.0 ; python_version=="2.7"',
-        'pytest-mock>=3.0 ; python_version>="3"',
+        "pytest-mock>=3.0",
     ],
     "xrootd": [
         "xrootd>=4.12.2",
@@ -68,6 +66,7 @@ setup(
         "cernopendata_client",
     ],
     extras_require=extras_require,
+    python_requires=">=3.8",
     install_requires=install_requires,
     entry_points={
         "console_scripts": [
@@ -81,8 +80,6 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
