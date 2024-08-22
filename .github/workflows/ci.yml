@@ -1,152 +1,178 @@
 name: CI
 
 on:
-    push:
-        branches: master
-    pull_request:
-        branches: master
+  push:
+    branches: master
+  pull_request:
+    branches: master
 
 jobs:
-    lint-shellcheck:
-        runs-on: ubuntu-20.04
-        steps:
-          - uses: actions/checkout@v2
+  lint-commitlint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-          - name: Runs shell script static analysis
-            run: |
-              sudo apt-get install shellcheck
-              ./run-tests.sh --check-shellscript
+      - name: Setup Node
+        uses: actions/setup-node@v4
 
-    lint-black:
-        runs-on: ubuntu-20.04
-        steps:
-          - uses: actions/checkout@v2
+      - name: Install commitlint
+        run: |
+          npm install conventional-changelog-conventionalcommits
+          npm install commitlint@latest
 
-          - name: Setup Python
-            uses: actions/setup-python@v2
-            with:
-              python-version: 3.8
+      - name: Check commit message compliance of the recently pushed commit
+        if: github.event_name == 'push'
+        run: |
+          ./run-tests.sh --check-commitlint HEAD~1 HEAD
 
-          - name: Check Python code formatting
-            run: |
-              pip install black
-              ./run-tests.sh --check-black
+      - name: Check commit message compliance of the pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          ./run-tests.sh --check-commitlint ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.number }}
 
-    lint-pydocstyle:
-      runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
+  lint-shellcheck:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Setup Python
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.8
+      - name: Runs shell script static analysis
+        run: |
+          sudo apt-get install shellcheck
+          ./run-tests.sh --check-shellcheck
 
-        - name: Check compliance with Python docstring conventions
-          run: |
-            pip install pydocstyle
-            ./run-tests.sh --check-pydocstyle
+  lint-black:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-    lint-flake8:
-      runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-        - name: Setup Python
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.8
+      - name: Check Python code formatting
+        run: |
+          pip install black
+          ./run-tests.sh --check-black
 
-        - name: Check compliance with pep8, pyflakes and circular complexity
-          run: |
-            pip install flake8
-            ./run-tests.sh --check-flake8
+  lint-pydocstyle:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-    lint-check-manifest:
-      runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-        - name: Setup Python
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.8
+      - name: Check compliance with Python docstring conventions
+        run: |
+          pip install pydocstyle
+          ./run-tests.sh --check-pydocstyle
 
-        - name: Check Python manifest completeness
-          run: |
-            pip install check-manifest
-            ./run-tests.sh --check-manifest
+  lint-flake8:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-    lint-dockerfile:
-      runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-        - name: Check Dockerfile compliance
-          run: ./run-tests.sh --check-dockerfile
+      - name: Check compliance with pep8, pyflakes and circular complexity
+        run: |
+          pip install flake8
+          ./run-tests.sh --check-flake8
 
-    docs-sphinx:
-      runs-on: ubuntu-20.04
-      steps:
-        - uses: actions/checkout@v2
+  lint-check-manifest:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Setup Python
-          uses: actions/setup-python@v2
-          with:
-            python-version: 3.8
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-        - name: Install system dependencies
-          run: |
-            sudo apt-get update -y
-            sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
+      - name: Check Python manifest completeness
+        run: |
+          pip install check-manifest
+          ./run-tests.sh --check-manifest
 
-        - name: Install Python dependencies
-          run: pip install -e .[docs]
+  lint-dockerfile:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-        - name: Run Sphinx documentation with doctests
-          run: ./run-tests.sh --check-sphinx
+      - name: Check Dockerfile compliance
+        run: ./run-tests.sh --check-dockerfile
 
-    python-tests:
-        runs-on: ubuntu-20.04
-        strategy:
-          matrix:
-             python-version: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+  docs-sphinx:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
 
-        steps:
-          - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-          - name: Set up Python ${{ matrix.python-version }}
-            uses: actions/setup-python@v2
-            with:
-              python-version: ${{ matrix.python-version }}
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
 
-          - name: Install system dependencies
-            run: |
-              sudo apt-get update -y
-              sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
+      - name: Install Python dependencies
+        run: pip install -e .[docs]
 
-          - name: Install Python dependencies
-            run: |
-              pip install --upgrade pip setuptools wheel
-              pip install -e .[docs,tests,pycurl]
+      - name: Run Sphinx documentation with doctests
+        run: ./run-tests.sh --check-sphinx
 
-          - name: Run pytest
-            run: ./run-tests.sh --check-pytest
+  python-tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
 
-          - name: Codecov Coverage
-            if: matrix.python-version == 3.8
-            uses: codecov/codecov-action@v1
-            with:
-              token: ${{ secrets.CODECOV_TOKEN }}
-              files: coverage.xml
+    steps:
+      - uses: actions/checkout@v2
 
-    docker-tests:
-        runs-on: ubuntu-20.04
-        steps:
-          - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-          - name: Build Docker image
-            run: ./run-tests.sh --check-docker-build
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
 
-          - name: Run Docker image tests
-            run: sudo ./run-tests.sh --check-docker-run
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -e .[docs,tests,pycurl]
+
+      - name: Run pytest
+        run: ./run-tests.sh --check-pytest
+
+      - name: Codecov Coverage
+        if: matrix.python-version == 3.8
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+
+  docker-tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: ./run-tests.sh --check-docker-build
+
+      - name: Run Docker image tests
+        run: sudo ./run-tests.sh --check-docker-run
