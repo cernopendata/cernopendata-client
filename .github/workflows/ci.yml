@@ -34,7 +34,7 @@ jobs:
           ./run-tests.sh --check-commitlint ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.number }}
 
   lint-shellcheck:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -44,14 +44,14 @@ jobs:
           ./run-tests.sh --check-shellcheck
 
   lint-black:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.12"
 
       - name: Check Python code formatting
         run: |
@@ -59,14 +59,14 @@ jobs:
           ./run-tests.sh --check-black
 
   lint-pydocstyle:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.12"
 
       - name: Check compliance with Python docstring conventions
         run: |
@@ -74,14 +74,14 @@ jobs:
           ./run-tests.sh --check-pydocstyle
 
   lint-flake8:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.12"
 
       - name: Check compliance with pep8, pyflakes and circular complexity
         run: |
@@ -89,14 +89,14 @@ jobs:
           ./run-tests.sh --check-flake8
 
   lint-check-manifest:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.12"
 
       - name: Check Python manifest completeness
         run: |
@@ -104,7 +104,7 @@ jobs:
           ./run-tests.sh --check-manifest
 
   lint-dockerfile:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -112,14 +112,14 @@ jobs:
         run: ./run-tests.sh --check-dockerfile
 
   docs-sphinx:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.12"
 
       - name: Install system dependencies
         run: |
@@ -133,10 +133,10 @@ jobs:
         run: ./run-tests.sh --check-sphinx
 
   python-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v4
@@ -160,14 +160,14 @@ jobs:
         run: ./run-tests.sh --check-pytest
 
       - name: Codecov Coverage
-        if: matrix.python-version == 3.8
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
 
   docker-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
