@@ -31,7 +31,6 @@ extras_require = {
         "coverage>=4.0",
         "mock>=3.0",
         "pydocstyle>=1.0.0",
-        "pytest-cache>=1.0",
         "pytest-cov>=1.8.0",
         "pytest>=2.8.0",
         "pytest-mock>=3.0",
