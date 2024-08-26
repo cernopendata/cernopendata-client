@@ -13,12 +13,13 @@ import re
 
 from setuptools import setup
 
-readme = open("README.rst").read()
-history = open("CHANGES.rst").read()
+readme = open("README.md").read()
+history = open("CHANGELOG.md").read()
 
 
 extras_require = {
     "docs": [
+        "myst-parser",
         "jinja2<3.1.0",
         "Sphinx>=1.4.4",
         "sphinx-rtd-theme>=0.1.9",
@@ -59,6 +60,7 @@ setup(
     version=version,
     description=__doc__,
     long_description=readme + "\n\n" + history,
+    long_description_content_type="text/markdown",
     author="CERN Open Data",
     author_email="opendata-team@cern.ch",
     packages=[

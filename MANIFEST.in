@@ -1,6 +1,5 @@
 include *.json
 include *.md
-include *.rst
 include *.sh
 include *.yaml
 include .flake8
@@ -14,5 +13,5 @@ prune docs/_build
 recursive-include cernopendata_client *.py
 recursive-include docs *.png
 recursive-include docs *.py
-recursive-include docs *.rst
+recursive-include docs *.md
 recursive-include tests *.py

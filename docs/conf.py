@@ -23,7 +23,7 @@ import sphinx.environment
 # -- Project information -----------------------------------------------------
 
 project = "cernopendata_client"
-copyright = "2019-2021, CERN"
+copyright = "2019-2024, CERN"
 author = "CERN Open Data"
 
 # Get the version string. Cannot be done with import!
@@ -47,6 +47,7 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
