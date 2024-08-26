@@ -100,11 +100,13 @@ check_all () {
 }
 
 if [ $# -eq 0 ]; then
-    check_all
+    arg="--check-all"
+else
+    arg="$1"
 fi
 
-arg="$1"
 case $arg in
+    --check-all) check_all;;
     --check-commitlint) check_commitlint "$@";;
     --check-shellcheck) check_shellcheck;;
     --check-black) check_black;;
