@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -196,51 +196,40 @@ def get_files_list(
     if server != SERVER_HTTP_URI and searcher_protocol != "xrootd":
         searcher_protocol = server.split(":")[0]
     files_list = []
-    for file_ in record_json["metadata"]["files"]:
-        files_list.append((file_["uri"], file_["size"], file_["checksum"]))
-    if expand:
-        # let's unwind file indexes
-        files_list_expanded = []
-        for file_ in files_list:
-            if file_[0].endswith("_file_index.json"):
-                try:
-                    url_file = "{}/record/{}/files/{}".format(
-                        server, str(record_json["id"]), file_[0].split("/")[-1]
-                    )
-                    json_files = requests.get(url_file).json()
-                except Exception:
-                    display_message(
-                        msg_type="error",
-                        msg="Error occured while fetching file info. Please try again.",
-                    )
-                    sys.exit(1)
-                for file_ in json_files:
-                    files_list_expanded.append(
-                        (
-                            file_["uri"],
-                            file_["size"],
-                            file_["checksum"],
-                        )
-                    )
-            elif file_[0].endswith("_file_index.txt"):
-                pass
-            else:
-                files_list_expanded.append(file_)
-        files_list = files_list_expanded
+
+    new_server = SERVER_ROOT_URI
     if searcher_protocol == "http":
-        files_list = [
-            (file_[0].replace(SERVER_ROOT_URI, server), file_[1], file_[2])
-            for file_ in files_list
-        ]
+        new_server = server
     elif searcher_protocol == "https":
-        files_list = [
+        new_server = SERVER_HTTPS_URI
+
+    for file_ in record_json["metadata"].get("files", []):
+        files_list.append(
             (
-                file_[0].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI),
-                file_[1],
-                file_[2],
+                file_["uri"].replace(SERVER_ROOT_URI, new_server),
+                file_["size"],
+                file_["checksum"],
             )
-            for file_ in files_list
-        ]
+        )
+    for file_ in record_json["metadata"].get("_file_indices", []):
+        if expand:
+            # let's unwind file indexes
+            for inner_file in file_["files"]:
+                files_list.append(
+                    (
+                        inner_file["uri"].replace(SERVER_ROOT_URI, new_server),
+                        inner_file["size"],
+                        inner_file["checksum"],
+                    )
+                )
+        else:
+            files_list.append(
+                (
+                    f"{SERVER_HTTPS_URI}/record/{record_json['metadata']['recid']}/file_index/{file_['key']}",
+                    file_["size"],
+                    "",
+                )
+            )
     return files_list
 
 

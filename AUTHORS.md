@@ -8,5 +8,6 @@ The list of contributors in alphabetical order:
 - [Jan Okraska](https://orcid.org/0000-0002-1416-3244)
 - [Jiri Kuncar](https://github.com/jirikuncar)
 - [Joud Masoud](https://github.com/joudmas)
+- [Pablo Saiz](https://github.com/psaiz)
 - [Parth Shandilya](https://github.com/ParthS007)
 - [Tibor Simko](https://orcid.org/0000-0001-7202-5803)
