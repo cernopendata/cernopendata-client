@@ -81,6 +81,10 @@ check_sphinx () {
     sphinx-build -qnNW -b doctest docs docs/_build/doctest
 }
 
+check_yamllint() {
+    yamllint .
+}
+
 check_pytest () {
     pytest
 }
@@ -96,6 +100,7 @@ check_all () {
     check_docker_build
     check_docker_run
     check_sphinx
+    check_yamllint
     check_pytest
 }
 
@@ -117,6 +122,7 @@ case $arg in
     --check-docker-build) check_docker_build;;
     --check-docker-run) check_docker_run;;
     --check-sphinx) check_sphinx;;
+    --check-yamllint) check_yamllint;;
     --check-pytest) check_pytest;;
     *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1;;
 esac
