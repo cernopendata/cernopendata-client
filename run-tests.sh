@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2023, 2024 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023, 2024, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -10,7 +10,7 @@
 set -o errexit
 set -o nounset
 
-check_commitlint () {
+check_commitlint() {
     from=${2:-master}
     to=${3:-HEAD}
     pr=${4:-[0-9]+}
@@ -32,7 +32,7 @@ check_commitlint () {
         # (iii) check absence of merge commits in feature branches
         if [ "$commit_number_of_parents" -gt 1 ]; then
             if echo "$commit_title" | grep -qP "^chore\(.*\): merge "; then
-                break  # skip checking maint-to-master merge commits
+                break # skip checking maint-to-master merge commits
             else
                 echo "✖   Merge commits are not allowed in feature branches: $commit_title"
                 found=1
@@ -44,44 +44,44 @@ check_commitlint () {
     fi
 }
 
-check_shellcheck () {
+check_shellcheck() {
     find . -name "*.sh" -exec shellcheck {} \+
 }
 
-check_black () {
+check_black() {
     black --check .
 }
 
-check_pydocstyle () {
+check_pydocstyle() {
     pydocstyle cernopendata_client
 }
 
-check_flake8 () {
+check_flake8() {
     flake8 .
 }
 
-check_manifest () {
+check_manifest() {
     check-manifest
 }
 
-check_dockerfile () {
-    docker run -i --rm docker.io/hadolint/hadolint:v2.12.0 < Dockerfile
+check_dockerfile() {
+    docker run -i --rm docker.io/hadolint/hadolint:v2.12.0 <Dockerfile
 }
 
-check_docker_build () {
+check_docker_build() {
     docker build -t docker.io/cernopendata/cernopendata-client .
 }
 
-check_docker_run () {
+check_docker_run() {
     docker run --rm -v "$PWD"/tests:/code/tests --entrypoint /bin/bash docker.io/cernopendata/cernopendata-client -c 'pytest tests'
 }
 
-check_sphinx () {
+check_sphinx() {
     sphinx-build -qnNW docs docs/_build/html
     sphinx-build -qnNW -b doctest docs docs/_build/doctest
 }
 
-check_markdownlint () {
+check_markdownlint() {
     markdownlint-cli2 "**/*.md"
 }
 
@@ -89,52 +89,57 @@ check_yamllint() {
     yamllint .
 }
 
-check_prettier () {
+check_prettier() {
     prettier -c .
 }
 
-check_pytest () {
+check_pytest() {
     pytest
 }
 
-check_all () {
-    check_commitlint
-    check_shellcheck
+check_shfmt() {
+    shfmt -d .
+}
+
+check_all() {
     check_black
-    check_pydocstyle
-    check_flake8
-    check_manifest
-    check_dockerfile
+    check_commitlint
     check_docker_build
     check_docker_run
-    check_sphinx
+    check_dockerfile
+    check_flake8
+    check_manifest
     check_markdownlint
-    check_yamllint
     check_prettier
+    check_pydocstyle
+    check_shellcheck
+    check_shfmt
+    check_sphinx
+    check_yamllint
     check_pytest
 }
 
 if [ $# -eq 0 ]; then
-    arg="--check-all"
-else
-    arg="$1"
+    check_all
+    exit 0
 fi
 
+arg="$1"
 case $arg in
-    --check-all) check_all;;
-    --check-commitlint) check_commitlint "$@";;
-    --check-shellcheck) check_shellcheck;;
-    --check-black) check_black;;
-    --check-pydocstyle) check_pydocstyle;;
-    --check-flake8) check_flake8;;
-    --check-manifest) check_manifest;;
-    --check-dockerfile) check_dockerfile;;
-    --check-docker-build) check_docker_build;;
-    --check-docker-run) check_docker_run;;
-    --check-sphinx) check_sphinx;;
-    --check-markdownlint) check_markdownlint;;
-    --check-yamllint) check_yamllint;;
-    --check-prettier) check_prettier;;
-    --check-pytest) check_pytest;;
-    *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1;;
+--check-black) check_black ;;
+--check-commitlint) check_commitlint "$@" ;;
+--check-docker-build) check_docker_build ;;
+--check-docker-run) check_docker_run ;;
+--check-dockerfile) check_dockerfile ;;
+--check-flake8) check_flake8 ;;
+--check-manifest) check_manifest ;;
+--check-markdownlint) check_markdownlint ;;
+--check-prettier) check_prettier ;;
+--check-pydocstyle) check_pydocstyle ;;
+--check-pytest) check_pytest ;;
+--check-shellcheck) check_shellcheck ;;
+--check-shfmt) check_shfmt ;;
+--check-sphinx) check_sphinx ;;
+--check-yamllint) check_yamllint ;;
+*) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1 ;;
 esac
