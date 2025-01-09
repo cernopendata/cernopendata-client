@@ -98,6 +98,18 @@ $ cernopendata-client get-metadata --recid 329 --output-value authors.name --fil
 Rousseau, David
 ```
 
+Another example of using \--filter would be retrieving the container image
+details. For instance, to get the container images registered in Docker Hub
+repository for a specific open data record, you can use:
+
+``` console
+$ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name
+docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
+gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
+$ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name --filter registry=dockerhub
+docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
+```
+
 ## Listing available data files
 
 In order to get a list of data files belonging to a record, please use
