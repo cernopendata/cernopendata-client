@@ -2,10 +2,10 @@
 
 ## General help
 
-In order to get help for any `cernopendata-client` command, use the
-`--help` option:
+In order to get help for any `cernopendata-client` command, use the `--help`
+option:
 
-``` console
+```console
 $ cernopendata-client --help
 Usage: cernopendata-client [OPTIONS] COMMAND [ARGS]...
 
@@ -23,17 +23,16 @@ version             Return cernopendata-client version.
 
 ## Selecting records
 
-The data published on the [CERN Open Data
-portal](http://opendata.cern.ch) are organised in bibliographic records.
-Each record is uniquely identified by a numerical **record ID**, for
-example [record 1](http://opendata.cern.ch/record/1). Moreover, some
-records are minted with a **Digital Object Identifier (DOI)**, for
-example
+The data published on the [CERN Open Data portal](http://opendata.cern.ch) are
+organised in bibliographic records. Each record is uniquely identified by a
+numerical **record ID**, for example
+[record 1](http://opendata.cern.ch/record/1). Moreover, some records are minted
+with a **Digital Object Identifier (DOI)**, for example
 [10.7483/OPENDATA.CMS.A342.9982](http://doi.org/10.7483/OPENDATA.CMS.A342.9982).
-Each of these identifiers can be used in various `cernopendata-client`
-commands to select record one is interested at. For example:
+Each of these identifiers can be used in various `cernopendata-client` commands
+to select record one is interested at. For example:
 
-``` console
+```console
 $ cernopendata-client <command> --recid 1
 $ cernopendata-client <command> --doi 10.7483/OPENDATA.CMS.A342.9982
 ```
@@ -45,7 +44,7 @@ Various available commands are shown below.
 In order to get metadata information about a record, please use the
 **get-metadata** command:
 
-``` console
+```console
 $ cernopendata-client get-metadata --recid 1
 {
     "$schema": "http://opendata.cern.ch/schema/records/record-v1.0.0.json",
@@ -65,28 +64,28 @@ $ cernopendata-client get-metadata --recid 1
 ...
 ```
 
-This will output a JSON containing all the record metadata, such as
-title, authors, keywords, collision energy, etc. The JSON may also
-contain interesting physics information describing the dataset.
+This will output a JSON containing all the record metadata, such as title,
+authors, keywords, collision energy, etc. The JSON may also contain interesting
+physics information describing the dataset.
 
-If you would like to extract parts of metadata, for example to extract
-only the dataset title, or only the Global Tag information for CMS
-datasets, you can use **\--output-value** command-line option:
+If you would like to extract parts of metadata, for example to extract only the
+dataset title, or only the Global Tag information for CMS datasets, you can use
+**\--output-value** command-line option:
 
-``` console
+```console
 $ cernopendata-client get-metadata --recid 1 --output-value title
 /BTau/Run2010B-Apr21ReReco-v1/AOD
 $ cernopendata-client get-metadata --recid 1 --output-value system_details.global_tag
 FT_R_42_V10A::All
 ```
 
-If the output field produces a list of values, you may want to filter
-only certain field values of interest. For example, you may want to ask
-not to output all authors of a dataset record, but only the authors
-matching certain particular author name. You can use the **\--filter**
-command-line option to achieve this:
+If the output field produces a list of values, you may want to filter only
+certain field values of interest. For example, you may want to ask not to output
+all authors of a dataset record, but only the authors matching certain
+particular author name. You can use the **\--filter** command-line option to
+achieve this:
 
-``` console
+```console
 $ cernopendata-client get-metadata --recid 329 --output-value authors.name
 Adam-Bourdarios, Claire
 Cowan, Glen
@@ -102,7 +101,7 @@ Another example of using \--filter would be retrieving the container image
 details. For instance, to get the container images registered in Docker Hub
 repository for a specific open data record, you can use:
 
-``` console
+```console
 $ cernopendata-client get-metadata --recid 22234 --output-value system_details.container_images.name
 docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
 gitlab-registry.cern.ch/cms-cloud/cmssw-docker-opendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
@@ -112,12 +111,12 @@ docker.io/cmsopendata/cmssw_7_6_7-slc6_amd64_gcc493:latest
 
 ## Listing available data files
 
-In order to get a list of data files belonging to a record, please use
-the **get-file-locations** command:
+In order to get a list of data files belonging to a record, please use the
+**get-file-locations** command:
 
 **HTTP protocol**
 
-``` console
+```console
 $ cernopendata-client get-file-locations --recid 5500
 http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
 http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
@@ -132,17 +131,17 @@ http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_co
 http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_combine.png
 ```
 
-This command will output URIs for all the files associated with the
-record ID 5500, using the HTTP protocol. Note that you can specify
-`--server https://opendata.cern.ch` if you would like to use the HTTPS
-protocol instead.
+This command will output URIs for all the files associated with the record ID
+5500, using the HTTP protocol. Note that you can specify
+`--server https://opendata.cern.ch` if you would like to use the HTTPS protocol
+instead.
 
 **XRootD protocol**
 
-Note that you can use `--protocol xrootd` command-line option if you
-would rather see the equivalent XRootD endpoints for the files:
+Note that you can use `--protocol xrootd` command-line option if you would
+rather see the equivalent XRootD endpoints for the files:
 
-``` console
+```console
 $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd
 root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml
 root://eospublic.cern.ch//eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc
@@ -162,10 +161,10 @@ command.
 
 **File sizes and checksums**
 
-If you would like to know in advance the file sizes and checksums, you
-can use `--verbose` option:
+If you would like to know in advance the file sizes and checksums, you can use
+`--verbose` option:
 
-``` console
+```console
 $ cernopendata-client get-file-locations --recid 5500 --verbose
 http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/BuildFile.xml    305 adler32:ff63668a
 http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/HiggsDemoAnalyzer.cc 83761   adler32:f205f068
@@ -183,14 +182,14 @@ http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_co
 ## Downloading data files
 
 In order to download data files belonging to a record, please use the
-**download-files** command. The command can download files over HTTP,
-HTTPS or XRootD protocols and verify the file checksums.
+**download-files** command. The command can download files over HTTP, HTTPS or
+XRootD protocols and verify the file checksums.
 
 **HTTP protocol**
 
 By default the **download-files** command uses HTTP protocol:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500
 ==> Downloading file 1 of 11
   -> File: ./5500/BuildFile.xml
@@ -228,16 +227,15 @@ $ cernopendata-client download-files --recid 5500
 ==> Success!
 ```
 
-The command will download files into a local directory called `5500`
-after the record ID input parameter.
+The command will download files into a local directory called `5500` after the
+record ID input parameter.
 
-By default the download will be carried out over HTTP protocol. If you
-would like to use the HTTPS protocol instead , please specify
+By default the download will be carried out over HTTP protocol. If you would
+like to use the HTTPS protocol instead , please specify
 `--server https://opendata.cern.ch`.
 
-Note that you can also download files from another server, for example
-from our Quality Assurance server, by using
-`--server http://opendata-qa.cern.ch`.
+Note that you can also download files from another server, for example from our
+Quality Assurance server, by using `--server http://opendata-qa.cern.ch`.
 
 **XRootD protocol**
 
@@ -245,7 +243,7 @@ If you have installed client with XRootD support, you can use
 `--protocol xrootd` command-line option to use that protocol instead of
 HTTP/HTTPS:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --protocol xrootd
 ==> Downloading file 1 of 11
   -> File: ./5500/BuildFile.xml
@@ -276,12 +274,11 @@ $ cernopendata-client download-files --recid 5500 --protocol xrootd
 
 You can specify the download engine with `--download-engine` option.
 
--   `requests` and `pycurl` are two supported download engines for
-    **HTTP** protocol.
--   `xrootd` is the only supported download engine for **XRootD**
-    protocol.
+- `requests` and `pycurl` are two supported download engines for **HTTP**
+  protocol.
+- `xrootd` is the only supported download engine for **XRootD** protocol.
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml --download-engine pycurl
 ==> Downloading file 1 of 1
   -> File: ./5500/BuildFile.xml
@@ -291,13 +288,13 @@ $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml --
 
 **Filter by name**
 
-A dataset may consist of thousands of files. You can use powerful
-filtering options to download only certain files matching your criteria.
+A dataset may consist of thousands of files. You can use powerful filtering
+options to download only certain files matching your criteria.
 
-For example, you can download only files matching exactly a given file
-name using the `--filter-name` option:
+For example, you can download only files matching exactly a given file name
+using the `--filter-name` option:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
 ==> Downloading file 1 of 1
   -> File: ./5500/BuildFile.xml
@@ -305,7 +302,7 @@ $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml
 ==> Success!
 ```
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml,List_indexfile.txt
 ==> Downloading file 1 of 2
   -> File: ./5500/BuildFile.xml
@@ -318,10 +315,10 @@ $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml,Li
 
 **Filter by regular expression**
 
-You can download all files matching a certain regular expression using
-the `--filter-regexp` option:
+You can download all files matching a certain regular expression using the
+`--filter-regexp` option:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-regexp py$
 ==> Downloading file 1 of 4
   -> File: ./5500/demoanalyzer_cfg_level3MC.py
@@ -343,7 +340,7 @@ $ cernopendata-client download-files --recid 5500 --filter-regexp py$
 You can also download files from a specified range (i-j) using the
 `--filter-range` option:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-range 1-4
 ==> Downloading file 1 of 4
   -> File: ./5500/BuildFile.xml
@@ -360,7 +357,7 @@ $ cernopendata-client download-files --recid 5500 --filter-range 1-4
 ==> Success!
 ```
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7
 ==> Downloading file 1 of 5
   -> File: ./5500/BuildFile.xml
@@ -377,10 +374,10 @@ $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7
 
 **Filter by combining multiple selectors**
 
-You can combine multiple filters in the same download command. Here are
-several examples:
+You can combine multiple filters in the same download command. Here are several
+examples:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
 ==> Downloading file 1 of 2
   -> File: ./5500/demoanalyzer_cfg_level3MC.py
@@ -391,7 +388,7 @@ $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-ra
 ==> Success!
 ```
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2,4-4
 ==> Downloading file 1 of 3
   -> File: ./5500/demoanalyzer_cfg_level3MC.py
@@ -404,12 +401,12 @@ $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-ra
 
 ## Verifying files
 
-If you have downloaded the data files for a certain record, and you
-would like to verify their integrity and check whether there haven\'t
-been some critical updates on the CERN Open Data portal side, you can
-use the **verify-files** command:
+If you have downloaded the data files for a certain record, and you would like
+to verify their integrity and check whether there haven\'t been some critical
+updates on the CERN Open Data portal side, you can use the **verify-files**
+command:
 
-``` console
+```console
 $ cernopendata-client verify-files --recid 5500
 ==> Verifying number of files for record 5500...
   -> Expected 11, found 11
@@ -449,10 +446,10 @@ $ cernopendata-client verify-files --recid 5500
 ==> Success!
 ```
 
-Note that you can verify each file \"just in time\" as it is being
-downloaded as well:
+Note that you can verify each file \"just in time\" as it is being downloaded as
+well:
 
-``` console
+```console
 $ cernopendata-client download-files --recid 5500 --filter-range 1-4 --verify
 ==> Downloading file 1 of 4
   -> File: ./5500/BuildFile.xml
@@ -479,27 +476,26 @@ $ cernopendata-client download-files --recid 5500 --filter-range 1-4 --verify
 
 ## Listing directories
 
-The CERN Open Data files are hosted on the EOSPUBLIC data storage
-service. In order to get a list of files belonging to a certain
-EOSPUBLIC directory, please use the **list-directory** command:
+The CERN Open Data files are hosted on the EOSPUBLIC data storage service. In
+order to get a list of files belonging to a certain EOSPUBLIC directory, please
+use the **list-directory** command:
 
-``` console
+```console
 $ cernopendata-client list-directory /eos/opendata/cms/validated-runs/Commissioning10
 Commissioning10-May19ReReco_7TeV.json
 Commissioning10-May19ReReco_900GeV.json
 ```
 
-The **list-directory** command uses XRootD protocol to list data files and
-hence it is available only when you install the XRootD flavour. Please see the
+The **list-directory** command uses XRootD protocol to list data files and hence
+it is available only when you install the XRootD flavour. Please see the
 [Installation](installation) documentation for more details.
 
 **Iterate recursively**
 
-Note that you can use `--recursive` command-line option if you would
-like to iterate also through all the subdirectories of the given
-directory:
+Note that you can use `--recursive` command-line option if you would like to
+iterate also through all the subdirectories of the given directory:
 
-``` console
+```console
 $ cernopendata-client list-directory /eos/opendata/cms/validated-runs --recursive
 Commissioning10-May19ReReco_7TeV.json
 Commissioning10-May19ReReco_900GeV.json
@@ -510,11 +506,11 @@ Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt
 
 **Iterate recursively with timeout**
 
-If you would like to list a directory that contains a large amount of
-files, you can specify `--timeout` option in order to exit after a
-certain amount of time. The default timeout is 60 seconds.
+If you would like to list a directory that contains a large amount of files, you
+can specify `--timeout` option in order to exit after a certain amount of time.
+The default timeout is 60 seconds.
 
-``` console
+```console
 $ cernopendata-client list-directory /eos/opendata/cms/Run2010B/BTau/AOD --recursive --timeout 30
 CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.json
 CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0000_file_index.txt
@@ -533,6 +529,5 @@ CMS_Run2010B_BTau_AOD_Apr21ReReco-v1_0005_file_index.txt
 
 ## More information
 
-For more information about all the available `cernopendata-client`
-commands and options, please see [CLI API](cliapi).
-
+For more information about all the available `cernopendata-client` commands and
+options, please see [CLI API](cliapi).

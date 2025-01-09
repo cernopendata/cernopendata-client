@@ -89,6 +89,10 @@ check_yamllint() {
     yamllint .
 }
 
+check_prettier () {
+    prettier -c .
+}
+
 check_pytest () {
     pytest
 }
@@ -106,6 +110,7 @@ check_all () {
     check_sphinx
     check_markdownlint
     check_yamllint
+    check_prettier
     check_pytest
 }
 
@@ -129,6 +134,7 @@ case $arg in
     --check-sphinx) check_sphinx;;
     --check-markdownlint) check_markdownlint;;
     --check-yamllint) check_yamllint;;
+    --check-prettier) check_prettier;;
     --check-pytest) check_pytest;;
     *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1;;
 esac

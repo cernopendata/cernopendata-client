@@ -30,19 +30,19 @@ found in
 
 1. Clone the repository:
 
-   ``` console
+   ```console
    $ git clone https://github.com/cernopendata/cernopendata-client
    ```
 
 2. Setup a [virtual environment](https://docs.python.org/3/library/venv.html):
 
-   ``` console
+   ```console
    $ python3 -m venv env
    $ source env/bin/activate
    ```
 
-3. Install [cernopendata-client]{.title-ref} in [editable
-   mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html):
+3. Install [cernopendata-client]{.title-ref} in
+   [editable mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html):
 
    ```console
    $ pip install -e '.[tests]'
