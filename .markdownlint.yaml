@@ -1,0 +1,14 @@
+# Allow longer line lenghts in headings, code blocks and tables
+MD013:
+  code_blocks: false
+  headings: false
+  tables: false
+
+# Allow prompt dollar sign in console examples without showing output
+MD014: false
+
+# Allow docs to use emphasis instead of headings; useful for usage guide
+MD036: false
+
+# Allow docs not to start with a heading; useful for ReadTheDocs imports
+MD041: false
