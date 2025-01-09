@@ -101,6 +101,10 @@ check_shfmt() {
     shfmt -d .
 }
 
+check_jsonlint() {
+    find . -name "*.json" -exec jsonlint -q {} \+
+}
+
 check_all() {
     check_black
     check_commitlint
@@ -108,6 +112,7 @@ check_all() {
     check_docker_run
     check_dockerfile
     check_flake8
+    check_jsonlint
     check_manifest
     check_markdownlint
     check_prettier
@@ -132,6 +137,7 @@ case $arg in
 --check-docker-run) check_docker_run ;;
 --check-dockerfile) check_dockerfile ;;
 --check-flake8) check_flake8 ;;
+--check-jsonlint) check_jsonlint ;;
 --check-manifest) check_manifest ;;
 --check-markdownlint) check_markdownlint ;;
 --check-prettier) check_prettier ;;

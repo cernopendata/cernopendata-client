@@ -1,12 +1,110 @@
-name: CI
+name: ci
 
-on:
-  push:
-    branches: master
-  pull_request:
-    branches: master
+on: [push, pull_request]
 
 jobs:
+  docker-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: ./run-tests.sh --check-docker-build
+
+      - name: Run Docker image tests
+        run: sudo ./run-tests.sh --check-docker-run
+
+  docs-sphinx:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
+
+      - name: Install Python dependencies
+        run: pip install -e .[docs]
+
+      - name: Run Sphinx documentation with doctests
+        run: ./run-tests.sh --check-sphinx
+
+  format-black:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check Python code formatting
+        run: |
+          pip install black
+          ./run-tests.sh --check-black
+
+  format-prettier:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Check Prettier code fomatting
+        run: |
+          npm install prettier --global
+          ./run-tests.sh --check-prettier
+
+  format-pydocstyle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check compliance with Python docstring conventions
+        run: |
+          pip install pydocstyle
+          ./run-tests.sh --check-pydocstyle
+
+  format-shfmt:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check shell script code fomatting
+        run: |
+          sudo apt-get install shfmt
+          ./run-tests.sh --check-shfmt
+
+  lint-check-manifest:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check Python manifest completeness
+        run: |
+          pip install check-manifest
+          ./run-tests.sh --check-manifest
+
   lint-commitlint:
     runs-on: ubuntu-24.04
     steps:
@@ -33,45 +131,13 @@ jobs:
         run: |
           ./run-tests.sh --check-commitlint ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.number }}
 
-  lint-shellcheck:
+  lint-dockerfile:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Runs shell script static analysis
-        run: |
-          sudo apt-get install shellcheck
-          ./run-tests.sh --check-shellcheck
-
-  format-black:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Check Python code formatting
-        run: |
-          pip install black
-          ./run-tests.sh --check-black
-
-  format-pydocstyle:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Check compliance with Python docstring conventions
-        run: |
-          pip install pydocstyle
-          ./run-tests.sh --check-pydocstyle
+      - name: Check Dockerfile compliance
+        run: ./run-tests.sh --check-dockerfile
 
   lint-flake8:
     runs-on: ubuntu-24.04
@@ -88,49 +154,43 @@ jobs:
           pip install flake8
           ./run-tests.sh --check-flake8
 
-  lint-check-manifest:
+  lint-jsonlint:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Setup Node
+        uses: actions/setup-node@v4
 
-      - name: Check Python manifest completeness
+      - name: Lint JSON files
         run: |
-          pip install check-manifest
-          ./run-tests.sh --check-manifest
+          npm install jsonlint --global
+          ./run-tests.sh --check-jsonlint
 
-  lint-dockerfile:
+  lint-markdownlint:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Check Dockerfile compliance
-        run: ./run-tests.sh --check-dockerfile
+      - name: Setup Node
+        uses: actions/setup-node@v4
 
-  docs-sphinx:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install system dependencies
+      - name: Lint Markdown files
         run: |
-          sudo apt-get update -y
-          sudo apt-get install libcurl4-openssl-dev libgnutls28-dev libssl-dev uuid-dev
+          npm install markdownlint-cli2 --global
+          ./run-tests.sh --check-markdownlint
 
-      - name: Install Python dependencies
-        run: pip install -e .[docs]
+  lint-shellcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Run Sphinx documentation with doctests
-        run: ./run-tests.sh --check-sphinx
+      - name: Runs shell script static analysis
+        run: |
+          sudo apt-get install shellcheck
+          ./run-tests.sh --check-shellcheck
 
   lint-yamllint:
     runs-on: ubuntu-24.04
@@ -149,45 +209,6 @@ jobs:
         run: |
           pip install yamllint
           ./run-tests.sh --check-yamllint
-
-  lint-markdownlint:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-
-      - name: Lint Markdown files
-        run: |
-          npm install markdownlint-cli2 --global
-          ./run-tests.sh --check-markdownlint
-
-  format-prettier:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-
-      - name: Check Prettier code fomatting
-        run: |
-          npm install prettier --global
-          ./run-tests.sh --check-prettier
-
-  format-shfmt:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check shell script code fomatting
-        run: |
-          sudo apt-get install shfmt
-          ./run-tests.sh --check-shfmt
 
   python-tests:
     runs-on: ubuntu-24.04
@@ -222,14 +243,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
-
-  docker-tests:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build Docker image
-        run: ./run-tests.sh --check-docker-build
-
-      - name: Run Docker image tests
-        run: sudo ./run-tests.sh --check-docker-run
