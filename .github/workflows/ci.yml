@@ -8,11 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: ./run-tests.sh --check-docker-build
+      - name: Check Docker build
+        run: ./run-tests.sh --docker-build
 
-      - name: Run Docker image tests
-        run: sudo ./run-tests.sh --check-docker-run
+      - name: Check Docker tests
+        run: sudo ./run-tests.sh --docker-tests
 
   docs-sphinx:
     runs-on: ubuntu-24.04
@@ -32,8 +32,8 @@ jobs:
       - name: Install Python dependencies
         run: pip install -e .[docs]
 
-      - name: Run Sphinx documentation with doctests
-        run: ./run-tests.sh --check-sphinx
+      - name: Check Sphinx docs build
+        run: ./run-tests.sh --docs-sphinx
 
   format-black:
     runs-on: ubuntu-24.04
@@ -45,10 +45,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check Python code formatting
+      - name: Check formatting of Python code
         run: |
           pip install black
-          ./run-tests.sh --check-black
+          ./run-tests.sh --format-black
 
   format-prettier:
     runs-on: ubuntu-24.04
@@ -59,25 +59,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
 
-      - name: Check Prettier code fomatting
+      - name: Check formatting of Markdown etc files
         run: |
           npm install prettier --global
-          ./run-tests.sh --check-prettier
-
-  format-pydocstyle:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Check compliance with Python docstring conventions
-        run: |
-          pip install pydocstyle
-          ./run-tests.sh --check-pydocstyle
+          ./run-tests.sh --format-prettier
 
   format-shfmt:
     runs-on: ubuntu-24.04
@@ -85,25 +70,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Check shell script code fomatting
+      - name: Check formatting of shell scripts
         run: |
           sudo apt-get install shfmt
-          ./run-tests.sh --check-shfmt
-
-  lint-check-manifest:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Check Python manifest completeness
-        run: |
-          pip install check-manifest
-          ./run-tests.sh --check-manifest
+          ./run-tests.sh --format-shfmt
 
   lint-commitlint:
     runs-on: ubuntu-24.04
@@ -124,20 +94,20 @@ jobs:
       - name: Check commit message compliance of the recently pushed commit
         if: github.event_name == 'push'
         run: |
-          ./run-tests.sh --check-commitlint HEAD~1 HEAD
+          ./run-tests.sh --lint-commitlint HEAD~1 HEAD
 
       - name: Check commit message compliance of the pull request
         if: github.event_name == 'pull_request'
         run: |
-          ./run-tests.sh --check-commitlint ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.number }}
+          ./run-tests.sh --lint-commitlint ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.number }}
 
-  lint-dockerfile:
+  lint-hadolint:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Dockerfile compliance
-        run: ./run-tests.sh --check-dockerfile
+      - name: Check linting of Dockerfiles
+        run: ./run-tests.sh --lint-hadolint
 
   lint-flake8:
     runs-on: ubuntu-24.04
@@ -149,10 +119,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Check compliance with pep8, pyflakes and circular complexity
+      - name: Check linting of Python code
         run: |
           pip install flake8
-          ./run-tests.sh --check-flake8
+          ./run-tests.sh --lint-flake8
 
   lint-jsonlint:
     runs-on: ubuntu-24.04
@@ -163,10 +133,25 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
 
-      - name: Lint JSON files
+      - name: Check linting of JSON files
         run: |
           npm install jsonlint --global
-          ./run-tests.sh --check-jsonlint
+          ./run-tests.sh --lint-jsonlint
+
+  lint-manifest:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check linting of Python manifest
+        run: |
+          pip install check-manifest
+          ./run-tests.sh --lint-manifest
 
   lint-markdownlint:
     runs-on: ubuntu-24.04
@@ -177,20 +162,35 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
 
-      - name: Lint Markdown files
+      - name: Check linting of Markdown files
         run: |
           npm install markdownlint-cli2 --global
-          ./run-tests.sh --check-markdownlint
+          ./run-tests.sh --lint-markdownlint
+
+  lint-pydocstyle:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check linting of Python docstrings
+        run: |
+          pip install pydocstyle
+          ./run-tests.sh --lint-pydocstyle
 
   lint-shellcheck:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - name: Runs shell script static analysis
+      - name: Check linting of shell scripts
         run: |
           sudo apt-get install shellcheck
-          ./run-tests.sh --check-shellcheck
+          ./run-tests.sh --lint-shellcheck
 
   lint-yamllint:
     runs-on: ubuntu-24.04
@@ -205,10 +205,10 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Lint YAML files
+      - name: Check linting of YAML files
         run: |
           pip install yamllint
-          ./run-tests.sh --check-yamllint
+          ./run-tests.sh --lint-yamllint
 
   python-tests:
     runs-on: ubuntu-24.04
@@ -234,8 +234,8 @@ jobs:
           pip install --upgrade pip setuptools wheel
           pip install -e .[docs,tests,pycurl]
 
-      - name: Run pytest
-        run: ./run-tests.sh --check-pytest
+      - name: Check Python test suite
+        run: ./run-tests.sh --python-tests
 
       - name: Codecov Coverage
         if: matrix.python-version == '3.12'
