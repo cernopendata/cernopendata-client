@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -63,7 +63,7 @@ def test_get_metadata_from_filter_metadata_two():
             "--filter",
             "affiliation=CERN",
             "--filter",
-            "ccid=CCID-722528",
+            "inspireid=INSPIRE-00330082",
         ],
     )
     assert test_result.exit_code == 0
