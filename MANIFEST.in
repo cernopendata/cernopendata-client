@@ -10,6 +10,7 @@ include docs/requirements.txt
 include pytest.ini
 include tox.ini
 exclude .editorconfig
+exclude .prettierignore
 prune docs/_build
 recursive-include cernopendata_client *.py
 recursive-include docs *.png

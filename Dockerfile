@@ -68,7 +68,7 @@ ENTRYPOINT ["cernopendata-client"]
 
 # Set image labels
 LABEL org.opencontainers.image.authors="opendata-team@cern.ch"
-LABEL org.opencontainers.image.created="2024-08-22"
+LABEL org.opencontainers.image.created="2025-02-25"
 LABEL org.opencontainers.image.description="CERN Open Data - command-line client"
 LABEL org.opencontainers.image.documentation="https://cernopendata-client.readthedocs.io/"
 LABEL org.opencontainers.image.licenses="GPLv3"
@@ -77,5 +77,5 @@ LABEL org.opencontainers.image.title="cernopendata-client"
 LABEL org.opencontainers.image.url="https://github.com/cernopendata/cernopendata-client"
 LABEL org.opencontainers.image.vendor="cernopendata"
 # x-release-please-start-version
-LABEL org.opencontainers.image.version="0.4.0"
+LABEL org.opencontainers.image.version="1.0.0"
 # x-release-please-end
