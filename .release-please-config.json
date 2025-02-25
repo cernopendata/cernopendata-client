@@ -18,7 +18,8 @@
         { "type": "ci", "section": "Continuous integration", "hidden": false },
         { "type": "docs", "section": "Documentation", "hidden": false },
         { "type": "chore", "section": "Chores", "hidden": true }
-      ]
+      ],
+      "extra-files": ["Dockerfile"]
     }
   },
   "pull-request-footer": " ",
