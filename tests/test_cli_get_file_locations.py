@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -130,3 +130,14 @@ def test_get_file_locations_no_expand_with_http_protocol():
     assert test_result.exit_code == 0
     assert "http://opendata.cern.ch" in test_result.output
     assert "file_index" in test_result.output
+
+
+def test_get_file_locations_with_custom_https_server():
+    """Test `get-file-locations --server` command for custom https server."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations, ["--recid", 5500, "--server", "https://opendata-qa.cern.ch"]
+    )
+    assert test_result.exit_code == 0
+    assert "https://opendata-qa.cern.ch" in test_result.output
+    assert "https://opendata.cern.ch" not in test_result.output

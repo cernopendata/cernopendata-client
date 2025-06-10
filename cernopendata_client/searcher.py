@@ -198,10 +198,8 @@ def get_files_list(
     files_list = []
 
     new_server = SERVER_ROOT_URI
-    if searcher_protocol == "http":
+    if searcher_protocol in ("http", "https"):
         new_server = server
-    elif searcher_protocol == "https":
-        new_server = SERVER_HTTPS_URI
 
     for file_ in record_json["metadata"].get("files", []):
         files_list.append(
