@@ -225,7 +225,7 @@ def get_files_list(
         else:
             files_list.append(
                 (
-                    f"{SERVER_HTTPS_URI}/record/{record_json['metadata']['recid']}/file_index/{file_['key']}",
+                    f"{new_server}/record/{record_json['metadata']['recid']}/file_index/{file_['key']}",
                     file_["size"],
                     "",
                 )

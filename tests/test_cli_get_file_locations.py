@@ -11,7 +11,7 @@
 
 from click.testing import CliRunner
 from cernopendata_client.cli import get_file_locations
-from cernopendata_client.config import SERVER_HTTPS_URI
+from cernopendata_client.config import SERVER_HTTPS_URI, SERVER_ROOT_URI
 
 
 def test_get_file_locations_from_recid():
@@ -106,3 +106,27 @@ def test_get_file_locations_with_https_server_xrootd_protocol():
     )
     assert test_result.exit_code == 0
     assert "root://eospublic.cern.ch//eos/" in test_result.output
+
+
+def test_get_file_locations_no_expand_with_xrootd_protocol():
+    """Test `get-file-locations --no-expand --protocol xrootd` command."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations,
+        ["--recid", 1, "--no-expand", "--protocol", "xrootd"],
+    )
+    assert test_result.exit_code == 0
+    assert SERVER_ROOT_URI in test_result.output
+    assert "file_index" in test_result.output
+
+
+def test_get_file_locations_no_expand_with_http_protocol():
+    """Test `get-file-locations --no-expand --protocol http` command."""
+    test_get_file_locations = CliRunner()
+    test_result = test_get_file_locations.invoke(
+        get_file_locations,
+        ["--recid", 1, "--no-expand", "--protocol", "http"],
+    )
+    assert test_result.exit_code == 0
+    assert "http://opendata.cern.ch" in test_result.output
+    assert "file_index" in test_result.output
