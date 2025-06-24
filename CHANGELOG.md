@@ -2,6 +2,13 @@
 
 # Changelog
 
+## [1.0.1](https://github.com/cernopendata/cernopendata-client/compare/1.0.0...1.0.1) (2025-06-24)
+
+
+### Bug fixes
+
+* **searcher:** respect `get-file-locations --protocol` parameter ([#154](https://github.com/cernopendata/cernopendata-client/issues/154)) ([625eb9d](https://github.com/cernopendata/cernopendata-client/commit/625eb9d301a4a8d3c5fef25efdeb505fe45b846c)), closes [#152](https://github.com/cernopendata/cernopendata-client/issues/152)
+
 ## [1.0.0](https://github.com/cernopendata/cernopendata-client/compare/0.4.0...1.0.0) (2025-02-25)
 
 
