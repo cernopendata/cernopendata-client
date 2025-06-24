@@ -198,10 +198,8 @@ def get_files_list(
     files_list = []
 
     new_server = SERVER_ROOT_URI
-    if searcher_protocol == "http":
+    if searcher_protocol in ("http", "https"):
         new_server = server
-    elif searcher_protocol == "https":
-        new_server = SERVER_HTTPS_URI
 
     for file_ in record_json["metadata"].get("files", []):
         files_list.append(
@@ -262,7 +260,7 @@ def get_file_info_remote(server, recid, protocol=None, filtered_files=None):
         if searcher_protocol == "http":
             file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
         elif searcher_protocol == "https":
-            file_uri = file_info["uri"].replace(SERVER_ROOT_URI, SERVER_HTTPS_URI)
+            file_uri = file_info["uri"].replace(SERVER_ROOT_URI, server)
         if not filtered_files or file_uri in filtered_files:
             file_info_remote.append(
                 {
