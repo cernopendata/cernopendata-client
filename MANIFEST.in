@@ -1,6 +1,7 @@
 include *.json
 include *.md
 include *.sh
+include *.toml
 include *.yaml
 include .flake8
 include .readthedocs.yaml

@@ -1,0 +1,9 @@
+# This file is part of cernopendata-client.
+#
+# Copyright (C) 2025 CERN.
+#
+# cernopendata-client is free software; you can redistribute it and/or modify
+# it under the terms of the GPLv3 license; see LICENSE file for more details.
+
+[tools]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
