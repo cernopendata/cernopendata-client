@@ -124,8 +124,10 @@ def test_get_file_info_local_good_input_wrong_checksum():
     assert test_result.output.endswith("\n==> Success!\n")
 
     # simulate checksum change
-    cmd = "sed -i -e 's,a,b,g' {}".format(test_file)
-    subprocess.check_output(cmd, shell=True)
+    with open(test_file, "r") as f:
+        content = f.read()
+    with open(test_file, "w") as f:
+        f.write(content.replace("a", "b"))
 
     # now test verifier
     test_verifier_files = CliRunner()
@@ -153,9 +155,11 @@ def test_get_file_info_local_good_input_wrong_size():
     assert os.path.getsize(test_file) == 3644
     assert test_result.output.endswith("\n==> Success!\n")
 
-    # simulate checksum change
-    cmd = "sed -i -e 's,a,bbbbbb,g' {}".format(test_file)
-    subprocess.check_output(cmd, shell=True)
+    # simulate size change
+    with open(test_file, "r") as f:
+        content = f.read()
+    with open(test_file, "w") as f:
+        f.write(content.replace("a", "bbbbbb"))
 
     # now test verifier
     test_verifier_files = CliRunner()
