@@ -1,6 +1,24 @@
-<!-- markdownlint-disable MD012 MD013 -->
+<!-- markdownlint-disable MD012 MD013 MD024 -->
 
 # Changelog
+
+## [1.0.1](https://github.com/cernopendata/cernopendata-client/compare/1.0.0...1.0.1) (2025-11-10)
+
+
+### Build
+
+* **python:** add support for Python 3.14 ([#158](https://github.com/cernopendata/cernopendata-client/issues/158)) ([0083d29](https://github.com/cernopendata/cernopendata-client/commit/0083d290687bc462f97c060b45e3d0a4c6eee131))
+
+
+### Bug fixes
+
+* **searcher:** respect `get-file-locations --protocol` parameter ([#154](https://github.com/cernopendata/cernopendata-client/issues/154)) ([625eb9d](https://github.com/cernopendata/cernopendata-client/commit/625eb9d301a4a8d3c5fef25efdeb505fe45b846c)), closes [#152](https://github.com/cernopendata/cernopendata-client/issues/152)
+* **searcher:** respect `get-file-locations --server` parameter ([#155](https://github.com/cernopendata/cernopendata-client/issues/155)) ([16af0d0](https://github.com/cernopendata/cernopendata-client/commit/16af0d0b90a75c38551b4c152bfad33b4886ed45)), closes [#153](https://github.com/cernopendata/cernopendata-client/issues/153)
+
+
+### Test suite
+
+* **verifier:** replace `sed` calls with native Python code ([#157](https://github.com/cernopendata/cernopendata-client/issues/157)) ([20588e8](https://github.com/cernopendata/cernopendata-client/commit/20588e8a5dc919476db6d447ec6daed331b18130))
 
 ## [1.0.0](https://github.com/cernopendata/cernopendata-client/compare/0.4.0...1.0.0) (2025-02-25)
 
