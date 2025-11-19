@@ -22,6 +22,7 @@ from .searcher import (
     get_recid_api,
     get_record_as_json,
     verify_recid,
+    search_records,
 )
 from .downloader import (
     check_error,
@@ -502,3 +503,32 @@ def list_directory(path, recursive, timeout):
         )
         sys.exit(2)
     display_message(msg="\n".join(files))
+
+
+@cernopendata_client.command()
+@click.option("--q", default="", help="Search query")
+@click.option("--experiment", help="Filter by experiment")
+@click.option("--type", help="Filter by type (e.g., 'Dataset::Simulated')")
+@click.option("--year", help="Filter by year (e.g., '2016--2016')")
+@click.option("--category", help="Filter by category (e.g., '\"Standard Model Physics::Drell-Yan\"')")
+@click.option(
+    "--server",
+    default=SERVER_HTTP_URI,
+    type=click.STRING,
+    help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
+)
+def search(server, q, experiment, type, year, category):
+    """Search for records and print their titles."""
+    facets = {
+        "experiment": experiment,
+        "type": type,
+        "year": year,
+        "category": category,
+    }
+    # Remove None values from facets
+    facets = {k: v for k, v in facets.items() if v is not None}
+    results = search_records(server=server, q=q, facets=facets)
+    if "hits" in results and "hits" in results["hits"]:
+        for hit in results["hits"]["hits"]:
+            if "metadata" in hit and "title" in hit["metadata"]:
+                display_message(msg=hit["metadata"]["title"])
