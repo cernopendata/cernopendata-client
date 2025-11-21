@@ -48,7 +48,7 @@ from .config import (
     DOWNLOAD_RETRY_LIMIT,
     DOWNLOAD_RETRY_SLEEP,
 )
-from .utils import parse_parameters
+from .utils import parse_parameters, parse_query_from_url
 from .printer import display_message
 
 from .version import __version__
@@ -510,24 +510,61 @@ def list_directory(path, recursive, timeout):
 @click.option("--experiment", help="Filter by experiment")
 @click.option("--type", help="Filter by type (e.g., 'Dataset::Simulated')")
 @click.option("--year", help="Filter by year (e.g., '2016--2016')")
-@click.option("--category", help="Filter by category (e.g., '\"Standard Model Physics::Drell-Yan\"')")
+@click.option(
+    "--category",
+    help="Filter by category (e.g., '\"Standard Model Physics::Drell-Yan\"')",
+)
+@click.option(
+    "--query",
+    default=None,
+    help="Full URL or query string from CERN Open Data search (e.g., 'q=online&f=experiment%3ACMS')",
+)
+@click.option(
+    "--query-pattern",
+    default=None,
+    help="Free text search pattern",
+)
+@click.option(
+    "--query-facet",
+    multiple=True,
+    type=(str, str),
+    help="Facet filter as key-value pair (can be repeated, e.g., --query-facet experiment CMS --query-facet type Dataset)",
+)
 @click.option(
     "--server",
     default=SERVER_HTTP_URI,
     type=click.STRING,
     help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
-def search(server, q, experiment, type, year, category):
+def search(
+    server, q, experiment, type, year, category, query, query_pattern, query_facet
+):
     """Search for records and print their titles."""
-    facets = {
+    final_q = q
+    final_facets = {}
+
+    if query:
+        parsed = parse_query_from_url(query)
+        final_q = parsed["q"]
+        final_facets.update(parsed["facets"])
+
+    if query_pattern:
+        final_q = query_pattern
+
+    legacy_facets = {
         "experiment": experiment,
         "type": type,
         "year": year,
         "category": category,
     }
-    # Remove None values from facets
-    facets = {k: v for k, v in facets.items() if v is not None}
-    results = search_records(server=server, q=q, facets=facets)
+    for key, value in legacy_facets.items():
+        if value is not None:
+            final_facets[key] = value
+
+    for facet_key, facet_value in query_facet:
+        final_facets[facet_key] = facet_value
+
+    results = search_records(server=server, q=final_q, facets=final_facets)
     if "hits" in results and "hits" in results["hits"]:
         for hit in results["hits"]["hits"]:
             if "metadata" in hit and "title" in hit["metadata"]:

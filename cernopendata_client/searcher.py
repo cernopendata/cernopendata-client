@@ -273,24 +273,21 @@ def get_file_info_remote(server, recid, protocol=None, filtered_files=None):
     return file_info_remote
 
 
-def search_records(server=None, q=None, facets=None):
+def search_records(server=None, q=None, facets=None, size=10):
     """Perform a search query."""
     query_params = []
     if q:
         query_params.append(f"q={quote(q)}")
-    
+
     query_params.append("sort=-mostrecent")
     query_params.append("page=1")
-    query_params.append("size=10")
+    query_params.append(f"size={size}")
     query_params.append("skip_files=1")
 
     if facets:
         for k, v in facets.items():
             query_params.append(f"{k}={quote(v)}")
     url = server + "/api/records/?" + "&".join(query_params)
-    print('url:', url)
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
-
-#https://opendata.cern.ch/api/records/?q=&sort=-mostrecent&page=1&size=10&skip_files=1&experiment=CMS&type=Dataset::Simulated&year=2016--2016&category=Standard%20Model%20Physics::Drell-Yan

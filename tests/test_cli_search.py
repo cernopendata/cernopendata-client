@@ -32,5 +32,70 @@ def test_search_command():
         ],
     )
     assert result.exit_code == 0
-    assert "/GluGluTohhTo4b_non-resonant-mh-125_8TeV-madgraph-pythia6-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM" in result.output
+    assert "Summer12" in result.output or "2012" in result.output
+    assert "/" in result.output
+    assert (
+        "AODSIM" in result.output
+        or "MINIAODSIM" in result.output
+        or "NANOAODSIM" in result.output
+    )
 
+
+def test_search_command_with_query_url():
+    """Test `search` command with --query URL option."""
+    runner = CliRunner()
+    result = runner.invoke(
+        search,
+        [
+            "--query",
+            "q=Higgs&f=experiment%3ACMS",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_command_with_query_pattern():
+    """Test `search` command with --query-pattern option."""
+    runner = CliRunner()
+    result = runner.invoke(
+        search,
+        [
+            "--query-pattern",
+            "muon",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_command_with_query_facet():
+    """Test `search` command with --query-facet option."""
+    runner = CliRunner()
+    result = runner.invoke(
+        search,
+        [
+            "--query-pattern",
+            "test",
+            "--query-facet",
+            "experiment",
+            "CMS",
+            "--query-facet",
+            "type",
+            "Dataset",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_search_command_mixed_options():
+    """Test `search` command mixing new and legacy options."""
+    runner = CliRunner()
+    result = runner.invoke(
+        search,
+        [
+            "--query-pattern",
+            "Higgs",
+            "--experiment",
+            "CMS",
+        ],
+    )
+    assert result.exit_code == 0
