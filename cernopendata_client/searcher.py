@@ -207,6 +207,7 @@ def get_files_list(
                 file_["uri"].replace(SERVER_ROOT_URI, new_server),
                 file_["size"],
                 file_["checksum"],
+                file_["availability"],
             )
         )
     for file_ in record_json["metadata"].get("_file_indices", []):
@@ -218,6 +219,7 @@ def get_files_list(
                         inner_file["uri"].replace(SERVER_ROOT_URI, new_server),
                         inner_file["size"],
                         inner_file["checksum"],
+                        inner_file["availability"],
                     )
                 )
         else:

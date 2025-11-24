@@ -171,7 +171,8 @@ def get_metadata(server, recid, doi, title, output_value, filters):
     default=False,
     help="Output also the file size (in the second column) and the file checksum (in the third column).",
 )
-def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
+@click.option("--file-availability", type=click.Choice(["online", "all"]), default=None, help="Filter files by their availability status")
+def get_file_locations(server, recid, doi, title, protocol, expand, verbose, file_availability=None):
     """Get a list of data file locations of a record.
 
     Select a CERN Open Data bibliographic record by a record ID, a
@@ -182,18 +183,30 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     \t $ cernopendata-client get-file-locations --recid 5500\n
     \t $ cernopendata-client get-file-locations --recid 5500 --protocol xrootd\n
     \t $ cernopendata-client get-file-locations --recid 5500 --verbose
+    \t $ cernopendata-client get-file-locations --recid 8886 --file-availability online
     """
     validate_server(server)
     if recid is not None:
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand, verbose)
+    if not file_availability and any(f[3] != "online" for f in file_locations):                                                         
+        display_message(                                                                                                                               
+            msg_type="warning",                                                                                                                       
+            msg="""                                                                                                                                   
+WARNING: Some files in the list are not online and may not be downloadable.                                                                           
+To list only online files, use the '--file-availability online' option.                                                                               
+""",                                                                                                                                                   
+)      
+    if file_availability=="online":
+        file_locations = [file_ for file_ in file_locations if file_[3]=="online"]
     if verbose:
         for file_ in file_locations:
             display_message(msg="{}\t{}\t{}".format(file_[0], file_[1], file_[2]))
     else:
         for file_ in file_locations:
             display_message(msg="{}".format(file_[0]))
+    
 
 
 @cernopendata_client.command()
@@ -201,7 +214,7 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
 @click.option("--doi", help="Digital Object Identifier")
 @click.option("--title", help="Record title")
 @click.option(
-    "--protocol",
+    "--protocol",   
     default="http",
     type=click.Choice(["http", "xrootd"]),
     help="Protocol to be used in links [http,xrootd]",
