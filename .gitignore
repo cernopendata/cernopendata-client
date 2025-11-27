@@ -106,3 +106,6 @@ venv.bak/
 
 # _cache folder with archived websites
 cache
+
+# Claude Code
+.claude
