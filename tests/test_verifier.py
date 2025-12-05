@@ -10,10 +10,11 @@
 """cernopendata-client file verifier tests."""
 
 import os
-import pytest
-import requests
 import subprocess
 import tempfile
+
+import pytest
+import requests
 
 from click.testing import CliRunner
 from cernopendata_client.cli import download_files, verify_files
@@ -69,11 +70,7 @@ def test_get_file_info_local_wrong_input():
 
 def test_get_file_info_local_good_input():
     """Test get_file_info_local() for good inputs."""
-
-    # remove test file
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
-    if os.path.isfile(test_file):
-        os.remove(test_file)
 
     # first download it
     test_download_files = CliRunner()
@@ -96,18 +93,10 @@ def test_get_file_info_local_good_input():
     assert test_result.exit_code == 0
     assert test_result.output.endswith("\n==> Success!\n")
 
-    # remove test file
-    if os.path.isfile(test_file):
-        os.remove(test_file)
-
 
 def test_get_file_info_local_good_input_wrong_count():
     """Test get_file_info_local() for good inputs simulating wrong file count."""
-
-    # remove test file
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
-    if os.path.isfile(test_file):
-        os.remove(test_file)
 
     # first download it
     test_download_files = CliRunner()
@@ -126,20 +115,10 @@ def test_get_file_info_local_good_input_wrong_count():
     test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
 
-    # remove test files
-    if os.path.isfile(test_file + ".extra"):
-        os.remove(test_file + ".extra")
-    if os.path.isfile(test_file):
-        os.remove(test_file)
-
 
 def test_get_file_info_local_good_input_wrong_checksum():
     """Test get_file_info_local() for good inputs simulating wrong file checksum."""
-
-    # remove test file
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
-    if os.path.isfile(test_file):
-        os.remove(test_file)
 
     # first download it
     test_download_files = CliRunner()
@@ -160,18 +139,10 @@ def test_get_file_info_local_good_input_wrong_checksum():
     test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
 
-    # remove test file
-    if os.path.isfile(test_file):
-        os.remove(test_file)
-
 
 def test_get_file_info_local_good_input_wrong_size():
     """Test get_file_info_local() for good inputs simulating wrong file size."""
-
-    # remove test file
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
-    if os.path.isfile(test_file):
-        os.remove(test_file)
 
     # first download it
     test_download_files = CliRunner()
@@ -191,10 +162,6 @@ def test_get_file_info_local_good_input_wrong_size():
     test_verifier_files = CliRunner()
     test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
-
-    # remove test file
-    if os.path.isfile(test_file):
-        os.remove(test_file)
 
 
 @pytest.mark.local
