@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2023 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -70,9 +70,9 @@ def version():
 
 
 @cernopendata_client.command()
-@click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier")
-@click.option("--title", help="Title of the record")
+@click.option("--recid", type=click.INT, help="Record ID (exact match)")
+@click.option("--doi", help="Digital Object Identifier (exact match)")
+@click.option("--title", help="Record title (exact match, no wildcards)")
 @click.option(
     "--output-value",
     is_flag=False,
@@ -147,9 +147,9 @@ def get_metadata(server, recid, doi, title, output_value, filters):
 
 
 @cernopendata_client.command()
-@click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier")
-@click.option("--title", help="Record title")
+@click.option("--recid", type=click.INT, help="Record ID (exact match)")
+@click.option("--doi", help="Digital Object Identifier (exact match)")
+@click.option("--title", help="Record title (exact match, no wildcards)")
 @click.option(
     "--protocol",
     default="http",
@@ -197,9 +197,9 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
 
 
 @cernopendata_client.command()
-@click.option("--recid", type=click.INT, help="Record ID")
-@click.option("--doi", help="Digital Object Identifier")
-@click.option("--title", help="Record title")
+@click.option("--recid", type=click.INT, help="Record ID (exact match)")
+@click.option("--doi", help="Digital Object Identifier (exact match)")
+@click.option("--title", help="Record title (exact match, no wildcards)")
 @click.option(
     "--protocol",
     default="http",
@@ -311,7 +311,9 @@ def download_files(
         validate_retry_limit(retry_limit=retry_limit)
     if retry_sleep:
         validate_retry_sleep(retry_sleep=retry_sleep)
+    # Get record metadata and resolve recid from DOI/title if needed
     record_json = get_record_as_json(server, recid, doi, title)
+    record_recid = record_json["metadata"]["recid"]
     file_locations_info = get_files_list(server, record_json, protocol, expand)
     file_locations = [file_[0] for file_ in file_locations_info]
     download_file_locations = []
@@ -353,7 +355,7 @@ def download_files(
         sys.exit(0)
 
     total_files = len(download_file_locations)
-    path = str(recid)
+    path = record_recid
     if not os.path.isdir(path):
         try:
             os.mkdir(path)
@@ -390,11 +392,11 @@ def download_files(
         if verify:
             file_info_remote = get_file_info_remote(
                 server,
-                recid,
+                record_recid,
                 protocol=protocol,
                 filtered_files=[file_location],
             )
-            file_info_local = get_file_info_local(recid)
+            file_info_local = get_file_info_local(record_recid)
             verify_file_info(file_info_local, file_info_remote)
     display_message(
         msg_type="info",
@@ -403,19 +405,21 @@ def download_files(
 
 
 @cernopendata_client.command()
-@click.option("--recid", type=click.INT, help="Record ID")
+@click.option("--recid", type=click.INT, help="Record ID (exact match)")
+@click.option("--doi", help="Digital Object Identifier (exact match)")
+@click.option("--title", help="Record title (exact match, no wildcards)")
 @click.option(
     "--server",
     default=SERVER_HTTP_URI,
     type=click.STRING,
     help="Which CERN Open Data server to query? [default={}]".format(SERVER_HTTP_URI),
 )
-def verify_files(server, recid):
+def verify_files(server, recid, doi, title):
     """Verify downloaded data file integrity.
 
-    Select a CERN Open Data bibliographic record by a record ID and
-    verify integrity of downloaded data files belonging to this
-    record.
+    Select a CERN Open Data bibliographic record by a record ID, a
+    DOI, or a title and verify integrity of downloaded data files
+    belonging to this record.
 
     Examples: \n
     \t $ cernopendata-client verify-files --recid 5500
@@ -425,16 +429,20 @@ def verify_files(server, recid):
     if recid is not None:
         validate_recid(recid)
 
+    # Get record metadata and resolve recid from DOI/title if needed
+    record_json = get_record_as_json(server, recid, doi, title)
+    record_recid = record_json["metadata"]["recid"]
+
     # Get remote file information
-    file_info_remote = get_file_info_remote(server, recid)
+    file_info_remote = get_file_info_remote(server, record_recid)
 
     # Get local file information
-    file_info_local = get_file_info_local(recid)
+    file_info_local = get_file_info_local(record_recid)
     if not file_info_local:
         display_message(
             msg_type="error",
             msg="No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
-                recid
+                record_recid
             ),
         )
         sys.exit(1)
@@ -442,7 +450,7 @@ def verify_files(server, recid):
     # Verify number of files
     display_message(
         msg_type="info",
-        msg="Verifying number of files for record {}... ".format(recid),
+        msg="Verifying number of files for record {}... ".format(record_recid),
     )
     display_message(
         msg_type="note",

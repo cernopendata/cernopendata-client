@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2021 CERN.
+# Copyright (C) 2020, 2021, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -53,6 +53,31 @@ def test_dry_run_from_doi_wrong():
         download_files, ["--doi", "NONEXISTING", "--no-expand", "--dry-run"]
     )
     assert test_result.exit_code == 2
+
+
+def test_download_files_from_doi_uses_recid_directory(mocker):
+    """Test that download-files --doi stores files in recid directory, not 'None'."""
+    mocker.patch("cernopendata_client.downloader.pycurl_available", False)
+    # DOI 10.7483/OPENDATA.CMS.W26R.J96R corresponds to recid 461
+    test_file = "461/readme.txt"
+    wrong_file = "None/readme.txt"
+    if os.path.isfile(test_file):
+        os.remove(test_file)
+    if os.path.isfile(wrong_file):
+        os.remove(wrong_file)
+    test_download_files = CliRunner()
+    test_result = test_download_files.invoke(
+        download_files,
+        ["--doi", "10.7483/OPENDATA.CMS.W26R.J96R", "--filter-name", "readme.txt"],
+    )
+    assert test_result.exit_code == 0
+    # File should be in the recid directory (461), not 'None'
+    assert os.path.isfile(test_file) is True
+    assert os.path.isfile(wrong_file) is False
+    assert os.path.getsize(test_file) == 2971
+    assert test_result.output.endswith("\n==> Success!\n")
+    if os.path.isfile(test_file):
+        os.remove(test_file)
 
 
 def test_download_files_http_pycurl():
