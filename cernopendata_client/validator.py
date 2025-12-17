@@ -117,9 +117,6 @@ def validate_directory(directory=None):
     :return: Bool after verifying directory
     :rtype: bool
     """
-    if sys.version_info[0] < 3:
-        if isinstance(directory, unicode):  # noqa F821
-            directory = directory.encode("utf-8")
     if isinstance(directory, str):
         if not directory.startswith("/eos/opendata/"):
             display_message(
