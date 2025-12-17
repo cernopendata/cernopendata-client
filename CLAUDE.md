@@ -100,6 +100,46 @@ pytest
 - Shell scripts: shellcheck + shfmt
 - Markdown/YAML/JSON: prettier + markdownlint + yamllint + jsonlint
 
+## When Making Changes
+
+When modifying files in this repository:
+
+1. **Update copyright years**: If a file has a copyright header, add the current
+   year to the list if not already present (e.g.
+   `Copyright (C) 2019, 2020, 2021, 2023, 2025 CERN.`)
+
+2. **Python files** (`.py`): Run `./run-tests.sh --format-black` to check
+   formatting, and `./run-tests.sh --lint-flake8` and
+   `./run-tests.sh --lint-pydocstyle` to check linting
+
+3. **Shell scripts** (`.sh`): Run `./run-tests.sh --format-shfmt` and
+   `./run-tests.sh --lint-shellcheck` to check formatting and linting
+
+4. **Markdown files** (`.md`): Run `./run-tests.sh --format-prettier` and
+   `./run-tests.sh --lint-markdownlint` to check formatting and linting
+
+5. **YAML files** (`.yml`, `.yaml`): Run `./run-tests.sh --format-prettier` and
+   `./run-tests.sh --lint-yamllint` to check formatting and linting
+
+6. **JSON files** (`.json`): Run `./run-tests.sh --format-prettier` and
+   `./run-tests.sh --lint-jsonlint` to check formatting and linting
+
+7. **Dockerfile**: Run `./run-tests.sh --lint-hadolint` to check linting, and
+   `./run-tests.sh --docker-build` to verify the Docker image builds correctly
+
+8. **Documentation** (`docs/`): Run `./run-tests.sh --docs-sphinx` to verify
+   Sphinx documentation builds correctly
+
+9. **Python package structure** (`setup.py`, `MANIFEST.in`): Run
+   `./run-tests.sh --lint-manifest` to verify the package manifest is correct
+
+10. **Commit messages**: Run `./run-tests.sh --lint-commitlint` to verify commit
+    messages follow conventional commits format
+
+11. **Tests** (`tests/`): Run `./run-tests.sh --python-tests-local` for local
+    tests without network access, or `./run-tests.sh --python-tests` for all
+    tests including those that connect to the CERN Open Data portal
+
 ## Key Notes
 
 - License: GPLv3
