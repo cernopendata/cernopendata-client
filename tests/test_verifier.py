@@ -11,7 +11,9 @@
 
 import os
 import pytest
+import requests
 import subprocess
+import tempfile
 
 from click.testing import CliRunner
 from cernopendata_client.cli import download_files, verify_files
@@ -33,6 +35,27 @@ def test_get_file_checksum():
     """Test get_file_checksum()."""
     afile = "./tests/test_version.py"
     assert get_file_checksum(afile) == "adler32:fa91da1e"
+
+
+def test_get_file_checksum_zero_padding():
+    """Test get_file_checksum() zero-pads checksums to 8 hex characters.
+
+    Uses a real open data file from recid 93773 whose checksum has a leading
+    zero.
+    """
+    file_url = "http://opendata.cern.ch/eos/opendata/delphi/simulated-data/cern/hzha03pyth6156/va0u/206.5/hzha03pyth6156_hattbb_206.5_70_90_22432.xsdst"
+    file_checksum = "adler32:03d9681c"
+
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        tmp_path = tmp.name
+        response = requests.get(file_url)
+        tmp.write(response.content)
+
+    try:
+        result = get_file_checksum(tmp_path)
+        assert result == file_checksum
+    finally:
+        os.remove(tmp_path)
 
 
 def test_get_file_info_local_wrong_input():
