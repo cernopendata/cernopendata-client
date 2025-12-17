@@ -66,3 +66,13 @@ def test_recursive_list_directory_wrong():
     assert (
         "Directory /eos/opendata/recursiveFoobar does not exist." in test_result.output
     )
+
+
+@pytest.mark.local
+def test_list_directory_empty(mocker):
+    """Test `list_directory` command with empty directory."""
+    mocker.patch("cernopendata_client.cli.get_list_directory", return_value=[])
+    test_empty = CliRunner()
+    test_result = test_empty.invoke(list_directory, ["/eos/opendata/test"])
+    assert test_result.exit_code == 2
+    assert "No files in the directory" in test_result.output
