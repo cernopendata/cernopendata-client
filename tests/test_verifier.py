@@ -29,14 +29,14 @@ from cernopendata_client.verifier import (
 def test_get_file_size():
     """Test get_file_size()."""
     afile = "./tests/test_version.py"
-    assert get_file_size(afile) == 616
+    assert get_file_size(afile) == 628
 
 
 @pytest.mark.local
 def test_get_file_checksum():
     """Test get_file_checksum()."""
     afile = "./tests/test_version.py"
-    assert get_file_checksum(afile) == "adler32:8510d24c"
+    assert get_file_checksum(afile) == "adler32:41cdd471"
 
 
 def test_get_file_checksum_zero_padding():
