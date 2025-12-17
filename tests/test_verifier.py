@@ -16,7 +16,6 @@ import tempfile
 import pytest
 import requests
 
-from click.testing import CliRunner
 from cernopendata_client.cli import download_files, verify_files
 from cernopendata_client.verifier import (
     get_file_size,
@@ -30,14 +29,14 @@ from cernopendata_client.verifier import (
 def test_get_file_size():
     """Test get_file_size()."""
     afile = "./tests/test_version.py"
-    assert get_file_size(afile) == 675
+    assert get_file_size(afile) == 616
 
 
 @pytest.mark.local
 def test_get_file_checksum():
     """Test get_file_checksum()."""
     afile = "./tests/test_version.py"
-    assert get_file_checksum(afile) == "adler32:ac0ae69b"
+    assert get_file_checksum(afile) == "adler32:8510d24c"
 
 
 def test_get_file_checksum_zero_padding():
@@ -68,39 +67,36 @@ def test_get_file_info_local_wrong_input():
     assert get_file_info_local(123456) == []
 
 
-def test_get_file_info_local_good_input():
+def test_get_file_info_local_good_input(cli_runner):
     """Test get_file_info_local() for good inputs."""
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
 
     # first download it
-    test_download_files = CliRunner()
-    test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(download_files, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
     assert test_result.output.endswith("\n==> Success!\n")
 
     # now test get_file_info_local()
-    test_result = get_file_info_local(3005)
-    assert len(test_result) == 1
-    assert test_result[0]["name"] == "0d0714743f0204ed3c0144941e6ce248.configFile.py"
-    assert test_result[0]["size"] == 3644
-    assert test_result[0]["checksum"] == "adler32:be83a186"
+    local_result = get_file_info_local(3005)
+    assert len(local_result) == 1
+    assert local_result[0]["name"] == "0d0714743f0204ed3c0144941e6ce248.configFile.py"
+    assert local_result[0]["size"] == 3644
+    assert local_result[0]["checksum"] == "adler32:be83a186"
 
     # now test verifier
-    test_verifier_files = CliRunner()
-    test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert test_result.output.endswith("\n==> Success!\n")
 
 
-def test_get_file_info_local_good_input_wrong_count():
+def test_get_file_info_local_good_input_wrong_count(cli_runner):
     """Test get_file_info_local() for good inputs simulating wrong file count."""
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
 
     # first download it
-    test_download_files = CliRunner()
-    test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(download_files, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
@@ -111,18 +107,16 @@ def test_get_file_info_local_good_input_wrong_count():
     subprocess.check_output(cmd, shell=True)
 
     # now test verifier
-    test_verifier_files = CliRunner()
-    test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
 
 
-def test_get_file_info_local_good_input_wrong_checksum():
+def test_get_file_info_local_good_input_wrong_checksum(cli_runner):
     """Test get_file_info_local() for good inputs simulating wrong file checksum."""
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
 
     # first download it
-    test_download_files = CliRunner()
-    test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(download_files, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
@@ -135,18 +129,16 @@ def test_get_file_info_local_good_input_wrong_checksum():
         f.write(content.replace("a", "b"))
 
     # now test verifier
-    test_verifier_files = CliRunner()
-    test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
 
 
-def test_get_file_info_local_good_input_wrong_size():
+def test_get_file_info_local_good_input_wrong_size(cli_runner):
     """Test get_file_info_local() for good inputs simulating wrong file size."""
     test_file = "3005/0d0714743f0204ed3c0144941e6ce248.configFile.py"
 
     # first download it
-    test_download_files = CliRunner()
-    test_result = test_download_files.invoke(download_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(download_files, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert os.path.isfile(test_file) is True
     assert os.path.getsize(test_file) == 3644
@@ -159,8 +151,7 @@ def test_get_file_info_local_good_input_wrong_size():
         f.write(content.replace("a", "bbbbbb"))
 
     # now test verifier
-    test_verifier_files = CliRunner()
-    test_result = test_verifier_files.invoke(verify_files, ["--recid", 3005])
+    test_result = cli_runner.invoke(verify_files, ["--recid", 3005])
     assert test_result.exit_code == 1
 
 

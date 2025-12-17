@@ -10,14 +10,12 @@
 import pytest
 
 from cernopendata_client import __version__
-from click.testing import CliRunner
 from cernopendata_client.cli import version
 
 
 @pytest.mark.local
-def test_version():
+def test_version(cli_runner):
     """Test version import."""
-    test_version = CliRunner()
-    test_result = test_version.invoke(version)
+    test_result = cli_runner.invoke(version)
     assert test_result.exit_code == 0
     assert test_result.output == __version__ + "\n"

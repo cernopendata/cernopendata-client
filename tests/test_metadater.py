@@ -11,7 +11,6 @@
 
 import pytest
 
-from click.testing import CliRunner
 from cernopendata_client.cli import get_metadata
 
 from cernopendata_client.metadater import (
@@ -20,10 +19,9 @@ from cernopendata_client.metadater import (
 )
 
 
-def test_get_metadata_from_filter_fields_empty():
+def test_get_metadata_from_filter_fields_empty(cli_runner):
     """Test `get-metadata --recid --output-value --filter` command with empty values."""
-    test_get_metadata = CliRunner()
-    test_result = test_get_metadata.invoke(
+    test_result = cli_runner.invoke(
         get_metadata,
         ["--recid", 1, "--output-value", "usage.links.description", "--filter", "url"],
     )
@@ -34,10 +32,9 @@ def test_get_metadata_from_filter_fields_empty():
     )
 
 
-def test_get_metadata_from_filter_metadata_one():
+def test_get_metadata_from_filter_metadata_one(cli_runner):
     """Test `get-metadata --recid --output-value --filter` command."""
-    test_get_metadata = CliRunner()
-    test_result = test_get_metadata.invoke(
+    test_result = cli_runner.invoke(
         get_metadata,
         [
             "--recid",
@@ -52,10 +49,9 @@ def test_get_metadata_from_filter_metadata_one():
     assert "Getting started with CMS open data" in test_result.output
 
 
-def test_get_metadata_from_filter_metadata_two():
+def test_get_metadata_from_filter_metadata_two(cli_runner):
     """Test `get-metadata --recid --output-value --filter` command."""
-    test_get_metadata = CliRunner()
-    test_result = test_get_metadata.invoke(
+    test_result = cli_runner.invoke(
         get_metadata,
         [
             "--recid",
@@ -72,10 +68,9 @@ def test_get_metadata_from_filter_metadata_two():
     assert "Plagge, Michael" in test_result.output
 
 
-def test_get_metadata_from_filter_metadata_wrong_one():
+def test_get_metadata_from_filter_metadata_wrong_one(cli_runner):
     """Test `get-metadata --recid --output-value --filter` command for wrong values."""
-    test_get_metadata = CliRunner()
-    test_result = test_get_metadata.invoke(
+    test_result = cli_runner.invoke(
         get_metadata,
         [
             "--recid",
@@ -90,10 +85,9 @@ def test_get_metadata_from_filter_metadata_wrong_one():
     assert "Field 'link' is not present in metadata" in test_result.output
 
 
-def test_get_metadata_from_filter_metadata_wrong_two():
+def test_get_metadata_from_filter_metadata_wrong_two(cli_runner):
     """Test `get-metadata --recid --output-value --filter` command for wrong values."""
-    test_get_metadata = CliRunner()
-    test_result = test_get_metadata.invoke(
+    test_result = cli_runner.invoke(
         get_metadata,
         [
             "--recid",

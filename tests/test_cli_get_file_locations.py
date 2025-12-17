@@ -9,58 +9,47 @@
 
 """cernopendata-client cli command get-file-locations test."""
 
-import pytest
-
-from click.testing import CliRunner
 from cernopendata_client.cli import get_file_locations
 from cernopendata_client.config import SERVER_HTTPS_URI, SERVER_ROOT_URI
 
 
-def test_get_file_locations_from_recid():
+def test_get_file_locations_from_recid(cli_runner):
     """Test `get-file-locations --recid` command."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 3005])
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 3005])
     assert test_result.exit_code == 0
     assert "0d0714743f0204ed3c0144941e6ce248.configFile.py" in test_result.output
 
 
-def test_get_file_locations_from_recid_without_files():
+def test_get_file_locations_from_recid_without_files(cli_runner):
     """Test `get-file-locations --recid` command for recid without files."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 550])
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 550])
     assert test_result.exit_code == 0
     assert "" in test_result.output
 
 
-def test_get_file_locations_from_recid_expand():
+def test_get_file_locations_from_recid_expand(cli_runner):
     """Test `get-file-locations --recid` command with expand."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 282])
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 282])
     assert test_result.exit_code == 0
     assert "2A227E10-C949-E311-B033-003048FEAF50.root" in test_result.output
 
 
-def test_get_file_locations_from_recid_expand_verbose():
+def test_get_file_locations_from_recid_expand_verbose(cli_runner):
     """Test `get-file-locations --recid` command with expand and verbose."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
-        get_file_locations, ["--recid", 282, "--verbose"]
-    )
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 282, "--verbose"])
     assert test_result.exit_code == 0
     assert "2A227E10-C949-E311-B033-003048FEAF50.root" in test_result.output
 
 
-def test_get_file_locations_from_recid_wrong():
+def test_get_file_locations_from_recid_wrong(cli_runner):
     """Test `get-file-locations --recid` command for wrong values."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(get_file_locations, ["--recid", 0])
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 0])
     assert test_result.exit_code == 2
 
 
-def test_get_file_locations_from_doi():
+def test_get_file_locations_from_doi(cli_runner):
     """Test `get-file-locations --doi` command."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations, ["--doi", "10.7483/OPENDATA.CMS.A342.9982", "--no-expand"]
     )
     assert test_result.exit_code == 0
@@ -70,39 +59,33 @@ def test_get_file_locations_from_doi():
     )
 
 
-def test_get_file_locations_from_doi_wrong():
+def test_get_file_locations_from_doi_wrong(cli_runner):
     """Test `get-file-locations --doi` command for wrong values."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations, ["--doi", "NONEXISTING", "--no-expand"]
     )
     assert test_result.exit_code == 2
 
 
-def test_get_file_locations_with_verbose():
+def test_get_file_locations_with_verbose(cli_runner):
     """Test `get-file-locations --verbose` command."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
-        get_file_locations, ["--recid", 5500, "--verbose"]
-    )
+    test_result = cli_runner.invoke(get_file_locations, ["--recid", 5500, "--verbose"])
     assert test_result.exit_code == 0
     assert "\t93152\tadler32:62e0c299\n" in test_result.output
 
 
-def test_get_file_locations_with_https_server():
+def test_get_file_locations_with_https_server(cli_runner):
     """Test `get-file-locations --server` command for https server."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations, ["--recid", 3005, "--server", SERVER_HTTPS_URI]
     )
     assert test_result.exit_code == 0
     assert "configFile.py" in test_result.output
 
 
-def test_get_file_locations_with_https_server_xrootd_protocol():
+def test_get_file_locations_with_https_server_xrootd_protocol(cli_runner):
     """Test `get-file-locations --server --protocol xrootd` command for https server."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations,
         ["--recid", 3005, "--server", SERVER_HTTPS_URI, "--protocol", "xrootd"],
     )
@@ -110,10 +93,9 @@ def test_get_file_locations_with_https_server_xrootd_protocol():
     assert "root://eospublic.cern.ch//eos/" in test_result.output
 
 
-def test_get_file_locations_no_expand_with_xrootd_protocol():
+def test_get_file_locations_no_expand_with_xrootd_protocol(cli_runner):
     """Test `get-file-locations --no-expand --protocol xrootd` command."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations,
         ["--recid", 1, "--no-expand", "--protocol", "xrootd"],
     )
@@ -122,10 +104,9 @@ def test_get_file_locations_no_expand_with_xrootd_protocol():
     assert "file_index" in test_result.output
 
 
-def test_get_file_locations_no_expand_with_http_protocol():
+def test_get_file_locations_no_expand_with_http_protocol(cli_runner):
     """Test `get-file-locations --no-expand --protocol http` command."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations,
         ["--recid", 1, "--no-expand", "--protocol", "http"],
     )
@@ -134,10 +115,9 @@ def test_get_file_locations_no_expand_with_http_protocol():
     assert "file_index" in test_result.output
 
 
-def test_get_file_locations_with_custom_https_server():
+def test_get_file_locations_with_custom_https_server(cli_runner):
     """Test `get-file-locations --server` command for custom https server."""
-    test_get_file_locations = CliRunner()
-    test_result = test_get_file_locations.invoke(
+    test_result = cli_runner.invoke(
         get_file_locations, ["--recid", 5500, "--server", "https://opendata-qa.cern.ch"]
     )
     assert test_result.exit_code == 0

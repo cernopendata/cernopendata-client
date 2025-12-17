@@ -13,6 +13,7 @@ import os
 import shutil
 
 import pytest
+from click.testing import CliRunner
 
 
 @pytest.fixture(autouse=True)
@@ -32,3 +33,9 @@ def cleanup_download_directories():
     for test_dir in test_dirs:
         if os.path.isdir(test_dir):
             shutil.rmtree(test_dir)
+
+
+@pytest.fixture
+def cli_runner():
+    """Provide a Click CLI test runner."""
+    return CliRunner()
