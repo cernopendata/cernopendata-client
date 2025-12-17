@@ -72,7 +72,7 @@ def test_validate_retry_limit():
     pytest.raises(SystemExit, validate_retry_limit, -1)
     pytest.raises(SystemExit, validate_retry_limit, 0)
     pytest.raises(SystemExit, validate_retry_limit, None)
-    assert validate_recid(1) is True
+    assert validate_retry_limit(1) is True
 
 
 @pytest.mark.local
@@ -81,4 +81,4 @@ def test_validate_retry_sleep():
     pytest.raises(SystemExit, validate_retry_sleep, -1)
     pytest.raises(SystemExit, validate_retry_sleep, 0)
     pytest.raises(SystemExit, validate_retry_sleep, None)
-    assert validate_recid(1) is True
+    assert validate_retry_sleep(1) is True
