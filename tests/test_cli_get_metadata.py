@@ -118,3 +118,13 @@ def test_get_metadata_wrong_value():
     )
     assert test_result.exit_code == 2
     assert "Invalid value for --server" in test_result.output
+
+
+def test_get_metadata_filter_without_output_value():
+    """Test get-metadata --filter without --output-value."""
+    test_get_metadata = CliRunner()
+    test_result = test_get_metadata.invoke(
+        get_metadata, ["--recid", 1, "--filter", "foo=bar"]
+    )
+    assert test_result.exit_code == 0
+    assert "--filter can only be used with --output-value" in test_result.output
