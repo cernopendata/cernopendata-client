@@ -108,3 +108,38 @@ def test_get_metadata_from_filter_metadata_wrong_two():
     assert (
         "No objects found with url=/docs/cms-getting-started-20" in test_result.output
     )
+
+
+@pytest.mark.local
+def test_filter_matching_output_without_output_field(capsys):
+    """Test filter_matching_output when output_field is not in object."""
+    matching_objects = {"name_0": {"foo": "bar", "baz": "qux"}}
+    output_json = [{"foo": "bar", "baz": "qux"}]
+    filter_matching_output(matching_objects, "nonexistent", output_json)
+    captured = capsys.readouterr()
+    assert '"foo": "bar"' in captured.out
+    assert '"baz": "qux"' in captured.out
+
+
+@pytest.mark.local
+def test_filter_matching_output_multiple_matches_without_output_field(capsys):
+    """Test filter_matching_output with multiple matches when output_field is not in object."""
+    # Two different filter fields matching the same object at index 0
+    matching_objects = {
+        "field1_0": {"a": "1", "b": "2"},
+        "field2_0": {"a": "1", "b": "2"},
+    }
+    output_json = [{"a": "1", "b": "2"}]
+    filter_matching_output(matching_objects, "nonexistent", output_json)
+    captured = capsys.readouterr()
+    assert '"a": "1"' in captured.out
+    assert '"b": "2"' in captured.out
+
+
+@pytest.mark.local
+def test_filter_metadata_schema_field():
+    """Test filter_metadata when output_json contains $schema."""
+    output_json = ["$schema", {"name": "test"}]
+    with pytest.raises(SystemExit) as exc_info:
+        filter_metadata("name", ["name=test"], output_json)
+    assert exc_info.value.code == 1
