@@ -2,6 +2,43 @@
 
 # Changelog
 
+## [1.0.2](https://github.com/cernopendata/cernopendata-client/compare/1.0.1...1.0.2) (2025-12-17)
+
+
+### Bug fixes
+
+* **download:** use record IDs for all local data paths ([#167](https://github.com/cernopendata/cernopendata-client/issues/167)) ([9b97f7c](https://github.com/cernopendata/cernopendata-client/commit/9b97f7caebf2c049f2734ec1af399c6aeb027341)), closes [#166](https://github.com/cernopendata/cernopendata-client/issues/166)
+* **verifier:** zero-pad Adler32 checksums to 8 hex characters ([#169](https://github.com/cernopendata/cernopendata-client/issues/169)) ([b6daa50](https://github.com/cernopendata/cernopendata-client/commit/b6daa508c3d190585f84853687ff0cfb8acbe792))
+
+
+### Code refactoring
+
+* **searcher:** remove Python 2 compatibility code ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([cc3bb8b](https://github.com/cernopendata/cernopendata-client/commit/cc3bb8b80b6cf383168e0edf93ae17fafe65ab5c))
+* **validator:** remove Python 2 compatibility code ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([b03de4f](https://github.com/cernopendata/cernopendata-client/commit/b03de4fb7519864a1e0f1f1380467007c5a73b17))
+
+
+### Test suite
+
+* **conftest:** add fixture for automatic directory cleanup ([#168](https://github.com/cernopendata/cernopendata-client/issues/168)) ([b847121](https://github.com/cernopendata/cernopendata-client/commit/b84712178cd143d86d66642b09e45d1ffdd9f6b0))
+* **conftest:** add shared CLI runner fixture ([#168](https://github.com/cernopendata/cernopendata-client/issues/168)) ([b387fde](https://github.com/cernopendata/cernopendata-client/commit/b387fde1569c7e81c825fe3b8601a4cbefe51fbd))
+* **downloader:** add unit tests for file filtering functions ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([a93d2be](https://github.com/cernopendata/cernopendata-client/commit/a93d2be9528016868a06cf0622c13f83493a834d))
+* **get-metadata:** add test for filter without output-value ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([7c65a79](https://github.com/cernopendata/cernopendata-client/commit/7c65a79de09b675847067db7c6f036cf0f62588c))
+* **global:** add [@pytest](https://github.com/pytest).mark.local marker for local-only tests ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([59fb1da](https://github.com/cernopendata/cernopendata-client/commit/59fb1da2a4ffd6160ad7cd8ce291d88c4774e807))
+* **list-directory:** add test for empty directory ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([22e75e5](https://github.com/cernopendata/cernopendata-client/commit/22e75e56cab423905d701a4de05295fcfd319d3d))
+* **metadater:** add tests for filter edge cases ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([b1855b9](https://github.com/cernopendata/cernopendata-client/commit/b1855b9e12b1c8365cdcf1c3f6e73227dedbfba6))
+* **validator:** correct typos in test assertions ([#170](https://github.com/cernopendata/cernopendata-client/issues/170)) ([07b7b00](https://github.com/cernopendata/cernopendata-client/commit/07b7b00376921288fbb3aed66fac9ce04866858c))
+
+
+### Continuous integration
+
+* **commitlint:** fix local running of commit linter on macOS ([#168](https://github.com/cernopendata/cernopendata-client/issues/168)) ([6f411b1](https://github.com/cernopendata/cernopendata-client/commit/6f411b1b4ed859b18a54365d43a0f748dbfa7c9c))
+
+
+### Documentation
+
+* **claude:** add initial Claude Code configuration ([#164](https://github.com/cernopendata/cernopendata-client/issues/164)) ([7d14b38](https://github.com/cernopendata/cernopendata-client/commit/7d14b3845b859af2f2282f565f1c040898adc7f6))
+* **claude:** expand file change instructions for all file types ([#168](https://github.com/cernopendata/cernopendata-client/issues/168)) ([5652939](https://github.com/cernopendata/cernopendata-client/commit/5652939b50c1b0dd60471961e80476dcad64ab0a))
+
 ## [1.0.1](https://github.com/cernopendata/cernopendata-client/compare/1.0.0...1.0.1) (2025-11-10)
 
 
