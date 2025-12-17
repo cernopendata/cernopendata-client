@@ -9,6 +9,8 @@
 
 """cernopendata-client cli command get-metadata test."""
 
+import pytest
+
 from click.testing import CliRunner
 from cernopendata_client.cli import get_metadata
 
@@ -97,6 +99,7 @@ def test_get_metadata_from_output_fields_wrong():
     assert "Field 'global_tag' is not present in metadata\n" in test_result.output
 
 
+@pytest.mark.local
 def test_get_metadata_empty_value():
     """Test get_metadata() command with empty value."""
     test_get_metadata_empty_value = CliRunner()
@@ -105,6 +108,7 @@ def test_get_metadata_empty_value():
     assert "Please provide at least one of following arguments" in test_result.output
 
 
+@pytest.mark.local
 def test_get_metadata_wrong_value():
     """Test download_files() command with wrong value."""
     test_get_metadata_wrong_value = CliRunner()

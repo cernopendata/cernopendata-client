@@ -15,6 +15,7 @@ import pytest
 from cernopendata_client.utils import parse_parameters
 
 
+@pytest.mark.local
 def test_parse_parameters():
     """Test parse_parameters() method."""
     pytest.raises(SystemExit, parse_parameters, (9))

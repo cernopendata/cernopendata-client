@@ -236,6 +236,7 @@ def test_download_files_with_verify():
         os.remove(test_file)
 
 
+@pytest.mark.local
 def test_download_files_empty_value():
     """Test download_files() command with empty value."""
     test_download_files_empty_value = CliRunner()
@@ -244,6 +245,7 @@ def test_download_files_empty_value():
     assert "Please provide at least one of following arguments" in test_result.output
 
 
+@pytest.mark.local
 def test_download_files_wrong_value():
     """Test download_files() command with wrong value."""
     test_download_files_empty_value = CliRunner()

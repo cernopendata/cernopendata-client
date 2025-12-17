@@ -9,6 +9,8 @@
 
 """cernopendata-client cli command get-file-locations test."""
 
+import pytest
+
 from click.testing import CliRunner
 from cernopendata_client.cli import get_file_locations
 from cernopendata_client.config import SERVER_HTTPS_URI, SERVER_ROOT_URI

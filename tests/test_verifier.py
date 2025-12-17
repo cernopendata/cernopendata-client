@@ -25,16 +25,18 @@ from cernopendata_client.verifier import (
 )
 
 
+@pytest.mark.local
 def test_get_file_size():
     """Test get_file_size()."""
     afile = "./tests/test_version.py"
-    assert get_file_size(afile) == 641
+    assert get_file_size(afile) == 675
 
 
+@pytest.mark.local
 def test_get_file_checksum():
     """Test get_file_checksum()."""
     afile = "./tests/test_version.py"
-    assert get_file_checksum(afile) == "adler32:fa91da1e"
+    assert get_file_checksum(afile) == "adler32:ac0ae69b"
 
 
 def test_get_file_checksum_zero_padding():
@@ -58,6 +60,7 @@ def test_get_file_checksum_zero_padding():
         os.remove(tmp_path)
 
 
+@pytest.mark.local
 def test_get_file_info_local_wrong_input():
     """Test get_file_info_local() for wrong inputs."""
 
@@ -194,6 +197,7 @@ def test_get_file_info_local_good_input_wrong_size():
         os.remove(test_file)
 
 
+@pytest.mark.local
 def test_verify_file_info_good_input():
     """Test verify_file_info() for good input."""
 
@@ -237,6 +241,7 @@ def test_verify_file_info_good_input():
     assert verify_file_info(test_file_info_local, test_file_info_remote) is True
 
 
+@pytest.mark.local
 def test_verify_file_info_wrong_input():
     """Test verify_file_info() for wrong input."""
 
@@ -281,6 +286,7 @@ def test_verify_file_info_wrong_input():
     )
 
 
+@pytest.mark.local
 def test_verify_file_info_wrong_checksum():
     """Test verify_file_info() for wrong checksum."""
 

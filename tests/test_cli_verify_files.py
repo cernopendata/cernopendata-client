@@ -74,6 +74,7 @@ def test_verify_files_https_server():
         os.remove(test_file)
 
 
+@pytest.mark.local
 def test_verify_files_empty_value():
     """Test verify-files command with empty value."""
     test_verify_files_empty_value = CliRunner()
@@ -82,6 +83,7 @@ def test_verify_files_empty_value():
     assert "Please provide at least one of following arguments" in test_result.output
 
 
+@pytest.mark.local
 def test_verify_files_wrong_value():
     """Test verify-files command with wrong value."""
     test_verify_files_wrong_value = CliRunner()

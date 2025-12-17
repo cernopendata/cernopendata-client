@@ -9,6 +9,8 @@
 
 """cernopendata-client file metadater test."""
 
+import pytest
+
 from click.testing import CliRunner
 from cernopendata_client.cli import get_metadata
 

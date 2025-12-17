@@ -97,6 +97,10 @@ python_tests() {
     pytest
 }
 
+python_tests_local() {
+    pytest -m local
+}
+
 format_shfmt() {
     shfmt -d .
 }
@@ -145,6 +149,7 @@ help() {
     echo "  --lint-shellcheck    Check linting of shell scripts"
     echo "  --lint-yamllint      Check linting of YAML files"
     echo "  --python-tests       Check Python test suite"
+    echo "  --python-tests-local Check Python test suite (local tests only, no portal access)"
 }
 
 if [ $# -eq 0 ]; then
@@ -172,5 +177,6 @@ case $arg in
 --lint-shellcheck) lint_shellcheck ;;
 --lint-yamllint) lint_yamllint ;;
 --python-tests) python_tests ;;
+--python-tests-local) python_tests_local ;;
 *) echo "[ERROR] Invalid argument '$arg'. Exiting." && help && exit 1 ;;
 esac

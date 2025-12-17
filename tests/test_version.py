@@ -7,11 +7,14 @@
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
 """cernopendata-client version test."""
 
+import pytest
+
 from cernopendata_client import __version__
 from click.testing import CliRunner
 from cernopendata_client.cli import version
 
 
+@pytest.mark.local
 def test_version():
     """Test version import."""
     test_version = CliRunner()
