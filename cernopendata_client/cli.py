@@ -190,16 +190,17 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose, fil
         validate_recid(recid)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations = get_files_list(server, record_json, protocol, expand, verbose)
-    if not file_availability and any(f[3] != "online" for f in file_locations):                                                         
-        display_message(                                                                                                                               
-            msg_type="warning",                                                                                                                       
-            msg="""                                                                                                                                   
-WARNING: Some files in the list are not online and may not be downloadable.                                                                           
-To list only online files, use the '--file-availability online' option.                                                                               
-""",                                                                                                                                                   
-)      
-    if file_availability=="online":
-        file_locations = [file_ for file_ in file_locations if file_[3]=="online"]
+    if expand:
+        if not file_availability and any(f[3] != "online" for f in file_locations):                                                         
+            display_message(                                                                                                                               
+                msg_type="warning",                                                                                                                       
+                msg="""                                                                                                                                   
+    WARNING: Some files in the list are not online and may not be downloadable.                                                                           
+    To list only online files, use the '--file-availability online' option.                                                                               
+    """,                                                                                                                                                   
+    )      
+        if file_availability=="online":
+            file_locations = [file_ for file_ in file_locations if file_[3]=="online"]
     if verbose:
         for file_ in file_locations:
             display_message(msg="{}\t{}\t{}".format(file_[0], file_[1], file_[2]))
@@ -288,6 +289,7 @@ To list only online files, use the '--file-availability online' option.
     "The available values are 'requests', 'pycurl', 'xrootd'."
     "[default=requests (for HTTP protocol), xrootd (for XRootD protocol)]",
 )
+@click.option("--file-availability", type=click.Choice(["online", "all"]), default=None, help="Filter files by their availability status")
 def download_files(
     server,
     recid,
@@ -303,6 +305,7 @@ def download_files(
     retry_limit,
     retry_sleep,
     download_engine,
+    file_availability,
 ):
     """Download data files belonging to a record.
 
@@ -326,6 +329,16 @@ def download_files(
         validate_retry_sleep(retry_sleep=retry_sleep)
     record_json = get_record_as_json(server, recid, doi, title)
     file_locations_info = get_files_list(server, record_json, protocol, expand)
+#     if not file_availability and any(f[3] != "online" for f in file_locations_info):                                                         
+#         display_message(                                                                                                                               
+#             msg_type="warning",                                                                                                                       
+#             msg="""                                                                                                                                   
+# WARNING: Some files in the list are not online and may not be downloadable.                                                                           
+# To list only online files, use the '--file-availability online' option.                                                                               
+# """,                                                                                                                                                   
+# )
+    if file_availability=="online":
+        file_locations_info = [file_ for file_ in file_locations_info if file_[3]=="online"]
     file_locations = [file_[0] for file_ in file_locations_info]
     download_file_locations = []
 
