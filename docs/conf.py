@@ -23,7 +23,7 @@ import sphinx.environment
 # -- Project information -----------------------------------------------------
 
 project = "cernopendata_client"
-copyright = "2019-2024, CERN"
+copyright = "2019-2025, CERN"
 author = "CERN Open Data"
 
 # Get the version string. Cannot be done with import!

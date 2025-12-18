@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -38,7 +38,9 @@ def get_file_checksum(afile):
     :return: Adler32 checksum of file
     :rtype: str
     """
-    return "adler32:" + hex(zlib.adler32(open(afile, "rb").read(), 1) & 0xFFFFFFFF)[2:]
+    return "adler32:{:08x}".format(
+        zlib.adler32(open(afile, "rb").read(), 1) & 0xFFFFFFFF
+    )
 
 
 def get_file_info_local(recid):

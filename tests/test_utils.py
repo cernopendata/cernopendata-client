@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -15,6 +15,7 @@ import pytest
 from cernopendata_client.utils import parse_parameters
 
 
+@pytest.mark.local
 def test_parse_parameters():
     """Test parse_parameters() method."""
     pytest.raises(SystemExit, parse_parameters, (9))

@@ -1,6 +1,6 @@
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2022, 2023, 2024 CERN.
+# Copyright (C) 2020, 2022, 2023, 2024, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -77,5 +77,5 @@ LABEL org.opencontainers.image.title="cernopendata-client"
 LABEL org.opencontainers.image.url="https://github.com/cernopendata/cernopendata-client"
 LABEL org.opencontainers.image.vendor="cernopendata"
 # x-release-please-start-version
-LABEL org.opencontainers.image.version="1.0.1"
+LABEL org.opencontainers.image.version="1.0.2"
 # x-release-please-end

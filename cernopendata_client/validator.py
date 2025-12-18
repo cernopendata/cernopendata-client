@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -117,9 +117,6 @@ def validate_directory(directory=None):
     :return: Bool after verifying directory
     :rtype: bool
     """
-    if sys.version_info[0] < 3:
-        if isinstance(directory, unicode):  # noqa F821
-            directory = directory.encode("utf-8")
     if isinstance(directory, str):
         if not directory.startswith("/eos/opendata/"):
             display_message(

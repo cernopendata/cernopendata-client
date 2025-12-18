@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020 CERN.
+# Copyright (C) 2020, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -22,6 +22,7 @@ from cernopendata_client.validator import (
 )
 
 
+@pytest.mark.local
 def test_validate_recid():
     """Test validate_recid()."""
     pytest.raises(SystemExit, validate_recid, -1)
@@ -30,6 +31,7 @@ def test_validate_recid():
     assert validate_recid(1) is True
 
 
+@pytest.mark.local
 def test_validate_server():
     """Test validate_server()."""
     assert validate_server("http://opendata.cern.ch") is True
@@ -40,6 +42,7 @@ def test_validate_server():
     pytest.raises(SystemExit, validate_server, "opendata.cern.ch")
 
 
+@pytest.mark.local
 def test_validate_range():
     """Test validate_range()."""
     assert validate_range(range="3-9", count=10) is True
@@ -51,6 +54,7 @@ def test_validate_range():
     pytest.raises(SystemExit, validate_range, "3,2", 5)
 
 
+@pytest.mark.local
 def test_validate_directory():
     """Test validate_directory()."""
     assert validate_directory(directory="/eos/opendata/cms/validated-runs/") is True
@@ -62,17 +66,19 @@ def test_validate_directory():
     pytest.raises(SystemExit, validate_directory, 90)
 
 
+@pytest.mark.local
 def test_validate_retry_limit():
     """Test validate_retry_limit()."""
     pytest.raises(SystemExit, validate_retry_limit, -1)
     pytest.raises(SystemExit, validate_retry_limit, 0)
     pytest.raises(SystemExit, validate_retry_limit, None)
-    assert validate_recid(1) is True
+    assert validate_retry_limit(1) is True
 
 
+@pytest.mark.local
 def test_validate_retry_sleep():
     """Test validate_retry_sleep()."""
     pytest.raises(SystemExit, validate_retry_sleep, -1)
     pytest.raises(SystemExit, validate_retry_sleep, 0)
     pytest.raises(SystemExit, validate_retry_sleep, None)
-    assert validate_recid(1) is True
+    assert validate_retry_sleep(1) is True

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2025 CERN.
+# Copyright (C) 2020, 2024, 2025 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -13,14 +13,10 @@ from __future__ import print_function
 import sys
 import requests
 
+from urllib.parse import quote
+
 from .config import SERVER_HTTP_URI, SERVER_ROOT_URI, SERVER_HTTPS_URI
 from .printer import display_message
-
-try:
-    from urllib.parse import quote
-except ImportError:
-    # fallback for Python 2
-    from urllib import quote
 
 
 def verify_recid(server=None, recid=None):
