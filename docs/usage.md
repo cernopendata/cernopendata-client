@@ -21,6 +21,22 @@ verify-files        Verify downloaded data file integrity.
 version             Return cernopendata-client version.
 ```
 
+Note that the `cernopendata-client` supports shell completion for Bash and Zsh.
+To enable the auto-completion of commands and options, add the following to your
+shell configuration file:
+
+**Bash** (add to `~/.bashrc`):
+
+```bash
+eval "$(_CERNOPENDATA_CLIENT_COMPLETE=bash_source cernopendata-client)"
+```
+
+**Zsh** (add to `~/.zshrc`):
+
+```bash
+eval "$(_CERNOPENDATA_CLIENT_COMPLETE=zsh_source cernopendata-client)"
+```
+
 ## Selecting records
 
 The data published on the [CERN Open Data portal](http://opendata.cern.ch) are
