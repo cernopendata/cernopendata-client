@@ -344,7 +344,9 @@ def download_files(
     \t $ cernopendata-client download-files --recid 5500 --filter-range 1-2,5-7\n
     \t $ cernopendata-client download-files --recid 5500 --filter-regexp py --filter-range 1-2
     """
-    record_json = _validate_and_load(server, recid, doi, title, retry_limit, retry_sleep)
+    record_json = _validate_and_load(
+        server, recid, doi, title, retry_limit, retry_sleep
+    )
     file_locations_info = get_files_list(server, record_json, protocol, expand)
     if expand:
         if not file_availability and any(f[3] != "online" for f in file_locations_info):
