@@ -90,6 +90,7 @@ pytest
   - `walker.py` - Directory traversal
 - `tests/` - Test suite
 - `docs/` - Sphinx documentation
+- `etc/` - Shell completion files (bash/zsh)
 
 ## Code Style
 
