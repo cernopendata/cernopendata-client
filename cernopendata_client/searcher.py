@@ -203,17 +203,18 @@ def get_files_list(
                 file_["uri"].replace(SERVER_ROOT_URI, new_server),
                 file_["size"],
                 file_["checksum"],
+                "online",
             )
         )
     for file_ in record_json["metadata"].get("_file_indices", []):
         if expand:
-            # let's unwind file indexes
             for inner_file in file_["files"]:
                 files_list.append(
                     (
                         inner_file["uri"].replace(SERVER_ROOT_URI, new_server),
                         inner_file["size"],
                         inner_file["checksum"],
+                        inner_file["availability"],
                     )
                 )
         else:
