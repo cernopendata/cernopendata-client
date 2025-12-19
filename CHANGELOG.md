@@ -2,6 +2,18 @@
 
 # Changelog
 
+## [1.1.0](https://github.com/cernopendata/cernopendata-client/compare/1.0.2...1.1.0) (2025-12-19)
+
+
+### Features
+
+* **etc:** add bash and zsh shell completion files ([#172](https://github.com/cernopendata/cernopendata-client/issues/172)) ([956ae1e](https://github.com/cernopendata/cernopendata-client/commit/956ae1e92f97db26b821828672b49bf582e66316))
+
+
+### Documentation
+
+* **usage:** add shell completion instructions ([#172](https://github.com/cernopendata/cernopendata-client/issues/172)) ([b28a25e](https://github.com/cernopendata/cernopendata-client/commit/b28a25e8ac1625e8cbd443d48bce00f621d231fe))
+
 ## [1.0.2](https://github.com/cernopendata/cernopendata-client/compare/1.0.1...1.0.2) (2025-12-17)
 
 
