@@ -77,5 +77,5 @@ LABEL org.opencontainers.image.title="cernopendata-client"
 LABEL org.opencontainers.image.url="https://github.com/cernopendata/cernopendata-client"
 LABEL org.opencontainers.image.vendor="cernopendata"
 # x-release-please-start-version
-LABEL org.opencontainers.image.version="1.0.2"
+LABEL org.opencontainers.image.version="1.1.0"
 # x-release-please-end
