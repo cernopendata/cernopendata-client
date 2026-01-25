@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024, 2025 CERN.
+# Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -13,9 +13,10 @@ import re
 
 from setuptools import setup
 
-readme = open("README.md").read()
-history = open("CHANGELOG.md").read()
-
+with open("README.md", "r") as f:
+    readme = f.read()
+with open("CHANGELOG.md", "r") as f:
+    history = f.read()
 
 extras_require = {
     "docs": [

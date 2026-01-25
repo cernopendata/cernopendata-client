@@ -13,3 +13,4 @@ The list of contributors in alphabetical order:
 - [Pablo Saiz](https://github.com/psaiz)
 - [Parth Shandilya](https://github.com/ParthS007)
 - [Tibor Simko](https://orcid.org/0000-0001-7202-5803)
+- [Zhuohang Shen](https://github.com/Stephen0512)
