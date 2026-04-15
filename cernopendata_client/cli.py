@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2019, 2020, 2021, 2023, 2025 CERN.
+# Copyright (C) 2019, 2020, 2021, 2023, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -29,6 +29,8 @@ from .downloader import (
     get_download_files_by_name,
     get_download_files_by_range,
     get_download_files_by_regexp,
+    get_download_path,
+    get_file_subdirectories,
 )
 from .validator import (
     validate_range,
@@ -355,21 +357,23 @@ def download_files(
         sys.exit(0)
 
     total_files = len(download_file_locations)
-    path = record_recid
-    if not os.path.isdir(path):
+    base_path = record_recid
+    if not os.path.isdir(base_path):
         try:
-            os.mkdir(path)
+            os.mkdir(base_path)
         except OSError:
             display_message(
                 msg_type="error",
-                msg="Creation of the directory {} failed".format(path),
+                msg="Creation of the directory {} failed".format(base_path),
             )
+    file_subdirs = get_file_subdirectories(download_file_locations)
     if not download_engine:
         if protocol.startswith("http"):
             download_engine = "requests"
         elif protocol == "xrootd":
             download_engine = "xrootd"
     for file_location in download_file_locations:
+        path = get_download_path(base_path, file_location, file_subdirs)
         display_message(
             msg_type="info",
             msg="Downloading file {} of {}".format(

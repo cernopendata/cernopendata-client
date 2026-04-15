@@ -8,7 +8,6 @@
 
 """cernopendata-client configuration."""
 
-
 SERVER_HTTP_URI = "http://opendata.cern.ch"
 """Default CERN Open Data server to query over HTTP protocol."""
 

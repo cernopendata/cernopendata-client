@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2021 CERN.
+# Copyright (C) 2020, 2021, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -358,6 +358,69 @@ def download_single_file(
         downloader = DownloaderXrootd(path, file_location, mode)
         downloader.file_downloader()
     return
+
+
+def get_file_subdirectories(file_locations):
+    """Return a mapping of file locations to subdirectory paths for disambiguation.
+
+    When multiple files share the same file name, compute subdirectory paths
+    by stripping the longest common directory prefix from the URL paths.
+    This preserves the original directory structure relative to the common root.
+
+    :param file_locations: List of remote file locations (URLs)
+    :type file_locations: list
+
+    :return: Dictionary mapping each file location to its subdirectory (empty
+        string if no subdirectory is needed)
+    :rtype: dict
+    """
+    from collections import Counter
+
+    file_names = [loc.split("/")[-1] for loc in file_locations]
+    file_name_counts = Counter(file_names)
+    has_duplicates = any(count > 1 for count in file_name_counts.values())
+
+    if not has_duplicates:
+        return {loc: "" for loc in file_locations}
+
+    # Split each URL into directory components (excluding the filename)
+    dir_parts_list = [loc.split("/")[:-1] for loc in file_locations]
+    # Find the longest common prefix of all directory paths
+    common_prefix_len = 0
+    if dir_parts_list:
+        min_len = min(len(parts) for parts in dir_parts_list)
+        for i in range(min_len):
+            if len(set(parts[i] for parts in dir_parts_list)) == 1:
+                common_prefix_len = i + 1
+            else:
+                break
+    # Build subdirectory for each file by stripping the common prefix
+    result = {}
+    for loc, dir_parts in zip(file_locations, dir_parts_list):
+        subdir = "/".join(dir_parts[common_prefix_len:])
+        result[loc] = subdir
+    return result
+
+
+def get_download_path(base_path, file_location, file_subdirs):
+    """Return download path for a file, creating subdirectories if needed.
+
+    :param base_path: Base directory for downloads (e.g. record ID)
+    :param file_location: Remote file location URL
+    :param file_subdirs: Mapping from file locations to subdirectory paths
+    :type base_path: str
+    :type file_location: str
+    :type file_subdirs: dict
+
+    :return: Local directory path where the file should be saved
+    :rtype: str
+    """
+    subdir = file_subdirs[file_location]
+    if subdir:
+        path = os.path.join(base_path, subdir)
+        os.makedirs(path, exist_ok=True)
+        return path
+    return base_path
 
 
 def get_download_files_by_name(names=None, file_locations=None):
