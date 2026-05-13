@@ -1,6 +1,6 @@
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2022, 2023, 2024, 2025 CERN.
+# Copyright (C) 2020, 2022, 2023, 2024, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -59,9 +59,10 @@ RUN pip3 install --no-cache-dir '.[pycurl,tests,xrootd]' && \
     rm -rf /code
 
 # Run container as `ubuntu` user with UID `1000`, which should match
-# current host user in most situations
+# current host user in most situations. Specify the primary group explicitly
+# so that container processes do not inherit extra supplementary groups.
 RUN chown -R ubuntu /code
-USER ubuntu
+USER ubuntu:ubuntu
 
 # Run cernopendata-client upon entry
 ENTRYPOINT ["cernopendata-client"]
