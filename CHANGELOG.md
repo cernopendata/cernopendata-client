@@ -2,6 +2,24 @@
 
 # Changelog
 
+## [1.1.0](https://github.com/cernopendata/cernopendata-client/compare/1.0.2...1.1.0) (2026-06-17)
+
+
+### Features
+
+* **etc:** add bash and zsh shell completion files ([#172](https://github.com/cernopendata/cernopendata-client/issues/172)) ([956ae1e](https://github.com/cernopendata/cernopendata-client/commit/956ae1e92f97db26b821828672b49bf582e66316))
+
+
+### Bug fixes
+
+* **downloader:** create directories for identically named files ([#178](https://github.com/cernopendata/cernopendata-client/issues/178)) ([2fbd023](https://github.com/cernopendata/cernopendata-client/commit/2fbd023a84d1c731e11b2dd0caca4339d75b23cf)), closes [#177](https://github.com/cernopendata/cernopendata-client/issues/177)
+* **verifier:** close file handle when computing checksum ([#176](https://github.com/cernopendata/cernopendata-client/issues/176)) ([8575507](https://github.com/cernopendata/cernopendata-client/commit/85755078d3dcaea4276801fe611b5fa11f9da5be))
+
+
+### Documentation
+
+* **usage:** add shell completion instructions ([#172](https://github.com/cernopendata/cernopendata-client/issues/172)) ([b28a25e](https://github.com/cernopendata/cernopendata-client/commit/b28a25e8ac1625e8cbd443d48bce00f621d231fe))
+
 ## [1.0.2](https://github.com/cernopendata/cernopendata-client/compare/1.0.1...1.0.2) (2025-12-17)
 
 
