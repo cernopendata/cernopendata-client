@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2021 CERN.
+# Copyright (C) 2020, 2021, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -17,14 +17,24 @@ import datetime
 from .config import SERVER_ROOT_URI
 from .printer import display_message
 
+# XRootD client error code for a not-found path. Resolved at import time and
+# left as None for older bindings that do not expose it; the wire-protocol
+# errno below is the stable fallback.
+XROOTD_CODE_NOT_FOUND = None
+
 try:
     from XRootD import client as xrootdclient
     from XRootD.client.flags import DirListFlags
+    from XRootD.client.responses import XRootDStatus
 
+    XROOTD_CODE_NOT_FOUND = getattr(XRootDStatus, "errNotFound", None)
     FS = xrootdclient.FileSystem(SERVER_ROOT_URI)
     xrootd_available = True
 except ImportError:
     xrootd_available = False
+
+# XRootD server error number returned when a path does not exist (kXR_NotFound).
+XROOTD_ERRNO_NOT_FOUND = 3011
 
 
 def get_list_directory(path, recursive, timeout, time_start=None):
@@ -57,24 +67,33 @@ def get_list_directory(path, recursive, timeout, time_start=None):
         )
         sys.exit(2)
     files = []
-    try:
-        status, listing = FS.dirlist(path, DirListFlags.STAT)
-        for entry in listing:
-            if entry.statinfo.flags == 19:  # entry is a directory
-                files.append(path + os.sep + entry.name)
-                if recursive:
-                    files.extend(
-                        get_list_directory(
-                            path + os.sep + entry.name, recursive, timeout, time_start
-                        )
-                    )
-            else:
-                files.append(path + os.sep + entry.name)
-        return files
-    except Exception:
-        display_message(
-            msg_type="error",
-            msg="Directory {} does not exist.".format(path),
+    status, listing = FS.dirlist(path, DirListFlags.STAT)
+    if not status.ok:
+        # A missing path is reported via the stable server error number, or,
+        # when the binding exposes it, the client-level not-found code.
+        path_not_found = status.errno == XROOTD_ERRNO_NOT_FOUND or (
+            XROOTD_CODE_NOT_FOUND is not None and status.code == XROOTD_CODE_NOT_FOUND
         )
+        if path_not_found:
+            display_message(
+                msg_type="error",
+                msg="Directory {} does not exist.".format(path),
+            )
+        else:
+            display_message(
+                msg_type="error",
+                msg="Cannot list directory {}: {}".format(path, status.message.strip()),
+            )
         sys.exit(1)
+    for entry in listing:
+        if entry.statinfo.flags == 19:  # entry is a directory
+            files.append(path + os.sep + entry.name)
+            if recursive:
+                files.extend(
+                    get_list_directory(
+                        path + os.sep + entry.name, recursive, timeout, time_start
+                    )
+                )
+        else:
+            files.append(path + os.sep + entry.name)
     return files

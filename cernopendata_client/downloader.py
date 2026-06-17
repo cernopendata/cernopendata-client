@@ -180,24 +180,26 @@ class DownloaderXrootd:
 
     def file_downloader(self):
         """Download single file with XRootD."""
-        try:
+        display_message(
+            msg_type="note",
+            msg="File: ./{}/{}".format(
+                self.path,
+                self.file_name,
+            ),
+        )
+        process = xrootdclient.CopyProcess()
+        process.add_job(
+            SERVER_ROOT_URI + self.file_src, os.getcwd() + os.sep + self.file_dest
+        )
+        status = process.prepare()
+        if status.ok:
+            status, _ = process.run()
+        if not status.ok:
             display_message(
-                msg_type="note",
-                msg="File: ./{}/{}".format(
-                    self.path,
-                    self.file_name,
-                ),
+                msg_type="error",
+                msg="Download error: {}".format(status.message.strip()),
             )
-            process = xrootdclient.CopyProcess()
-            process.add_job(
-                SERVER_ROOT_URI + self.file_src, os.getcwd() + os.sep + self.file_dest
-            )
-            process.prepare()
-            process.run()
-        except Exception:
-            display_message(
-                msg_type="error", msg="Download error occured. Please try again."
-            )
+            sys.exit(1)
 
 
 def check_error(
