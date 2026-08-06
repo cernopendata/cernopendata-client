@@ -12,11 +12,41 @@
 import pytest
 
 from cernopendata_client.downloader import (
+    download_single_file,
     get_download_files_by_name,
     get_download_files_by_regexp,
     get_download_files_by_range,
     get_file_subdirectories,
 )
+
+
+@pytest.mark.local
+def test_incomplete_http_download_exits(mocker, tmp_path, capsys):
+    """Test that a partial HTTP download is not reported as successful."""
+    file_location = "https://example.com/large.root"
+    (tmp_path / "large.root").write_bytes(b"partial")
+    checker = mocker.patch(
+        "cernopendata_client.downloader.downloader_file_checker",
+        side_effect=[True, True],
+    )
+    file_downloader = mocker.patch(
+        "cernopendata_client.downloader.DownloaderHttpRequests.file_downloader"
+    )
+
+    with pytest.raises(SystemExit) as exc_info:
+        download_single_file(
+            path=str(tmp_path),
+            file_location=file_location,
+            protocol="https",
+            download_engine="requests",
+        )
+
+    assert exc_info.value.code == 1
+    assert (
+        "File large.root is still incomplete after download." in capsys.readouterr().out
+    )
+    assert checker.call_count == 2
+    file_downloader.assert_called_once_with()
 
 
 @pytest.mark.local

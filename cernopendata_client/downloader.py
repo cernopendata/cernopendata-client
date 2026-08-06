@@ -343,6 +343,12 @@ def download_single_file(
                 path, file_location, mode, file_size_offline
             )
             downloader.file_downloader()
+        if downloader_file_checker(file_location, file_dest):
+            display_message(
+                msg_type="error",
+                msg="File {} is still incomplete after download.".format(file_name),
+            )
+            sys.exit(1)
         print()
     elif protocol == "xrootd":
         if download_engine not in DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP:
