@@ -199,7 +199,26 @@ http://opendata.cern.ch/eos/opendata/cms/software/HiggsExample20112012/mass4l_co
 
 In order to download data files belonging to a record, please use the
 **download-files** command. The command can download files over HTTP, HTTPS or
-XRootD protocols and verify the file checksums.
+XRootD protocols. Every downloaded destination is compared with the size in the
+record metadata, and its Adler-32 checksum is verified by default when one is
+available. Use `--no-verify` to skip checksum calculation; the size check is
+always performed so incomplete or oversized transfers cannot report success.
+
+When `--no-expand` downloads a file-index JSON document, its metadata size
+describes the aggregate indexed data rather than the JSON response. The client
+therefore checks that the exact index destination exists and is not a known
+download error page, but explicitly skips the inapplicable size and checksum
+comparisons for that response.
+
+For example, the following command still validates the downloaded byte count but
+omits the checksum pass:
+
+```console
+$ cernopendata-client download-files --recid 5500 --no-verify
+```
+
+The first HTTP example below shows the complete verification output. Later
+download transcripts omit repeated verification messages for brevity.
 
 **HTTP protocol**
 
@@ -210,36 +229,69 @@ $ cernopendata-client download-files --recid 5500
 ==> Downloading file 1 of 11
   -> File: ./5500/BuildFile.xml
   -> Progress: 0/0 KiB (100%)
+==> Verifying file 5500/BuildFile.xml...
+  -> Expected size 305, found 305
+  -> Expected checksum adler32:ff63668a, found adler32:ff63668a
 ==> Downloading file 2 of 11
   -> File: ./5500/HiggsDemoAnalyzer.cc
   -> Progress: 81/81 KiB (100%)
+==> Verifying file 5500/HiggsDemoAnalyzer.cc...
+  -> Expected size 83761, found 83761
+  -> Expected checksum adler32:f205f068, found adler32:f205f068
 ==> Downloading file 3 of 11
   -> File: ./5500/List_indexfile.txt
   -> Progress: 1/1 KiB (100%)
+==> Verifying file 5500/List_indexfile.txt...
+  -> Expected size 1669, found 1669
+  -> Expected checksum adler32:46a907fc, found adler32:46a907fc
 ==> Downloading file 4 of 11
   -> File: ./5500/M4Lnormdatall.cc
   -> Progress: 14/14 KiB (100%)
+==> Verifying file 5500/M4Lnormdatall.cc...
+  -> Expected size 14943, found 14943
+  -> Expected checksum adler32:af301992, found adler32:af301992
 ==> Downloading file 5 of 11
   -> File: ./5500/M4Lnormdatall_lvl3.cc
   -> Progress: 15/15 KiB (100%)
+==> Verifying file 5500/M4Lnormdatall_lvl3.cc...
+  -> Expected size 15805, found 15805
+  -> Expected checksum adler32:9d9b2126, found adler32:9d9b2126
 ==> Downloading file 6 of 11
   -> File: ./5500/demoanalyzer_cfg_level3MC.py
   -> Progress: 3/3 KiB (100%)
+==> Verifying file 5500/demoanalyzer_cfg_level3MC.py...
+  -> Expected size 3741, found 3741
+  -> Expected checksum adler32:cc943381, found adler32:cc943381
 ==> Downloading file 7 of 11
   -> File: ./5500/demoanalyzer_cfg_level3data.py
   -> Progress: 3/3 KiB (100%)
+==> Verifying file 5500/demoanalyzer_cfg_level3data.py...
+  -> Expected size 3689, found 3689
+  -> Expected checksum adler32:1d3e2a43, found adler32:1d3e2a43
 ==> Downloading file 8 of 11
   -> File: ./5500/demoanalyzer_cfg_level4MC.py
   -> Progress: 3/3 KiB (100%)
+==> Verifying file 5500/demoanalyzer_cfg_level4MC.py...
+  -> Expected size 3874, found 3874
+  -> Expected checksum adler32:9cbd53a3, found adler32:9cbd53a3
 ==> Downloading file 9 of 11
   -> File: ./5500/demoanalyzer_cfg_level4data.py
   -> Progress: 3/3 KiB (100%)
+==> Verifying file 5500/demoanalyzer_cfg_level4data.py...
+  -> Expected size 3821, found 3821
+  -> Expected checksum adler32:177b49c0, found adler32:177b49c0
 ==> Downloading file 10 of 11
   -> File: ./5500/mass4l_combine.pdf
   -> Progress: 17/17 KiB (100%)
+==> Verifying file 5500/mass4l_combine.pdf...
+  -> Expected size 18170, found 18170
+  -> Expected checksum adler32:19c6a6a2, found adler32:19c6a6a2
 ==> Downloading file 11 of 11
   -> File: ./5500/mass4l_combine.png
   -> Progress: 90/90 KiB (100%)
+==> Verifying file 5500/mass4l_combine.png...
+  -> Expected size 93152, found 93152
+  -> Expected checksum adler32:62e0c299, found adler32:62e0c299
 ==> Success!
 ```
 
@@ -328,6 +380,12 @@ $ cernopendata-client download-files --recid 5500 --filter-name BuildFile.xml,Li
   -> Progress: 1/1 KiB (100%)
 ==> Success!
 ```
+
+When a record contains files with duplicate base names, filtered downloads keep
+the subdirectory layout derived from the complete record. For example, a file
+may be saved as `X/0002/AO2D.root` rather than `X/AO2D.root`. This prevents
+successive filtered downloads from overwriting one another and keeps their paths
+compatible with `verify-files`.
 
 **Filter by regular expression**
 
@@ -426,65 +484,65 @@ command:
 $ cernopendata-client verify-files --recid 5500
 ==> Verifying number of files for record 5500...
   -> Expected 11, found 11
-==> Verifying file BuildFile.xml...
+==> Verifying file 5500/BuildFile.xml...
   -> Expected size 305, found 305
   -> Expected checksum adler32:ff63668a, found adler32:ff63668a
-==> Verifying file HiggsDemoAnalyzer.cc...
+==> Verifying file 5500/HiggsDemoAnalyzer.cc...
   -> Expected size 83761, found 83761
   -> Expected checksum adler32:f205f068, found adler32:f205f068
-==> Verifying file List_indexfile.txt...
+==> Verifying file 5500/List_indexfile.txt...
   -> Expected size 1669, found 1669
   -> Expected checksum adler32:46a907fc, found adler32:46a907fc
-==> Verifying file M4Lnormdatall.cc...
+==> Verifying file 5500/M4Lnormdatall.cc...
   -> Expected size 14943, found 14943
   -> Expected checksum adler32:af301992, found adler32:af301992
-==> Verifying file M4Lnormdatall_lvl3.cc...
+==> Verifying file 5500/M4Lnormdatall_lvl3.cc...
   -> Expected size 15805, found 15805
   -> Expected checksum adler32:9d9b2126, found adler32:9d9b2126
-==> Verifying file demoanalyzer_cfg_level3MC.py...
+==> Verifying file 5500/demoanalyzer_cfg_level3MC.py...
   -> Expected size 3741, found 3741
   -> Expected checksum adler32:cc943381, found adler32:cc943381
-==> Verifying file demoanalyzer_cfg_level3data.py...
+==> Verifying file 5500/demoanalyzer_cfg_level3data.py...
   -> Expected size 3689, found 3689
   -> Expected checksum adler32:1d3e2a43, found adler32:1d3e2a43
-==> Verifying file demoanalyzer_cfg_level4MC.py...
+==> Verifying file 5500/demoanalyzer_cfg_level4MC.py...
   -> Expected size 3874, found 3874
   -> Expected checksum adler32:9cbd53a3, found adler32:9cbd53a3
-==> Verifying file demoanalyzer_cfg_level4data.py...
+==> Verifying file 5500/demoanalyzer_cfg_level4data.py...
   -> Expected size 3821, found 3821
   -> Expected checksum adler32:177b49c0, found adler32:177b49c0
-==> Verifying file mass4l_combine.pdf...
+==> Verifying file 5500/mass4l_combine.pdf...
   -> Expected size 18170, found 18170
   -> Expected checksum adler32:19c6a6a2, found adler32:19c6a6a2
-==> Verifying file mass4l_combine.png...
+==> Verifying file 5500/mass4l_combine.png...
   -> Expected size 93152, found 93152
   -> Expected checksum adler32:62e0c299, found adler32:62e0c299
 ==> Success!
 ```
 
-Note that you can verify each file \"just in time\" as it is being downloaded as
-well:
+Each file is verified just in time as it is downloaded. The explicit `--verify`
+spelling remains available, although it is now the default:
 
 ```console
 $ cernopendata-client download-files --recid 5500 --filter-range 1-4 --verify
 ==> Downloading file 1 of 4
   -> File: ./5500/BuildFile.xml
-==> Verifying file BuildFile.xml...
+==> Verifying file 5500/BuildFile.xml...
   -> Expected size 305, found 305
   -> Expected checksum adler32:ff63668a, found adler32:ff63668a
 ==> Downloading file 2 of 4
   -> File: ./5500/HiggsDemoAnalyzer.cc
-==> Verifying file HiggsDemoAnalyzer.cc...
+==> Verifying file 5500/HiggsDemoAnalyzer.cc...
   -> Expected size 83761, found 83761
   -> Expected checksum adler32:f205f068, found adler32:f205f068
 ==> Downloading file 3 of 4
   -> File: ./5500/List_indexfile.txt
-==> Verifying file List_indexfile.txt...
+==> Verifying file 5500/List_indexfile.txt...
   -> Expected size 1669, found 1669
   -> Expected checksum adler32:46a907fc, found adler32:46a907fc
 ==> Downloading file 4 of 4
   -> File: ./5500/M4Lnormdatall.cc
-==> Verifying file M4Lnormdatall.cc...
+==> Verifying file 5500/M4Lnormdatall.cc...
   -> Expected size 14943, found 14943
   -> Expected checksum adler32:af301992, found adler32:af301992
 ==> Success!

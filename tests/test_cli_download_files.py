@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2021, 2025 CERN.
+# Copyright (C) 2020, 2021, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -10,11 +10,146 @@
 """cernopendata-client cli command download-files test."""
 
 import os
+import zlib
 
 import pytest
 
+from cernopendata_client import verifier
 from cernopendata_client.cli import download_files
 from cernopendata_client.config import SERVER_HTTPS_URI
+from cernopendata_client.searcher import FileEntry
+
+
+def _checksum(content):
+    """Return the metadata checksum for test content."""
+    return "adler32:{:08x}".format(zlib.adler32(content, 1) & 0xFFFFFFFF)
+
+
+def _mock_download_command(mocker, entries, content_by_location):
+    """Mock metadata lookup and write requested content like a downloader."""
+    record = mocker.patch(
+        "cernopendata_client.cli.get_record_as_json",
+        return_value={"metadata": {"recid": "42"}},
+    )
+    file_entries = mocker.patch(
+        "cernopendata_client.cli.get_file_entries", return_value=entries
+    )
+
+    def write_download(**kwargs):
+        content = content_by_location.get(kwargs["file_location"])
+        if content is not None:
+            destination = os.path.join(
+                kwargs["path"], kwargs["file_location"].rsplit("/", 1)[-1]
+            )
+            with open(destination, "wb") as stream:
+                stream.write(content)
+
+    downloader = mocker.patch(
+        "cernopendata_client.cli.download_single_file", side_effect=write_download
+    )
+    return record, file_entries, downloader
+
+
+@pytest.mark.local
+def test_download_files_verifies_checksum_by_default(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test same-sized corrupt content cannot report success by default."""
+    monkeypatch.chdir(tmp_path)
+    location = "http://example.com/data.bin"
+    entry = FileEntry(location, 4, _checksum(b"good"))
+    record, file_entries, _ = _mock_download_command(
+        mocker, [entry], {location: b"evil"}
+    )
+
+    result = cli_runner.invoke(download_files, ["--recid", "42"])
+
+    assert result.exit_code == 1
+    assert "File checksum does not match" in result.output
+    assert "Success!" not in result.output
+    record.assert_called_once_with("http://opendata.cern.ch", 42, None, None)
+    file_entries.assert_called_once()
+
+
+@pytest.mark.local
+def test_download_files_no_verify_skips_only_checksum(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test --no-verify accepts same-sized content without hashing it."""
+    monkeypatch.chdir(tmp_path)
+    location = "http://example.com/data.bin"
+    entry = FileEntry(location, 4, _checksum(b"good"))
+    _mock_download_command(mocker, [entry], {location: b"evil"})
+    checksum = mocker.spy(verifier, "get_file_checksum")
+
+    result = cli_runner.invoke(download_files, ["--recid", "42", "--no-verify"])
+
+    assert result.exit_code == 0
+    assert result.output.endswith("\n==> Success!\n")
+    checksum.assert_not_called()
+
+
+@pytest.mark.local
+def test_download_files_no_verify_rejects_truncated_file(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test --no-verify retains always-on expected-size validation."""
+    monkeypatch.chdir(tmp_path)
+    location = "http://example.com/data.bin"
+    entry = FileEntry(location, 10, _checksum(b"complete!!"))
+    _mock_download_command(mocker, [entry], {location: b"short"})
+
+    result = cli_runner.invoke(download_files, ["--recid", "42", "--no-verify"])
+
+    assert result.exit_code == 1
+    assert "Expected size 10, found 5" in result.output
+    assert "incomplete" in result.output
+    assert "Success!" not in result.output
+
+
+@pytest.mark.local
+def test_download_files_rejects_missing_engine_output(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test an engine returning without a destination cannot report success."""
+    monkeypatch.chdir(tmp_path)
+    location = "http://example.com/data.bin"
+    entry = FileEntry(location, 4, _checksum(b"data"))
+    _mock_download_command(mocker, [entry], {})
+
+    result = cli_runner.invoke(download_files, ["--recid", "42"])
+
+    assert result.exit_code == 1
+    assert "Downloaded file is missing" in result.output
+    assert "Success!" not in result.output
+
+
+@pytest.mark.local
+def test_download_files_unexpanded_index_is_explicitly_excluded(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test aggregate metadata is not compared to an index JSON response."""
+    monkeypatch.chdir(tmp_path)
+    location = "http://example.com/record/42/file_index/index.json"
+    entry = FileEntry(location, 1000000, "", is_file_index=True)
+    _mock_download_command(mocker, [entry], {location: b"{}"})
+
+    result = cli_runner.invoke(download_files, ["--recid", "42", "--no-expand"])
+
+    assert result.exit_code == 0
+    assert "Skipping metadata size and checksum checks" in result.output
+    assert result.output.index("Verifying file") < result.output.index("Skipping")
+    assert result.output.endswith("\n==> Success!\n")
+
+
+@pytest.mark.local
+def test_download_files_help_describes_default_verification(cli_runner):
+    """Test CLI help exposes both verification choices and the default."""
+    result = cli_runner.invoke(download_files, ["--help"])
+
+    assert result.exit_code == 0
+    assert "--verify / --no-verify" in result.output
+    assert "default=yes" in result.output
 
 
 def test_dry_run_from_recid(cli_runner):

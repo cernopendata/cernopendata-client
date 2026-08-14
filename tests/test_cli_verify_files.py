@@ -2,7 +2,7 @@
 #
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2025 CERN.
+# Copyright (C) 2020, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -10,11 +10,62 @@
 """cernopendata-client verify-files tests."""
 
 import os
+import zlib
 
 import pytest
 
 from cernopendata_client.cli import download_files, verify_files
 from cernopendata_client.config import SERVER_HTTPS_URI
+from cernopendata_client.searcher import FileEntry
+
+
+def _checksum(content):
+    """Return the metadata checksum for test content."""
+    return "adler32:{:08x}".format(zlib.adler32(content, 1) & 0xFFFFFFFF)
+
+
+@pytest.mark.local
+def test_verify_files_uses_exact_nested_destinations(
+    cli_runner, tmp_path, monkeypatch, mocker
+):
+    """Test duplicate basenames are verified in their exact subdirectories."""
+    monkeypatch.chdir(tmp_path)
+    first_content = b"first"
+    second_content = b"second"
+    entries = [
+        FileEntry(
+            "http://example.com/data/0001/data.root",
+            len(first_content),
+            _checksum(first_content),
+        ),
+        FileEntry(
+            "http://example.com/data/0002/data.root",
+            len(second_content),
+            _checksum(second_content),
+        ),
+    ]
+    first = tmp_path / "42" / "0001" / "data.root"
+    second = tmp_path / "42" / "0002" / "data.root"
+    first.parent.mkdir(parents=True)
+    second.parent.mkdir(parents=True)
+    first.write_bytes(first_content)
+    second.write_bytes(second_content)
+    record = mocker.patch(
+        "cernopendata_client.cli.get_record_as_json",
+        return_value={"metadata": {"recid": "42"}},
+    )
+    file_entries = mocker.patch(
+        "cernopendata_client.cli.get_file_entries", return_value=entries
+    )
+
+    result = cli_runner.invoke(verify_files, ["--recid", "42"])
+
+    assert result.exit_code == 0
+    assert "42/0001/data.root" in result.output
+    assert "42/0002/data.root" in result.output
+    assert result.output.endswith("\n==> Success!\n")
+    record.assert_called_once()
+    file_entries.assert_called_once()
 
 
 def test_verify_files(cli_runner):

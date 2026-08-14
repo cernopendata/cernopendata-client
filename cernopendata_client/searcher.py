@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of cernopendata-client.
 #
-# Copyright (C) 2020, 2024, 2025 CERN.
+# Copyright (C) 2020, 2024, 2025, 2026 CERN.
 #
 # cernopendata-client is free software; you can redistribute it and/or modify
 # it under the terms of the GPLv3 license; see LICENSE file for more details.
@@ -13,10 +13,21 @@ from __future__ import print_function
 import sys
 import requests
 
+from dataclasses import dataclass
 from urllib.parse import quote
 
 from .config import SERVER_HTTP_URI, SERVER_ROOT_URI, SERVER_HTTPS_URI
 from .printer import display_message
+
+
+@dataclass(frozen=True)
+class FileEntry:
+    """Describe a downloadable file and its verification metadata."""
+
+    uri: str
+    size: int
+    checksum: str
+    is_file_index: bool = False
 
 
 def verify_recid(server=None, recid=None):
@@ -188,6 +199,14 @@ def get_files_list(
     :return: List of files list
     :rtype: list
     """
+    return [
+        (entry.uri, entry.size, entry.checksum)
+        for entry in get_file_entries(server, record_json, protocol, expand)
+    ]
+
+
+def get_file_entries(server=None, record_json=None, protocol=None, expand=None):
+    """Return downloadable files with their metadata and origin."""
     searcher_protocol = protocol
     if server != SERVER_HTTP_URI and searcher_protocol != "xrootd":
         searcher_protocol = server.split(":")[0]
@@ -199,10 +218,10 @@ def get_files_list(
 
     for file_ in record_json["metadata"].get("files", []):
         files_list.append(
-            (
-                file_["uri"].replace(SERVER_ROOT_URI, new_server),
-                file_["size"],
-                file_["checksum"],
+            FileEntry(
+                uri=file_["uri"].replace(SERVER_ROOT_URI, new_server),
+                size=file_["size"],
+                checksum=file_.get("checksum", ""),
             )
         )
     for file_ in record_json["metadata"].get("_file_indices", []):
@@ -210,18 +229,21 @@ def get_files_list(
             # let's unwind file indexes
             for inner_file in file_["files"]:
                 files_list.append(
-                    (
-                        inner_file["uri"].replace(SERVER_ROOT_URI, new_server),
-                        inner_file["size"],
-                        inner_file["checksum"],
+                    FileEntry(
+                        uri=inner_file["uri"].replace(SERVER_ROOT_URI, new_server),
+                        size=inner_file["size"],
+                        checksum=inner_file.get("checksum", ""),
                     )
                 )
         else:
+            # The index size is the aggregate size of its data files, not the
+            # byte size of the JSON response returned by this synthetic URI.
             files_list.append(
-                (
-                    f"{new_server}/record/{record_json['metadata']['recid']}/file_index/{file_['key']}",
-                    file_["size"],
-                    "",
+                FileEntry(
+                    uri=f"{new_server}/record/{record_json['metadata']['recid']}/file_index/{file_['key']}",
+                    size=file_["size"],
+                    checksum="",
+                    is_file_index=True,
                 )
             )
     return files_list

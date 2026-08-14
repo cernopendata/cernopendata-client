@@ -9,6 +9,9 @@
 """cernopendata-client file downloading related utilities."""
 
 from __future__ import print_function
+from dataclasses import dataclass
+from typing import Optional
+
 import sys
 import os
 import re
@@ -45,6 +48,18 @@ from .config import (
     DOWNLOAD_ENGINE_PROTOCOL_XROOTD_MAP,
     SERVER_ROOT_URI,
 )
+
+
+@dataclass(frozen=True)
+class DownloadItem:
+    """Describe one selected download and its exact local destination."""
+
+    file_location: str
+    expected_size: Optional[int]
+    expected_checksum: Optional[str]
+    destination_directory: str
+    destination_path: str
+    is_file_index: bool = False
 
 
 class DownloaderHttpRequests:
@@ -203,7 +218,12 @@ class DownloaderXrootd:
 
 
 def check_error(
-    path=None, file_location=None, protocol=None, retry_limit=None, retry_sleep=None
+    path=None,
+    file_location=None,
+    protocol=None,
+    retry_limit=None,
+    retry_sleep=None,
+    download_engine=None,
 ):
     """Return True if the file size and checksum does not matches with download error page.
 
@@ -212,46 +232,47 @@ def check_error(
     :param protocol: Protocol to be used for downloading a file
     :param retry_limit: Number of retries to be made for downloading a file.
     :param retry_sleep: Time of sleep before every retry.
+    :param download_engine: Library to be used in downloading files.
     :type path: str
     :type file_location: str
     :type protocol: str
     :type retry_limit: int
     :type retry_sleep: int
+    :type download_engine: str
 
     :return: True if the file size and checksum does not matches with download error page.
     :rtype: Boolean
     """
     file_name = file_location.split("/")[-1]
-    file_dest = path + "/" + file_name
-    downloaded_file = {
-        "size": os.path.getsize(file_dest),
-        "checksum": get_file_checksum(file_dest),
-    }
-    if (
-        DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
-        and DOWNLOAD_ERROR_PAGE["checksum"] == downloaded_file["checksum"]
-    ):
-        for _retry in range(0, retry_limit + 1):
-            if _retry == retry_limit:
-                display_message(msg_type="error", msg="Number of retries exceeded.")
-                sys.exit(1)
-            display_message(
-                msg_type="note", msg="Retrying {}/{}".format(_retry + 1, retry_limit)
-            )
-            time.sleep(retry_sleep)
-            download_single_file(
-                path=path, file_location=file_location, protocol=protocol
-            )
-            downloaded_file = {
-                "size": os.path.getsize(file_dest),
-                "checksum": get_file_checksum(file_dest),
-            }
-            error = (
-                DOWNLOAD_ERROR_PAGE["size"] == downloaded_file["size"]
-                and DOWNLOAD_ERROR_PAGE["checksum"] == downloaded_file["checksum"]
-            )
-            if not error:
-                return True
+    file_dest = os.path.join(path, file_name)
+    if not _is_download_error_page(file_dest):
+        return True
+
+    for _retry in range(0, retry_limit or 0):
+        display_message(
+            msg_type="note", msg="Retrying {}/{}".format(_retry + 1, retry_limit)
+        )
+        time.sleep(retry_sleep)
+        download_single_file(
+            path=path,
+            file_location=file_location,
+            protocol=protocol,
+            download_engine=download_engine,
+        )
+        if not _is_download_error_page(file_dest):
+            return True
+
+    display_message(msg_type="error", msg="Number of retries exceeded.")
+    sys.exit(1)
+
+
+def _is_download_error_page(file_dest):
+    """Return whether a destination contains the known download error page."""
+    if not os.path.isfile(file_dest):
+        return False
+    if os.path.getsize(file_dest) != DOWNLOAD_ERROR_PAGE["size"]:
+        return False
+    return get_file_checksum(file_dest) == DOWNLOAD_ERROR_PAGE["checksum"]
 
 
 def downloader_file_checker(file_location, file_dest):
@@ -280,7 +301,11 @@ def downloader_file_checker(file_location, file_dest):
 
 
 def download_single_file(
-    path=None, file_location=None, protocol=None, download_engine=None
+    path=None,
+    file_location=None,
+    protocol=None,
+    download_engine=None,
+    expected_size=None,
 ):
     """Download a single file.
 
@@ -288,10 +313,12 @@ def download_single_file(
     :param file_location: Remote location of a file
     :param protocol: Protocol to be used for downloading a file
     :param download_engine: Library to be used in downloading files
+    :param expected_size: Final file size from record metadata, if applicable
     :type path: str
     :type file_location: str
     :type protocol: str
     :type download_engine: str
+    :type expected_size: int
 
     :return: None
     :rtype: None
@@ -322,7 +349,9 @@ def download_single_file(
                 ),
             )
             sys.exit(1)
-        file_download_incomplete = downloader_file_checker(file_location, file_dest)
+        file_download_incomplete = False
+        if os.path.isfile(file_dest) and expected_size is not None:
+            file_download_incomplete = os.path.getsize(file_dest) < expected_size
         if file_download_incomplete:
             file_size_offline = os.path.getsize(file_dest)
             mode = "ab"
@@ -423,6 +452,44 @@ def get_download_path(base_path, file_location, file_subdirs):
         os.makedirs(path, exist_ok=True)
         return path
     return base_path
+
+
+def get_download_items(base_path, file_entries, layout_entries=None):
+    """Return selected downloads with exact destinations and metadata.
+
+    :param base_path: Base directory for downloads
+    :param file_entries: Selected file metadata entries
+    :param layout_entries: All entries used to disambiguate destination paths
+    :type base_path: str
+    :type file_entries: list
+    :type layout_entries: list
+
+    :return: Selected downloads with exact destinations and metadata
+    :rtype: list
+    """
+    layout_entries = layout_entries if layout_entries is not None else file_entries
+    file_locations = [entry.uri for entry in layout_entries]
+    file_subdirs = get_file_subdirectories(file_locations)
+    download_items = []
+    for entry in file_entries:
+        subdir = file_subdirs[entry.uri]
+        destination_directory = os.path.join(base_path, subdir) if subdir else base_path
+        destination_path = os.path.join(
+            destination_directory, entry.uri.rsplit("/", 1)[-1]
+        )
+        download_items.append(
+            DownloadItem(
+                file_location=entry.uri,
+                expected_size=None if entry.is_file_index else entry.size,
+                expected_checksum=(
+                    None if entry.is_file_index else entry.checksum or None
+                ),
+                destination_directory=destination_directory,
+                destination_path=destination_path,
+                is_file_index=entry.is_file_index,
+            )
+        )
+    return download_items
 
 
 def get_download_files_by_name(names=None, file_locations=None):

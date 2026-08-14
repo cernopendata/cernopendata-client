@@ -16,7 +16,7 @@ import sys
 import re
 
 from .searcher import (
-    get_file_info_remote,
+    get_file_entries,
     get_files_list,
     get_recid,
     get_recid_api,
@@ -29,8 +29,7 @@ from .downloader import (
     get_download_files_by_name,
     get_download_files_by_range,
     get_download_files_by_regexp,
-    get_download_path,
-    get_file_subdirectories,
+    get_download_items,
 )
 from .validator import (
     validate_range,
@@ -41,7 +40,7 @@ from .validator import (
     validate_retry_sleep,
 )
 from .walker import get_list_directory
-from .verifier import get_file_info_local, verify_file_info
+from .verifier import get_local_file_paths, verify_downloaded_file
 from .metadater import filter_metadata, handle_error_message
 from .config import (
     SERVER_HTTP_URI,
@@ -245,11 +244,10 @@ def get_file_locations(server, recid, doi, title, protocol, expand, verbose):
     help="Download files from a specified list range (i-j)",
 )
 @click.option(
-    "--verify",
+    "--verify/--no-verify",
     "verify",
-    is_flag=True,
-    default=False,
-    help="Verify downloaded data file integrity",
+    default=True,
+    help="Verify downloaded data file checksums when available [default=yes]",
 )
 @click.option(
     "--retry-limit",
@@ -316,8 +314,8 @@ def download_files(
     # Get record metadata and resolve recid from DOI/title if needed
     record_json = get_record_as_json(server, recid, doi, title)
     record_recid = record_json["metadata"]["recid"]
-    file_locations_info = get_files_list(server, record_json, protocol, expand)
-    file_locations = [file_[0] for file_ in file_locations_info]
+    file_entries = get_file_entries(server, record_json, protocol, expand)
+    file_locations = [entry.uri for entry in file_entries]
     download_file_locations = []
 
     if names:
@@ -352,12 +350,18 @@ def download_files(
     else:
         download_file_locations = file_locations
 
+    file_entries_by_location = {entry.uri: entry for entry in file_entries}
+    download_file_entries = [
+        file_entries_by_location[file_location]
+        for file_location in download_file_locations
+    ]
+
     if dryrun:
         display_message(msg="\n".join(download_file_locations))
         sys.exit(0)
 
     total_files = len(download_file_locations)
-    base_path = record_recid
+    base_path = str(record_recid)
     if not os.path.isdir(base_path):
         try:
             os.mkdir(base_path)
@@ -366,42 +370,49 @@ def download_files(
                 msg_type="error",
                 msg="Creation of the directory {} failed".format(base_path),
             )
-    file_subdirs = get_file_subdirectories(download_file_locations)
+    download_items = get_download_items(
+        base_path, download_file_entries, layout_entries=file_entries
+    )
     if not download_engine:
         if protocol.startswith("http"):
             download_engine = "requests"
         elif protocol == "xrootd":
             download_engine = "xrootd"
-    for file_location in download_file_locations:
-        path = get_download_path(base_path, file_location, file_subdirs)
+    for file_number, download_item in enumerate(download_items, start=1):
+        os.makedirs(download_item.destination_directory, exist_ok=True)
         display_message(
             msg_type="info",
-            msg="Downloading file {} of {}".format(
-                download_file_locations.index(file_location) + 1, total_files
-            ),
+            msg="Downloading file {} of {}".format(file_number, total_files),
         )
         download_single_file(
-            path=path,
-            file_location=file_location,
+            path=download_item.destination_directory,
+            file_location=download_item.file_location,
             protocol=protocol,
             download_engine=download_engine,
+            expected_size=download_item.expected_size,
         )
         check_error(
-            path=path,
-            file_location=file_location,
+            path=download_item.destination_directory,
+            file_location=download_item.file_location,
             protocol=protocol,
             retry_limit=retry_limit,
             retry_sleep=retry_sleep,
+            download_engine=download_engine,
         )
-        if verify:
-            file_info_remote = get_file_info_remote(
-                server,
-                record_recid,
-                protocol=protocol,
-                filtered_files=[file_location],
+        verify_downloaded_file(
+            download_item.destination_path,
+            expected_size=download_item.expected_size,
+            expected_checksum=download_item.expected_checksum,
+            verify_checksum=verify,
+        )
+        if download_item.is_file_index:
+            display_message(
+                msg_type="note",
+                msg=(
+                    "Skipping metadata size and checksum checks for the "
+                    "unexpanded file-index response."
+                ),
             )
-            file_info_local = get_file_info_local(record_recid)
-            verify_file_info(file_info_local, file_info_remote)
     display_message(
         msg_type="info",
         msg="Success!",
@@ -437,12 +448,17 @@ def verify_files(server, recid, doi, title):
     record_json = get_record_as_json(server, recid, doi, title)
     record_recid = record_json["metadata"]["recid"]
 
-    # Get remote file information
-    file_info_remote = get_file_info_remote(server, record_recid)
+    file_entries = get_file_entries(
+        server=server,
+        record_json=record_json,
+        protocol=server.split(":", 1)[0],
+        expand=True,
+    )
+    download_items = get_download_items(str(record_recid), file_entries)
 
     # Get local file information
-    file_info_local = get_file_info_local(record_recid)
-    if not file_info_local:
+    local_file_paths = get_local_file_paths(str(record_recid))
+    if not local_file_paths:
         display_message(
             msg_type="error",
             msg="No local files found for record {}. Perhaps run `download-files` first? Exiting.".format(
@@ -458,17 +474,22 @@ def verify_files(server, recid, doi, title):
     )
     display_message(
         msg_type="note",
-        msg="Expected {}, found {}".format(len(file_info_remote), len(file_info_local)),
+        msg="Expected {}, found {}".format(len(download_items), len(local_file_paths)),
     )
-    if len(file_info_remote) != len(file_info_local):
+    if len(download_items) != len(local_file_paths):
         display_message(
             msg_type="error",
             msg="File count does not match.",
         )
         sys.exit(1)
 
-    # Verify size and checksum of each file
-    verify_file_info(file_info_local, file_info_remote)
+    # Verify size and checksum of each exact destination
+    for download_item in download_items:
+        verify_downloaded_file(
+            download_item.destination_path,
+            expected_size=download_item.expected_size,
+            expected_checksum=download_item.expected_checksum,
+        )
 
     # Success!
     display_message(

@@ -11,10 +11,11 @@
 
 import os
 import sys
-import click
 import zlib
 
 from .printer import display_message
+
+CHECKSUM_CHUNK_SIZE = 1024 * 1024
 
 
 def get_file_size(afile):
@@ -38,8 +39,26 @@ def get_file_checksum(afile):
     :return: Adler32 checksum of file
     :rtype: str
     """
+    checksum = 1
     with open(afile, "rb") as f:
-        return "adler32:{:08x}".format(zlib.adler32(f.read(), 1) & 0xFFFFFFFF)
+        while True:
+            chunk = f.read(CHECKSUM_CHUNK_SIZE)
+            if not chunk:
+                break
+            checksum = zlib.adler32(chunk, checksum)
+    return "adler32:{:08x}".format(checksum & 0xFFFFFFFF)
+
+
+def get_local_file_paths(adir):
+    """Return all regular files below a directory in deterministic order."""
+    local_file_paths = []
+    if not os.path.isdir(adir):
+        return local_file_paths
+    for root, directories, files in os.walk(adir):
+        directories.sort()
+        for afile in sorted(files):
+            local_file_paths.append(os.path.join(root, afile))
+    return local_file_paths
 
 
 def get_file_info_local(recid):
@@ -68,6 +87,55 @@ def get_file_info_local(recid):
         )
 
     return file_info_local
+
+
+def verify_downloaded_file(
+    afile,
+    expected_size=None,
+    expected_checksum=None,
+    verify_checksum=True,
+):
+    """Verify one exact local path against the supplied record metadata."""
+    display_message(
+        msg_type="info",
+        msg="Verifying file {}... ".format(afile),
+    )
+    if not os.path.isfile(afile):
+        display_message(
+            msg_type="error",
+            msg="Downloaded file is missing: {}.".format(afile),
+        )
+        sys.exit(1)
+
+    actual_size = get_file_size(afile)
+    if expected_size is not None:
+        display_message(
+            msg_type="note",
+            msg="Expected size {}, found {}".format(expected_size, actual_size),
+        )
+        if expected_size != actual_size:
+            size_failure = "incomplete" if actual_size < expected_size else "oversized"
+            display_message(
+                msg_type="error",
+                msg="File size does not match; the file is {}.".format(size_failure),
+            )
+            sys.exit(1)
+
+    if verify_checksum and expected_checksum:
+        actual_checksum = get_file_checksum(afile)
+        display_message(
+            msg_type="note",
+            msg="Expected checksum {}, found {}".format(
+                expected_checksum, actual_checksum
+            ),
+        )
+        if expected_checksum != actual_checksum:
+            display_message(
+                msg_type="error",
+                msg="File checksum does not match.",
+            )
+            sys.exit(1)
+    return True
 
 
 def verify_file_info(file_info_local, file_info_remote):
