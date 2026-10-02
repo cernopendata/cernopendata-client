@@ -10,13 +10,41 @@
 """cernopendata-client downloader unit tests."""
 
 import pytest
+from unittest.mock import Mock
 
 from cernopendata_client.downloader import (
+    DownloaderHttpRequests,
     get_download_files_by_name,
     get_download_files_by_regexp,
     get_download_files_by_range,
     get_file_subdirectories,
 )
+
+
+@pytest.mark.local
+@pytest.mark.parametrize("status, body", [(200, b"abcdef"), (206, b"def")])
+def test_http_resume_handles_ignored_range(tmp_path, monkeypatch, status, body):
+    """Keep complete content whether the server honors the Range header or not."""
+    destination = tmp_path / "data.bin"
+    destination.write_bytes(b"abc")
+    response = Mock(status_code=status, headers={"content-length": str(len(body))})
+    response.iter_content.return_value = iter([body])
+    get = Mock(return_value=response)
+    monkeypatch.setattr("cernopendata_client.downloader.requests.get", get)
+    downloader = DownloaderHttpRequests(
+        str(tmp_path), "https://example.com/data.bin", "ab", 3
+    )
+    downloader.show_download_progress = Mock()
+
+    downloader.file_downloader()
+
+    assert destination.read_bytes() == b"abcdef"
+    get.assert_called_once_with(
+        "https://example.com/data.bin", headers={"Range": "bytes=3-"}, stream=True
+    )
+    downloader.show_download_progress.assert_called_once_with(
+        download_t=6, download_d=6
+    )
 
 
 @pytest.mark.local

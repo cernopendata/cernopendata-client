@@ -79,7 +79,13 @@ class DownloaderHttpRequests:
             headers["Range"] = "bytes={}-".format(self.file_size_offline)
         response = requests.get(self.file_location, headers=headers, stream=True)
         total_size = int(response.headers.get("content-length", 0))
-        with open(self.file_dest, self.mode) as f:
+        mode = self.mode
+        downloaded = self.file_size_offline
+        if downloaded and response.status_code == 200:
+            # The server ignored Range and returned the complete file.
+            mode = "wb"
+            downloaded = 0
+        with open(self.file_dest, mode) as f:
             display_message(
                 msg_type="note",
                 msg="File: ./{}/{}".format(
@@ -87,8 +93,7 @@ class DownloaderHttpRequests:
                     self.file_name,
                 ),
             )
-            downloaded = self.file_size_offline
-            total_size = total_size + self.file_size_offline
+            total_size = total_size + downloaded
             for data in response.iter_content(chunk_size=1024):
                 downloaded += len(data)
                 try:
